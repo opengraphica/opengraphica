@@ -211,10 +211,10 @@ export default class SelectionController extends BaseMovementController {
 
                 const transform = canvasStore.get('transform');
                 const transformInverse = transform.inverse();
-                const startCursorX = pointer.down.pageX;
-                const startCursorY = pointer.down.pageY;
-                const cursorX = e.pageX;
-                const cursorY = e.pageY;
+                const startCursorX = -canvasStore.state.viewportCanvasOffsetLeft + pointer.down.pageX;
+                const startCursorY = -canvasStore.state.viewportCanvasOffsetTop + pointer.down.pageY;
+                const cursorX = -canvasStore.state.viewportCanvasOffsetLeft + e.pageX;
+                const cursorY = -canvasStore.state.viewportCanvasOffsetTop + e.pageY;
 
                 // Drag handle of active path
                 if (
@@ -611,7 +611,10 @@ export default class SelectionController extends BaseMovementController {
         const transform = canvasStore.get('transform');
         const decomposedTransform = canvasStore.get('decomposedTransform');
         const transformInverse = transform.inverse();
-        const cursor = new DOMPoint(x * devicePixelRatio, y * devicePixelRatio).matrixTransform(transformInverse);
+        const cursor = new DOMPoint(
+            (-canvasStore.state.viewportCanvasOffsetLeft + x) * devicePixelRatio,
+            (-canvasStore.state.viewportCanvasOffsetTop + y) * devicePixelRatio
+        ).matrixTransform(transformInverse);
 
         const dragHandleRadius = isTouch ? this.dragHandleRadiusTouch : this.dragHandleRadius;
 
@@ -655,7 +658,10 @@ export default class SelectionController extends BaseMovementController {
         }
 
         const transformInverse = canvasStore.get('transform').inverse();
-        const cursor = new DOMPoint(pointer.down.pageX * devicePixelRatio, pointer.down.pageY * devicePixelRatio).matrixTransform(transformInverse);
+        const cursor = new DOMPoint(
+            (-canvasStore.state.viewportCanvasOffsetLeft + pointer.down.pageX) * devicePixelRatio,
+            (-canvasStore.state.viewportCanvasOffsetTop + pointer.down.pageY) * devicePixelRatio
+        ).matrixTransform(transformInverse);
 
         if (activeSelectionPath.value.length < 1) {
             activeSelectionPath.value = [

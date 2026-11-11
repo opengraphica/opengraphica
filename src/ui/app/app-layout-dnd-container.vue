@@ -237,7 +237,7 @@ function calculateDndArea() {
         canvasStore.set('dndAreaWidth', mainRect.width * devicePixelRatio);
         if (footerToolbarComponent.value?.$el) {
             const toolbarRect = footerToolbarComponent.value.$el.getBoundingClientRect();
-            mainRect.height = toolbarRect.top - top - 8;
+            mainRect.height = (toolbarRect.top - canvasStore.state.viewportCanvasOffsetTop) - top - 8;
         }
         canvasStore.set('dndAreaHeight', mainRect.height * devicePixelRatio);
     }

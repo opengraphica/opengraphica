@@ -325,6 +325,9 @@ registerTool({
 registerTool({
     name: 'get-shape-list',
     description: t('mcp.getShapeList.description'),
+    annotations: {
+        readOnlyHint: true,
+    },
     async execute() {
         const { camelCaseToKebabCase } = await import('@/lib/string');
         const { getDefaultParseNodeGlobalOptions, parseFloatWithUnits } = await import('@/lib/svg');

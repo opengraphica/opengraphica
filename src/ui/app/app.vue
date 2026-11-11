@@ -61,8 +61,8 @@
                     </g>
                 </g>
             </svg>
-            <img class="og-preload__hidden-image" src="images/logo-full-dark.svg" aria-hidden="true" >
-            <img class="og-preload__hidden-image" src="images/logo-full-light.svg" aria-hidden="true" >
+            <img class="og-preload__hidden-image" :src="assetsBasePath + 'images/logo-full-dark.svg'" aria-hidden="true" >
+            <img class="og-preload__hidden-image" :src="assetsBasePath + 'images/logo-full-light.svg'" aria-hidden="true" >
         </div>
     </div>
 </template>
@@ -71,6 +71,7 @@
 import { computed, defineComponent, markRaw, nextTick, provide, ref, watch, type Component } from 'vue';
 import { useAppPreloadBlocker, isAppPreloading } from '@/composables/app-preload-blocker';
 import { usePlugin, getAppConfig } from '@/composables/app-plugin';
+import preferencesStore from '@/store/preferences';
 import appEmitter from '@/lib/emitter';
 
 import type { Notify } from 'element-plus/lib/components/notification/src/notification.d';
@@ -79,6 +80,8 @@ export default defineComponent({
     name: 'App',
     setup() {
         const { loading: isPreloadBlocked } = useAppPreloadBlocker(); 
+
+        const assetsBasePath = preferencesStore.state.assetsBasePath;
 
         /*------------------*\
         | Import Vue Plugins |
@@ -187,6 +190,7 @@ export default defineComponent({
                 background: var(--og-preload-background, white);
                 color: #333;
                 display: flex;
+                flex-grow: 1;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
@@ -346,6 +350,7 @@ export default defineComponent({
         document.head.appendChild(preloadStyleTag);
 
         return {
+            assetsBasePath,
             isShowingPreloadAnimation,
             isHidingPreloadAnimation,
             isPreloading,

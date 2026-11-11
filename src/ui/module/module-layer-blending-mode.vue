@@ -124,15 +124,15 @@
                     </div>
                     <div class="flex flex-row items-center justify-center mt-4">
                         <div class="block grow-1 shrink-1">
-                            <img :src="previewImages.top" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerTop')" width="256" height="256">
+                            <img :src="assetsBasePath + previewImages.top" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerTop')" width="256" height="256">
                         </div>
                         <span class="bi bi-plus text-3xl" />
                         <div class="block grow-1 shrink-1">
-                            <img :src="previewImages.bottom" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerBottom')" width="256" height="256">
+                            <img :src="assetsBasePath + previewImages.bottom" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerBottom')" width="256" height="256">
                         </div>
                         <span class="bi bi-arrow-right-short text-3xl" />
                         <div class="block grow-1 shrink-1">
-                            <img :src="previewImages.result" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.result')" width="256" height="256">
+                            <img :src="assetsBasePath + previewImages.result" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.result')" width="256" height="256">
                         </div>
                     </div>
                 </div>
@@ -167,6 +167,7 @@ import { ElRadioGroup, ElRadioButton } from 'element-plus/lib/components/radio/i
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 
 import historyStore from '@/store/history';
+import preferencesStore from '@/store/preferences';
 import { getLayerById } from '@/store/working-file';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { BundleAction } from '@/actions/bundle';
@@ -175,6 +176,7 @@ import type { WorkingFileLayerBlendingMode } from '@/types';
 
 const { t } = useI18n();
 const vLoading = ElLoading.directive;
+const assetsBasePath = preferencesStore.state.assetsBasePath;
 
 const props = defineProps({
     isDialog: {

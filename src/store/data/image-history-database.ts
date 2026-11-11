@@ -47,7 +47,7 @@ export default {
                         } catch (error) {}
                         if (shouldDeleteDatabase) {
                             await new Promise<void>((resolve, reject) => {
-                                let deleteRequest = window.indexedDB.deleteDatabase('undoHistoryImageStore');
+                                let deleteRequest = window.indexedDB.deleteDatabase('openGraphicaUndoHistoryImageStore');
                                 deleteRequest.onerror = () => {
                                     reject(deleteRequest.error);
                                 };
@@ -58,7 +58,7 @@ export default {
                         }
                         // Initialize database
                         await new Promise<void>((resolve, reject) => {
-                            let openRequest = window.indexedDB.open('undoHistoryImageStore', 1);
+                            let openRequest = window.indexedDB.open('openGraphicaUndoHistoryImageStore', 1);
                             openRequest.onupgradeneeded = function(event) {
                                 database = openRequest.result as IDBDatabaseEnhanced;
                                 switch (event.oldVersion) {

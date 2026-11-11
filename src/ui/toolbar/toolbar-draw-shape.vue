@@ -63,7 +63,7 @@
                         <i class="bi bi-palette-fill mr-1" aria-hidden="true" />
                         {{ t('toolbar.drawShape.fillStyle.label') }}
                         <div
-                            style="background-image: url('../images/transparency-bg.png')"
+                            :style="{ backgroundImage: `url('${assetsBasePath}images/transparency-bg.png')` }"
                             class="rounded-sm ml-2"
                         >
                             <div
@@ -78,7 +78,7 @@
                         @click="strokeStyleDockLeft = 0; strokeStyleDockTop = 0;">
                         {{ t('toolbar.drawShape.strokeStyle.label') }}
                         <div
-                            style="background-image: url('../images/transparency-bg.png')"
+                            :style="{ backgroundImage: `url('${assetsBasePath}images/transparency-bg.png')` }"
                             class="rounded-sm ml-2"
                         >
                             <div
@@ -265,6 +265,7 @@ import {
     strokeStyleDockVisible, strokeStyleDockLeft, strokeStyleDockTop,
     snappingDockVisible, snappingDockLeft, snappingDockTop,
 } from '@/tools/store/draw-shape-state';
+import preferencesStore from '@/store/preferences';
 
 import ElButton from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
@@ -298,6 +299,7 @@ defineOptions({
 const emit = defineEmits(['close']);
 
 const { t } = useI18n();
+const assetsBasePath = preferencesStore.state.assetsBasePath;
 
 /*------------*\
 | Toolbar Swap |

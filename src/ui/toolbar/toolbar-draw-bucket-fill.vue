@@ -14,7 +14,7 @@
                         <i class="bi bi-palette-fill mr-1" aria-hidden="true" />
                         {{ t('toolbar.drawBucketFill.brushColor') }}
                         <div
-                            style="background-image: url('../images/transparency-bg.png')"
+                            :style="{ backgroundImage: `url('${assetsBasePath}images/transparency-bg.png')` }"
                             class="rounded-sm ml-2"
                         >
                             <div
@@ -133,6 +133,7 @@ import {
     featherDockVisible, featherDockTop, featherDockLeft,
     settingsDockVisible, settingsDockTop, settingsDockLeft,
 } from '@/tools/store/draw-bucket-fill-state';
+import preferencesStore from '@/store/preferences';
 
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
@@ -154,6 +155,7 @@ defineOptions({
 });
 
 const emit = defineEmits(['close']);
+const assetsBasePath = preferencesStore.state.assetsBasePath;
 
 /*------------*\
 | Toolbar Swap |

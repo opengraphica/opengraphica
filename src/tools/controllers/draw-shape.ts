@@ -1608,7 +1608,10 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         const transform = canvasStore.get('transform');
         const decomposedTransform = canvasStore.get('decomposedTransform');
         const transformInverse = transform.inverse();
-        const cursor = new DOMPoint(x * devicePixelRatio, y * devicePixelRatio).matrixTransform(transformInverse);
+        const cursor = new DOMPoint(
+            (-canvasStore.state.viewportCanvasOffsetLeft + x) * devicePixelRatio,
+            (-canvasStore.state.viewportCanvasOffsetTop + y) * devicePixelRatio,
+        ).matrixTransform(transformInverse);
 
         const dragHandleRadius = isTouch ? this.dragHandleRadiusTouch : this.dragHandleRadius;
 

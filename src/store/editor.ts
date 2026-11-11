@@ -70,6 +70,7 @@ interface EditorState {
     activeToolbarPosition: 'top' | 'bottom';
     activeToolOverlays: string[];
     activeToolRestore: string | null;
+    appRootElement: HTMLDivElement | null;
     availableLiveUpdateBuild: LiveUpdateBuildInfo | null;
     bundleVersion: string;
     clipboardBufferImageHash: string | null;
@@ -109,6 +110,7 @@ interface EditorState {
 
 interface EditorDispatch {
     addTutorialFlag: keyof EditorState['tutorialFlags'],
+    removeActiveTheme: undefined;
     scheduleTask: EditorDeferredTask,
     setActiveTheme: string;
     setActiveTool: {
@@ -143,6 +145,7 @@ const store = new PerformantStore<EditorStore>({
         activeToolbarPosition: 'top',
         activeToolOverlays: [],
         activeToolRestore: null,
+        appRootElement: null,
         availableLiveUpdateBuild: null,
         bundleVersion: packageJson.version,
         clipboardBufferImageHash: null,
@@ -175,6 +178,7 @@ const store = new PerformantStore<EditorStore>({
         tutorialFlags: {},
         waiting: false,
     },
+    nonReactive: ['appRootElement'],
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
     restore: ['activeToolGroupRestore', 'activeToolRestore', 'isTouchUser', 'lastActiveThemeName', 'toolGroupLastActivatedTool', 'tutorialFlags'],
     async onDispatch(actionName: string, value: any, set) {
@@ -186,22 +190,36 @@ const store = new PerformantStore<EditorStore>({
                     set('tutorialFlags', tutorialFlags);
                 }
                 break;
+            
+            case 'removeActiveTheme':
+                let oldLinkElement;
+                if (store.state.activeTheme) {
+                    oldLinkElement = store.state.activeTheme.linkElement;
+                }
+                if (oldLinkElement && oldLinkElement.parentNode) {
+                    oldLinkElement.parentNode.removeChild(oldLinkElement);
+                }
+                set('activeTheme', null);
+                set('loadingThemeName', null);
+                set('lastActiveThemeName', null);
 
             case 'scheduleTask':
                 const newTask: EditorDeferredTask = value;
-                let tasks = store.get('tasks');
-                if (newTask.priority === 'clearQueue') {
-                    for (let task of tasks) {
-                        task.isCanceled = true;
+                if (newTask) {
+                    let tasks = store.get('tasks');
+                    if (newTask.priority === 'clearQueue') {
+                        for (let task of tasks) {
+                            task.isCanceled = true;
+                        }
+                        set('isTaskRunning', false);
+                        tasks = [];
                     }
-                    set('isTaskRunning', false);
-                    tasks = [];
+                    tasks.push(newTask);
+                    if (tasks[0] === newTask) {
+                        runTasks(++currentTaskRunId, set);
+                    }
+                    set('tasks', tasks);
                 }
-                tasks.push(newTask);
-                if (tasks[0] === newTask) {
-                    runTasks(++currentTaskRunId, set);
-                }
-                set('tasks', tasks);
                 break;
 
             case 'setActiveTheme':
@@ -302,6 +320,8 @@ const store = new PerformantStore<EditorStore>({
                     }
                     if (!themeNames.includes(lastActiveThemeName ?? '')) lastActiveThemeName = null;
                     await store.dispatch('setActiveTheme', lastActiveThemeName ?? themeNames[0]);
+                } else {
+                    await store.dispatch('removeActiveTheme');
                 }
                 break;
 

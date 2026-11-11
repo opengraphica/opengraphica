@@ -1,4 +1,4 @@
-import { createApp, type App } from 'vue';
+import { createApp, ref, type App } from 'vue';
 import '@/polyfill';
 import OpenGraphicaApp from '@/ui/app/app.vue';
 import appEmitter from '@/lib/emitter';
@@ -20,6 +20,7 @@ export interface OpenGraphica extends App<Element> {
     emit: typeof appEmitter.emit,
     theme: (themes: { [themeName: string]: string }) => Promise<OpenGraphica>
 }
+
 
 const app: OpenGraphica = createApp(OpenGraphicaApp) as OpenGraphica;
 app.use(createWebdavClient({ preferencesStore }));

@@ -36,8 +36,6 @@ export interface PointerTracker {
  */
 export default class BaseCanvasController {
 
-    protected canvas!: HTMLCanvasElement; 
-    protected ctx!: CanvasRenderingContext2D;
     protected previousPointerDown: PointerTracker | null = null;
     protected pointers: PointerTracker[] = [];
     protected touches: PointerTracker[] = []; // Populated at onMultiTouchDown(), once the multi-touch tap timeout extinquishes.

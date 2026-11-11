@@ -7,7 +7,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = function setupConfig(config) {
-    const plugins = config.plugins;
+    const plugins = config.plugins ?? [];
     delete config.plugins;
 
     return {
@@ -63,7 +63,10 @@ module.exports = function setupConfig(config) {
                 {
                     test: /\.css$/i,
                     use: [
-                        'style-loader',
+                        {
+                            loader: 'style-loader',
+                            options: { injectType: 'lazyStyleTag' },
+                        },
                         'css-loader',
                         {
                             loader: 'postcss-loader',

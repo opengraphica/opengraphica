@@ -29,6 +29,9 @@ async function addFontFamily(fontFamily?: string) {
 registerTool({
     name: 'get-available-font-list',
     description: t('mcp.getAvailableFontList.description'),
+    annotations: {
+        readOnlyHint: true,
+    },
     async execute() {
         const googleWebfonts = await import('@/config/google-webfonts.json');
         return {

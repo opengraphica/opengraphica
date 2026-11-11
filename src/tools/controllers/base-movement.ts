@@ -24,17 +24,16 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
     onPointerDown(e: PointerEvent): void {
         super.onPointerDown(e);
         const devicePixelRatio = window.devicePixelRatio || 1;
-        const touches = this.touches;
         if (e.isPrimary) {
-            this.lastCursorX = e.pageX;
-            this.lastCursorY = e.pageY;
+            this.lastCursorX = -canvasStore.state.viewportCanvasOffsetLeft + e.pageX;
+            this.lastCursorY = -canvasStore.state.viewportCanvasOffsetTop + e.pageY;
         }
         if (e.pointerType === 'mouse' && (e.button === 1 || e.button === 2)) {
             const transform = canvasStore.get('transform');
             this.moveTranslateStart = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio).matrixTransform(transform.inverse());
             this.handleCursorIcon();
-            canvasStore.set('cursorX', e.pageX * devicePixelRatio);
-            canvasStore.set('cursorY', e.pageY * devicePixelRatio);
+            canvasStore.set('cursorX', (-canvasStore.state.viewportCanvasOffsetLeft + e.pageX) * devicePixelRatio);
+            canvasStore.set('cursorY', (-canvasStore.state.viewportCanvasOffsetTop + e.pageY) * devicePixelRatio);
             canvasStore.set('viewDirty', true);
         }
     }
@@ -44,12 +43,20 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const touches = this.touches;
         if (touches.length === 2) {
-            this.lastCursorX = (touches[0].down.pageX + touches[1].down.pageX) / 2;
-            this.lastCursorY = (touches[0].down.pageY + touches[1].down.pageY) / 2;
+            this.lastCursorX = -canvasStore.state.viewportCanvasOffsetLeft + (touches[0].down.pageX + touches[1].down.pageX) / 2;
+            this.lastCursorY = -canvasStore.state.viewportCanvasOffsetTop +  (touches[0].down.pageY + touches[1].down.pageY) / 2;
             const transform = canvasStore.get('transform');
             this.moveTranslateStart = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio).matrixTransform(transform.inverse());
-            this.moveTouchDistanceStart = pointDistance2d(touches[0].down.pageX, touches[0].down.pageY, touches[1].down.pageX, touches[1].down.pageY);
-            this.moveTouchAngleStart = Math.atan2(touches[1].down.pageY - touches[0].down.pageY, touches[1].down.pageX - touches[0].down.pageX);
+            this.moveTouchDistanceStart = pointDistance2d(
+                touches[0].down.pageX,
+                touches[0].down.pageY,
+                touches[1].down.pageX,
+                touches[1].down.pageY
+            );
+            this.moveTouchAngleStart = Math.atan2(
+                touches[1].down.pageY - touches[0].down.pageY,
+                touches[1].down.pageX - touches[0].down.pageX
+            );
             const decomposed = canvasStore.get('decomposedTransform');
             this.moveScaleStart = decomposed.scaleX;
             this.moveRotationStart = decomposed.rotation;
@@ -68,8 +75,8 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
         super.onPointerMove(e);
         const devicePixelRatio = window.devicePixelRatio || 1;
         if (e.isPrimary) {
-            this.lastCursorX = e.pageX;
-            this.lastCursorY = e.pageY;
+            this.lastCursorX = -canvasStore.state.viewportCanvasOffsetLeft + e.pageX;
+            this.lastCursorY = -canvasStore.state.viewportCanvasOffsetTop + e.pageY;
         }
         if (this.moveTranslateStart) {
             const touches = this.touches;
@@ -143,8 +150,8 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
                 const translateMove = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio).matrixTransform(transform.inverse());
                 transform.translateSelf(translateMove.x - this.moveTranslateStart.x, translateMove.y - this.moveTranslateStart.y);
                 canvasStore.set('transform', transform);
-                canvasStore.set('cursorX', e.pageX * devicePixelRatio);
-                canvasStore.set('cursorY', e.pageY * devicePixelRatio);
+                canvasStore.set('cursorX', (-canvasStore.state.viewportCanvasOffsetLeft + e.pageX) * devicePixelRatio);
+                canvasStore.set('cursorY', (-canvasStore.state.viewportCanvasOffsetTop + e.pageY) * devicePixelRatio);
                 canvasStore.set('viewDirty', true);
             }
         }

@@ -104,7 +104,11 @@ async function translateRecursive(en, oldEn, language, target) {
                     target[key] = [];
                     needsRecursiveCall = true;
                 } else if (enKeyType === '[object String]') {
-                    needsTranslate = true;
+                    if (oldEnKeyType == '[object Undefined]' && targetKeyType === '[object String]') {
+                        needsTranslate = false;
+                    } else {
+                        needsTranslate = true;
+                    }
                 }
             } else if (enKeyType === '[object Object]' || enKeyType === '[object Array]') {
                 needsRecursiveCall = true;

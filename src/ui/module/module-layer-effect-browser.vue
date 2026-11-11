@@ -34,7 +34,7 @@
                                     'width': '100%',
                                     'height': previewImageHeight,
                                     'aspect-ratio': previewImageAspectRatio,
-                                    'background-image': 'url(\'../images/transparency-bg.png\')',
+                                    'background-image': 'url(\'' + assetsBasePath + 'images/transparency-bg.png\')',
                                     'background-repeat': 'repeat',
                                     'object-fit': 'cover',
                                 }"
@@ -42,7 +42,7 @@
                             >
                             <img
                                 v-else
-                                :src="`images/module/layer/layer-effect-browser/thumbnail/${filter.kebabId}.png`"
+                                :src="`${assetsBasePath}images/module/layer/layer-effect-browser/thumbnail/${filter.kebabId}.png`"
                                 :style="{
                                     'width': '100%',
                                     'height': previewImageHeight,
@@ -76,6 +76,7 @@ import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.
 import ElLoading from 'element-plus/lib/components/loading/index';
 import historyStore from '@/store/history';
 
+import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById, getSelectedLayers } from '@/store/working-file';
 
 import { createImageBlobFromCanvas } from '@/lib/image';
@@ -123,6 +124,8 @@ emit('update:dialogSize', 'big');
 
 const { t } = useI18n();
 const renderer = await useRenderer();
+
+const assetsBasePath = preferencesStore.state.assetsBasePath;
 
 const filterGenerationErrorMessage = ref();
 const filterPreviewThumbnails = ref<Record<string, string>>({});

@@ -10,6 +10,9 @@ interface PreferencesState {
     // to ensure there is no MITM attack when downloading updates.
     appUpdateSigningEd25519PublicKey: string;
 
+    // The base path to load the included image/font assets from. Set this when OpenGraphica is loaded from a non-root path.
+    assetsBasePath: string;
+
     // Whether or not to check for frontend build updates for the native mobile app.
     checkForAppUpdates: boolean;
 
@@ -127,6 +130,7 @@ const store = new PerformantStore<PreferencesStore>({
     state: {
         appUpdateBuildListUrl: 'https://app.opengraphica.com/app/updates/updates.json',
         appUpdateSigningEd25519PublicKey: '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAE2zR3zD+u8EEeGVVSE+80QQrdzTiOiBCDmM+fxygJM4=\n-----END PUBLIC KEY-----\n',
+        assetsBasePath: '',
         checkForAppUpdates: false,
         dockHideBreakpoint: 1000,
         dockPosition: 'right',

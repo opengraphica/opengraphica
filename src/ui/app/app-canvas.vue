@@ -78,6 +78,14 @@ export default defineComponent({
             if (rendererFrontend) {
                 rendererFrontend.resize(imageWidth.value, imageHeight.value, newWidth, newHeight);
             }
+            setTimeout(() => {
+                if (!canvas.value) return;
+                const { x, y } = canvas.value.getBoundingClientRect();
+                canvasStore.set({
+                    viewportCanvasOffsetLeft: x,
+                    viewportCanvasOffsetTop: y,
+                });
+            }, 100);
             canvasStore.set('viewDirty', true);
         });
 

@@ -3,7 +3,7 @@
         <div>
             <div class="og-logo">
                 <h1 class="px-6">
-                    <img :src="`images/logo-full-${logoThemeColor}.svg`" alt="OpenGraphica">
+                    <img :src="`${assetsBasePath}images/logo-full-${logoThemeColor}.svg`" alt="OpenGraphica">
                 </h1>
             </div>
             <div class="flex justify-center">
@@ -35,15 +35,20 @@ export default {
 }
 </script>
 <script setup lang="ts">
-import { defineComponent, computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useI18n } from '@/i18n';
-import { hasWorkingFile } from '@/store/data/working-file-database';
+
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
+
 import appEmitter from '@/lib/emitter';
 import { scheduleTutorialNotification } from '@/lib/tutorial';
+
 import { runModule } from '@/modules';
+
+import { hasWorkingFile } from '@/store/data/working-file-database';
 import editorStore from '@/store/editor';
+import preferencesStore from '@/store/preferences';
 
 const { t, tm, rt } = useI18n();
 const vLoading = ElLoading.directive;
@@ -54,6 +59,8 @@ const emit = defineEmits([
 ]);
 
 emit('update:title', 'empty');
+
+const assetsBasePath = preferencesStore.state.assetsBasePath;
 
 const loading = ref<boolean>(false);
 const showRestoreImage = ref<boolean>(false);

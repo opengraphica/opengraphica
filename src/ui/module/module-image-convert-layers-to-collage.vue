@@ -69,6 +69,8 @@ export default {
 <script setup lang="ts">
 import { computed, ref, reactive } from 'vue';
 import { useI18n } from '@/i18n';
+import { Rules } from 'async-validator';
+
 import ElButton from 'element-plus/lib/components/button/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
@@ -78,10 +80,14 @@ import ElRow from 'element-plus/lib/components/row/index';
 import ElCol from 'element-plus/lib/components/col/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
+
+import preferencesStore from '@/store/preferences';
+
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
-import { Rules } from 'async-validator';
-import { collageTypeCallbacks, convertLayersToCollage, type CollageTypeCallbackParam } from '@/modules/image/conversion';
 import { camelCaseToKebabCase } from '@/lib/string';
+
+import { collageTypeCallbacks, convertLayersToCollage, type CollageTypeCallbackParam } from '@/modules/image/conversion';
+
 
 const { t } = useI18n();
 const vLoading = ElLoading.directive;
@@ -114,7 +120,7 @@ const collageTypeOptions = computed(() => {
     return collageTypeCallbacks.map((definition) => ({
         type: definition.type,
         title: 'module.imageConvertLayersToCollage.collageType.' + definition.type,
-        icon: `images/module/image/convert-layers-to-collage/${camelCaseToKebabCase(definition.type)}.svg`
+        icon: `${preferencesStore.state.assetsBasePath}images/module/image/convert-layers-to-collage/${camelCaseToKebabCase(definition.type)}.svg`
     }));
 });
 

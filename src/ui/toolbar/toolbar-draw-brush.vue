@@ -38,7 +38,7 @@
                     <i class="bi bi-palette-fill mr-1" aria-hidden="true" />
                     {{ t('toolbar.drawBrush.brushColor') }}
                     <div
-                        style="background-image: url('../images/transparency-bg.png')"
+                        :style="{ backgroundImage: `url('${assetsBasePath}images/transparency-bg.png')` }"
                         class="rounded-sm ml-2"
                     >
                         <div
@@ -159,6 +159,7 @@ import {
     sizeDockVisible, sizeDockTop, sizeDockLeft, isPreviewingSize,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
 } from '@/tools/store/draw-brush-state';
+import preferencesStore from '@/store/preferences';
 
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
@@ -183,6 +184,7 @@ defineOptions({
 const emit = defineEmits(['close']);
 
 const uuid = uuidv4();
+const assetsBasePath = preferencesStore.state.assetsBasePath;
 
 /*------------*\
 | Toolbar Swap |

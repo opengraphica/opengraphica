@@ -3,12 +3,18 @@
     "version": "0.0.6-alpha.1",
     "author": "OpenGraphica devs",
     "license": "MIT",
-    "description": "A image editor for creating raster and vector graphics on mobile, desktop, or the web.",
-    "private": false,
-    "main": "electron/main.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/opengraphica/opengraphica/"
+    },
+    "description": "A image editor for creating raster and vector graphics on mobile, desktop, or the web.",
+    "private": false,
+    "main": "electron/main.js",
+    "exports": {
+        ".": {
+            "types": "./dist/types/main.d.ts",
+            "import": "./dist/esm/main.js"
+        }
     },
     "scripts": {
         "dev": "npm run dev:web",
@@ -21,7 +27,8 @@
         "build:android": "npm run build && npx cap sync android",
         "build:css": "node ./src/css/build.js",
         "build:clickable": "npm run build:website && clickable build --arch all",
-        "build:library": "webpack --mode=production --config ./webpack.config.library.js",
+        "build:library": "webpack --mode=production --config ./webpack.config.library.js && tsc -p tsconfig.dist.json",
+        "build:types": "tsc -p tsconfig.dist.json",
         "build:wasm": "wasm-pack build rust/renderer_wgpu_wasm --target web && wasm-pack build rust/vector_process_wasm --target web && npm run setup:wasm",
         "build:webfont": "node ./scripts/webfont.js",
         "build:website": "webpack --mode=production --config ./webpack.config.website.js",
@@ -54,7 +61,6 @@
         "fflate": "0.8.3",
         "file-saver": "2.0.5",
         "gifken": "2.1.1",
-        "libgif": "0.0.3",
         "lodash": "4.17.21",
         "micromark": "4.0.3",
         "mitt": "2.1.0",
@@ -105,7 +111,7 @@
         "vue-tsc": "0.0.8",
         "webfont": "11.2.26",
         "webmcp-types": "0.1.10",
-        "webpack": "5.98.0",
+        "webpack": "5.112.2",
         "webpack-bundle-analyzer": "4.4.0",
         "webpack-cli": "6.0.1",
         "webpack-comment-remover-loader": "0.0.3",

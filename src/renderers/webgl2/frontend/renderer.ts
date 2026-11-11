@@ -6,6 +6,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { allStoredFontsByFamily } from '@/store/font';
 import { getStoredImageAsBitmap } from '@/store/image';
+import preferencesStore from '@/store/preferences';
 import { getStoredSvgImage } from '@/store/svg';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import {
@@ -123,7 +124,17 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         ], ([remoteFonts, allStoredFonts]) => {
             const fontFetchDefinitions: Record<string, FontFamilyFetchDefinition> = {};
             for (const fontDefinition of defaultFontFamilies) {
-                fontFetchDefinitions[fontDefinition.family] = fontDefinition as FontFamilyFetchDefinition;
+                fontFetchDefinitions[fontDefinition.family] = {
+                    family: fontDefinition.family,
+                    subsets: fontDefinition.subsets,
+                    variants: Object.keys(fontDefinition.variants).reduce((accumulator, variantKey) => {
+                        accumulator[variantKey] = {
+                            name: fontDefinition.variants[variantKey].name,
+                            file: preferencesStore.state.assetsBasePath + fontDefinition.variants[variantKey].file,
+                        };
+                        return accumulator;
+                    }, {}),
+                }
             }
             for (const familyName in remoteFonts) {
                 fontFetchDefinitions[familyName] = remoteFonts[familyName];

@@ -6,6 +6,9 @@ import type { WorkingFileLayer, WorkingFileGroupLayer } from '@/types';
 registerTool({
     name: 'get-editor-guide',
     description: t('mcp.getEditorGuide.description'),
+    annotations: {
+        readOnlyHint: true,
+    },
     execute() {
         return {
             content: [
@@ -21,6 +24,9 @@ registerTool({
 registerTool({
     name: 'get-working-file-dimensions',
     description: t('mcp.getWorkingFileDimensions.description'),
+    annotations: {
+        readOnlyHint: true,
+    },
     async execute() {
         const { default: workingFileStore } = await import('@/store/working-file');
         return {
@@ -35,6 +41,9 @@ registerTool({
 registerTool({
     name: 'get-layer-list',
     description: t('mcp.getLayerList.description'),
+    annotations: {
+        readOnlyHint: true,
+    },
     async execute() {
         const { default: workingFileStore } = await import('@/store/working-file');
         function getLayers(storeLayers: WorkingFileLayer[]) {
@@ -75,6 +84,9 @@ registerTool({
         },
         required: ['id'],
     },
+    annotations: {
+        readOnlyHint: true,
+    },
     async execute({ id }) {
         const { getStoredImageCanvas } = await import('@/store/image');
         const { getLayerById } = await import('@/store/working-file');
@@ -103,6 +115,9 @@ registerTool({
             id: { type: 'number', description: t('mcp.getVectorLayerSvg.property.id') },
         },
         required: ['id'],
+    },
+    annotations: {
+        readOnlyHint: true,
     },
     async execute({ id }) {
         const { getStoredSvgDocument } = await import('@/store/svg');

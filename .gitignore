@@ -6,5 +6,5 @@ dist
 target
 www
 dist-ssr
+*.tgz
 *.local
-PRIORITY.txt

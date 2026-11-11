@@ -32,6 +32,8 @@ interface CanvasState {
     transformResetOptions: undefined | true | CanvasViewResetOptions;
     viewDirty: boolean;
     viewHeight: number; // Maps to screen height; devicePixelRatio IS applied.
+    viewportCanvasOffsetLeft: number; // Offset of the image canvas from the left of the browser window.
+    viewportCanvasOffsetTop: number; // Offset of the image canvas from the top of the browser window.
     viewWidth: number; // Maps to screen width; devicePixelRatio IS applied.
     workingImageBorderColor: string;
 }
@@ -81,10 +83,12 @@ const store = new PerformantStore<CanvasStore>({
         transformResetOptions: undefined,
         viewDirty: true,
         viewHeight: 100, // Maps to screen height; devicePixelRatio IS applied.
+        viewportCanvasOffsetLeft: 0,
+        viewportCanvasOffsetTop: 0,
         viewWidth: 100, // Maps to screen width; devicePixelRatio IS applied.
         workingImageBorderColor: '#cccccc'
     },
-    nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'selectionMaskCanvas', 'viewCanvas', 'viewCtx'],
+    nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'selectionMaskCanvas'],
     onSet(key, value, set) {
         if (key === 'transform') {
             const previousDecomposedTransform = store.state.decomposedTransform;

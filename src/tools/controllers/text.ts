@@ -348,7 +348,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.editorTextareaContainer = document.createElement('div');
         this.editorTextareaContainer.setAttribute('style', `position: absolute; top: 0; left: 0; padding: 0; width: 1px; height: 1px; background: transparent; border: none; outline: none; color: transparent; opacity: 0.01; pointer-events: none;`);
         this.editorTextareaContainer.appendChild(this.editorTextarea);
-        document.body.appendChild(this.editorTextareaContainer);
+        const textareaContainer = editorStore.get('appRootElement') ?? document.body;
+        textareaContainer.appendChild(this.editorTextareaContainer);
 
         this.onFocusEditorTextarea = this.onFocusEditorTextarea.bind(this);
         this.editorTextarea.addEventListener('focus', this.onFocusEditorTextarea, true);
@@ -1420,7 +1421,10 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewDecomposedTransform = canvasStore.get('decomposedTransform');
-        const viewTransformPoint = new DOMPoint(pageX * devicePixelRatio, pageY * devicePixelRatio)
+        const viewTransformPoint = new DOMPoint(
+            (-canvasStore.state.viewportCanvasOffsetLeft + pageX) * devicePixelRatio,
+            (-canvasStore.state.viewportCanvasOffsetTop + pageY) * devicePixelRatio
+        )
             .matrixTransform(viewTransform.inverse());
 
         let transformBoundsPoint: DOMPoint | null = null;

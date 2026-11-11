@@ -3,9 +3,9 @@
     <div v-else-if="isDeleting" v-loading="true" :element-loading-text="t('module.layerEffectEdit.deleting')" style="height: 15rem" />
     <div v-else v-loading="loading" :element-loading-text="t('module.layerEffectEdit.loading')">
         <div class="flex flex-row items-center">
-            <canvas ref="beforeEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" />
+            <canvas ref="beforeEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh;" :style="{ backgroundImage: assetsBasePath + 'images/transparency-bg.png' }" />
             <span class="bi bi-arrow-right-short shrink-1 text-5xl has-text-color-fill-darker" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" aria-hidden="true" />
-            <canvas ref="afterEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" />
+            <canvas ref="afterEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh;" :style="{ backgroundImage: assetsBasePath + 'images/transparency-bg.png', visibility: currentFilterEnabled ? undefined : 'hidden' }" />
         </div>
         <div class="flex flex-row items-center justify-center my-3">
             <el-button v-if="isSelectionMaskAvailable" @click="onCreateSelectionMask">
@@ -249,6 +249,7 @@ import { BundleAction } from '@/actions/bundle';
 
 import historyStore from '@/store/history';
 import { createStoredImage, deleteStoredImage, getStoredImageOrCanvas } from '@/store/image';
+import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById, getLayerGlobalTransform, discardMaskIfUnused } from '@/store/working-file';
 import { activeSelectionMask, appliedSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds } from '@/tools/store/selection-state';
 
@@ -304,6 +305,8 @@ emit('update:dialogSize', 'medium-large');
 
 const { t, te } = useI18n();
 const $notify = notifyInjector('$notify');
+
+const assetsBasePath = preferencesStore.state.assetsBasePath;
 
 const isUseWebGlPreview = isWebGLAvailable();
 const isCanceling = ref(false);

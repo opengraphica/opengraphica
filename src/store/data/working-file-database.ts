@@ -47,17 +47,17 @@ export async function init() {
                 if (window.indexedDB) {
                     // Initialize database
                     await new Promise<void>((resolve, reject) => {
-                        let openRequest = window.indexedDB.open('workingFileStore', 2);
+                        let openRequest = window.indexedDB.open('openGraphicaWorkingFileStore', 2);
                         openRequest.onupgradeneeded = function(event) {
                             database = openRequest.result as IDBDatabase;
-                            switch (event.oldVersion) {
-                                case 0:
-                                    database.createObjectStore('meta', { keyPath: 'id' });
-                                    database.createObjectStore('layers', { keyPath: 'id' });
-                                    database.createObjectStore('images', { keyPath: 'id' });
-                                    break;
-                                case 1:
-                                    database.createObjectStore('fonts', { keyPath: 'id' });
+                            const oldVersion = event.oldVersion;
+                            if (oldVersion < 1) {
+                                database.createObjectStore('meta', { keyPath: 'id' });
+                                database.createObjectStore('layers', { keyPath: 'id' });
+                                database.createObjectStore('images', { keyPath: 'id' });
+                            }
+                            if (oldVersion < 2 && !database.objectStoreNames.contains('fonts')) {
+                                database.createObjectStore('fonts', { keyPath: 'id' });
                             }
                         };
                         openRequest.onerror = () => {

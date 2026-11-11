@@ -1,0 +1,36 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "resolvePackageJsonExports": false,
+        "strict": true,
+        "rootDir": "src",
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "declarationDir": "dist/types",
+        "noImplicitAny": false,
+        "skipLibCheck": true,
+        "lib": ["esnext", "dom", "webworker"],
+        "types": ["color-namer", "file-saver", "lodash", "offscreencanvas", "pica", "three", "uuid", "webmcp-types"],
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
+    "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+    "exclude": [
+        "node_modules",
+        "android",
+        "clickable",
+        "dist",
+        "docs",
+        "electron",
+        "public",
+        "rust",
+        "scripts",
+        "target",
+        "www"
+    ]
+}

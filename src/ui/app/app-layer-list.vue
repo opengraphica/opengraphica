@@ -78,7 +78,7 @@
                             <i class="bi bi-arrow-return-right mr-1" aria-hidden="true"></i>
                             {{ t('app.layerList.effects') }}
                             <transition name="og-transition-fade">
-                                <img v-if="layer.isBaking" src="../../assets/images/loading-spinner.svg" class="self-center ml-3 mr-1" style="width: 1rem" />
+                                <img v-if="layer.isBaking" :src="assetsBasePath + 'images/loading-spinner.svg'" class="self-center ml-3 mr-1" style="width: 1rem" />
                             </transition>
                             <!-- <transition name="og-transition-fade">
                                 <span v-if="layer.isBaking" class="has-color-primary">{{ t('app.layerList.recalculatingEffect') }}</span>
@@ -208,6 +208,7 @@ import vPointer from '@/directives/pointer';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
+import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById, isGroupLayer } from '@/store/working-file';
 import { editingLayerIds as layerOpacityEditingLayerIds } from '@/tools/store/layer-opacity-state';
 import { effectEmitter, isToolbarVisible as isEffectToolbarVisible } from '@/tools/store/effect-state';
@@ -257,6 +258,8 @@ const emit = defineEmits([
 ]);
 
 const { t } = useI18n();
+
+const assetsBasePath = preferencesStore.state.assetsBasePath;
 
 const layerList = ref<HTMLUListElement>(null as unknown as HTMLUListElement);
 
