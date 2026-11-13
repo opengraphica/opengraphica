@@ -2,6 +2,7 @@ import type { ShowOpenFilePicker } from './file-system-access';
 
 declare global {
     var __BUILD_GIT_COMMIT_ID__: string;
+    var __OPENGRAPHICA_WEBPACK_MODULE_TO_CHUNK__: Record<string, string>;
 
     interface NavigatorUAData {
         brands: string[];

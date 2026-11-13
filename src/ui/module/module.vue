@@ -46,6 +46,8 @@ export default defineComponent({
         'layer-blending-mode': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-blending-mode' */ `@/ui/module/module-layer-blending-mode.vue`)),
         'layer-effect-browser': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-browser' */ `@/ui/module/module-layer-effect-browser.vue`)),
         'layer-effect-edit': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-edit' */ `@/ui/module/module-layer-effect-edit.vue`)),
+        'plugin-install-error': defineAsyncComponent(() => import(/* webpackChunkName: 'module-plugin-install-error' */ `@/ui/module/module-plugin-install-error.vue`)),
+        'plugin-install-reload-confirm': defineAsyncComponent(() => import(/* webpackChunkName: 'module-plugin-install-reload-confirm' */ `@/ui/module/module-plugin-install-reload-confirm.vue`)),
         'rename-layer': defineAsyncComponent(() => import(/* webpackChunkName: 'module-rename-layer' */ `@/ui/module/module-rename-layer.vue`)),
         'tutorial-welcome': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-tutorial-welcome' */ `@/ui/module/module-tutorial-welcome.vue`))
     },
@@ -105,7 +107,7 @@ export default defineComponent({
             onShowModule,
             onCloseModule,
             onSetDialogSize,
-            onSetTitle
+            onSetTitle,
         }
     }
 });

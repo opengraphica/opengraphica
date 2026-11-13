@@ -23,7 +23,7 @@
             >
                 <span class="bi bi-grip-vertical" aria-hidden="true" />
             </div>
-            <div class="og-floating-dock__content">
+            <div class="og-floating-dock__content" :class="contentClass">
                 <slot />
             </div>
         </div>
@@ -58,6 +58,10 @@ const props = defineProps({
     mobileFullscreen: {
         type: Boolean,
         default: false,
+    },
+    contentClass: {
+        type: String,
+        default: '',
     }
 });
 

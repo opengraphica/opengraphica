@@ -1,4 +1,5 @@
 import { createI18n } from 'vue-i18n';
+import { merge } from 'lodash';
 import preferencesStore from '@/store/preferences';
 import i18nMessagesEn from '@/i18n/en.json';
 
@@ -41,6 +42,12 @@ export async function setEditorLanguage(language: string) {
         i18n.global.setLocaleMessage(language, await loadLanguage(language));
     }
     i18n.global.locale.value = language as never;
+}
+
+export async function mergeMessages(language: string, messages: Record<string, any>) {
+    const existingMessages = await loadLanguage(language);
+    merge(existingMessages, messages);
+    i18n.global.setLocaleMessage(language, existingMessages);
 }
 
 export const { t, tm, rt } = i18n.global;

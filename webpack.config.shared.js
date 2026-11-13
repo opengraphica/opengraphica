@@ -6,9 +6,53 @@ const { VueLoaderPlugin } = require('vue-loader');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
+class ModuleChunkManifestPlugin {
+    apply(compiler) {
+        compiler.hooks.thisCompilation.tap('ModuleChunkManifestPlugin', compilation => {
+            compilation.hooks.processAssets.tap(
+                {
+                    name: 'ModuleChunkManifestPlugin',
+                    stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE,
+                },
+                () => {
+                    const map = {};
+
+                    for (const module of compilation.modules) {
+                        const resource = module.nameForCondition?.() || module.resource;
+                        if (!resource) continue;
+
+                        const id = compilation.chunkGraph.getModuleId(module);
+                        if (id == null) continue;
+
+                        const key = path
+                            .relative(compiler.context, resource)
+                            .split(path.sep)
+                            .join("/");
+
+                        const chunks = [
+                        ...compilation.chunkGraph.getModuleChunksIterable(module),
+                        ]
+                            .map(chunk => chunk.id)
+                            .filter(id => id != null);
+
+                        map[key] = { id, chunks };
+                    }
+
+                    compilation.emitAsset(
+                        'module-chunk-map.json',
+                        new compiler.webpack.sources.RawSource(JSON.stringify(map)),
+                    );
+                },
+            );
+        });
+    }
+}
+
 module.exports = function setupConfig(config) {
     const plugins = config.plugins ?? [];
     delete config.plugins;
+    const optimization = config.optimization ?? {};
+    delete config.optimization;
 
     return {
         context: path.join(__dirname, './'),
@@ -145,12 +189,14 @@ module.exports = function setupConfig(config) {
                 ]
             }),
             new VueLoaderPlugin(),
+            new ModuleChunkManifestPlugin(),
             ...plugins
         ],
         watchOptions: {
             ignored: /node_modules/
         },
         optimization: {
+            moduleIds: 'natural',
             runtimeChunk: 'single',
             splitChunks: {
                 chunks: 'all',
@@ -402,7 +448,8 @@ module.exports = function setupConfig(config) {
                         name: 'webdav'
                     }
                 }
-            }
+            },
+            ...optimization
         },
         ...config
     };

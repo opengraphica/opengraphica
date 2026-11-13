@@ -5,7 +5,7 @@
         v-html="warningParagraph"
         :class="{ 'mt-0': paragraphIndex === 0 }"
     />
-    <div class="text-right">
+    <div class="text-right mt-4">
         <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
         <el-button type="danger" @click="onDiscard">{{ t('button.discardChanges') }}</el-button>
     </div>

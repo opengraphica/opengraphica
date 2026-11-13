@@ -167,6 +167,7 @@
         "create": "Create",
         "createNewImage": "Create New Image",
         "delete": "Delete",
+        "deletePlugin": "Delete Plugin",
         "discardChanges": "Discard Changes",
         "done": "Done",
         "dontUpdate": "Don't Update",
@@ -180,6 +181,7 @@
         "ok": "OK",
         "openImage": "Open Image",
         "pickColor": "Pick Color",
+        "reload": "Reload",
         "restoreLastImage": "Restore Last Image",
         "reverse": "Reverse",
         "save": "Save",
@@ -308,6 +310,11 @@
                     "optimizeLargeImage": "Optimize for Large Image",
                     "highQualityScaling": "High Quality Scaling",
                     "fixAdjacentLayerSeams": "Fix Adjacent Layer Seams"
+                },
+                "plugins": {
+                    "groupTitle": "Plugins",
+                    "selectFile": "Add Plugin File...",
+                    "uninstall": "Uninstall"
                 },
                 "editor": {
                     "groupTitle": "Editor",
@@ -1457,6 +1464,21 @@
             "deleteFilterError": "An error occurred while attempting to delete the filter. If you keep seeing this message, please report this as a bug.",
             "applyFilterError": "An error occurred while attempting to apply the filter changes. If you keep seeing this message, please report this as a bug."
         },
+        "pluginInstallError": {
+            "title": "Error Installing Plugin",
+            "message": "An error occurred when installing the \"{pluginName}\" plugin. This might be resolved if you restart the editor."
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "Plugin Installed",
+            "message": "The editor needs to be reloaded before the plugin takes effect. If you are still working, save your changes first."
+        },
+        "pluginInstallZip": {
+            "title": "Install Plugin ZIP",
+            "installError": {
+                "title": "Error Installing Plugin",
+                "message": "Either the selected file is not an OpenGraphica editor plugin, or it is incompatible with the current version of the editor."
+            }
+        },
         "renameLayer": {
             "title": "Rename Layer",
             "layerName": "New Name"
@@ -1634,6 +1656,16 @@
                 "layerEffectEdit": {
                     "name": "Edit Effect",
                     "description": "Edit an effect"
+                }
+            }
+        },
+        "plugin": {
+            "name": "Plugin",
+            "description": "Plugin management.",
+            "modules": {
+                "installZip": {
+                    "name": "Install Plugin ZIP",
+                    "description": "Install a editor plugin from a ZIP file."
                 }
             }
         },

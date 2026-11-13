@@ -124,3 +124,15 @@ You must have Android Studio installed. This will prepare the project for Androi
 npm run build:clickable
 ```
 The resulting `.click` is stored in the `build/all/app` folder.
+
+## AI Policy
+
+**AI is not used by the core OpenGraphica maintainers to generate code.**
+
+This project relies on [LibreTranslate](https://libretranslate.com/) to provide machine translation placeholders for languages other than English. If you have better translations, please contribute!
+
+If you open a pull request that is assisted by an AI agent, it is expected that **you personally understand** every line of code in the pull request.
+
+Please do not use AI as a shortcut to vibe code a feature you want and submit it as a pull request. This can lead to unexpected copyright and license violations. These pull requests will not be accepted.
+
+OpenGraphica has a [plugin system](https://github.com/opengraphica/opengraphica/wiki/Plugin-API) for extending editor functionality if you wish to experiment with vibe coding a feature outside of the main codebase. Plugins are manually installed by the end user of OpenGraphica, and are not distributed in this repository.

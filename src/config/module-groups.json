@@ -243,6 +243,16 @@
             }
         }
     },
+    "plugin": {
+        "modules": {
+            "installZip": {
+                "action": {
+                    "type": "function",
+                    "target": "plugin/filesystem.installZip"
+                }
+            }
+        }
+    },
     "tutorial": {
         "modules": {
             "welcome": {

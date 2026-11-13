@@ -47,6 +47,7 @@ import AppWait from '@/ui/app/app-wait.vue';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
+import { readAllPlugins } from '@/store/data/plugin-database';
 
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -213,6 +214,9 @@ async function asyncMountSetup() {
 
     // Initialize i18n user language
     await initializeI18n();
+
+    // Read stored editor plugins into memory
+    await readAllPlugins();
 
     loading.value = false;
 

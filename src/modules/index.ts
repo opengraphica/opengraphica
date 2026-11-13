@@ -40,7 +40,7 @@ export function getModuleDefinition(moduleGroupName: string, moduleName: string)
     return null;
 }
 
-async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?: Record<string, unknown>, options: RunModuleOptions = {}) {
+export async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?: Record<string, unknown>, options: RunModuleOptions = {}) {
     if (module.action.type === 'ui') {
         appEmitter.emit('app.dialogs.openFromModule', {
             name: module.action.target,

@@ -299,6 +299,24 @@
                             </el-select>
                         </el-form-item>
                         <el-collapse class="el-collapse--menu-item" @change="onPrefsCollapseChange">
+                            <!-- Prefs: Plugins -->
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.plugins.groupTitle')">
+                                <div class="px-5 pb-4">
+                                    <div v-for="pluginMeta of allPluginMeta" :key="pluginMeta.pluginId" class="flex justify-between mb-2">
+                                        <span class="whitespace-nowrap overflow-hidden text-ellipsis">
+                                            <span class="bi bi-plugin mr-1" aria-hidden="true" />
+                                            {{ pluginMeta.name }}
+                                            <span v-if="pluginMeta.version" class="ml-1" style="color: var(--el-color-info)">{{ pluginMeta.version }}</span>
+                                        </span>
+                                        <a role="button" href="#" class="whitespace-nowrap" style="color: var(--el-color-danger)" @click.prevent="onUninstallPlugin(pluginMeta.pluginId)">
+                                            <span class="bi bi-x" aria-hidden="true" /> {{ t('dock.settings.prefs.plugins.uninstall') }}
+                                        </a>
+                                    </div>
+                                    <og-button type="button" outline solid small class="w-full mt-2!" @click="onSelectPluginFile">
+                                        {{ t('dock.settings.prefs.plugins.selectFile') }}
+                                    </og-button>
+                                </div>
+                            </el-collapse-item>
                             <!-- Prefs: Editor -->
                             <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.editor.groupTitle')">
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.menuBarPosition')">
@@ -404,7 +422,6 @@ export default {
 <script setup lang="ts">
 import { ref, computed, toRefs, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n, setEditorLanguage } from '@/i18n';
-import { v4 as uuidv4 } from 'uuid';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
@@ -424,6 +441,8 @@ import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';
 import ElTimeline, { ElTimelineItem } from 'element-plus/lib/components/timeline/index';
 
+import OgButton from '@/ui/element/button.vue';
+
 import vElCollapseItemSmartScroll from '@/directives/el-collapse-item-smart-scroll';
 
 import languages from '@/config/languages.json';
@@ -431,9 +450,12 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { HistoryState } from '@/store/history';
 import preferencesStore, { PreferencesState } from '@/store/preferences';
+import { allPluginMeta, deletePlugin } from '@/store/data/plugin-database';
 import { hasWorkingFile } from '@/store/data/working-file-database';
-import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
+
 import appEmitter from '@/lib/emitter';
+import { pickFile } from '@/lib/file';
+import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
 import { throttle } from '@/lib/timing';
 import { runModule } from '@/modules';
 import '@/format/title-case';
@@ -661,6 +683,32 @@ const languageOverride = computed<string>({
 });
 function onPrefsCollapseChange() {
     webdavStorageGroup.value?.calculateLabelMinWidth();
+}
+// Preferences - Plugins
+async function onSelectPluginFile() {
+    await pickFile({
+        types: [
+            {
+                description: 'ZIP Plugin File',
+                accept: {
+                    'application/zip': ['.zip'],
+                    'application/x-zip-compressed': ['.zip'],
+                },
+            },
+        ]
+    }).then((zip) => {
+        runModule('plugin', 'installZip', { zip }).catch(() => {
+            $notify({
+                type: 'error',
+                title: t('module.pluginInstallZip.installError.title'),
+                message: t('module.pluginInstallZip.installError.message'),
+                duration: 9000,
+            });
+        });
+    });
+}
+async function onUninstallPlugin(pluginId: string) {
+    deletePlugin(pluginId);
 }
 // Preferences - Editor
 const preferenceMenuBarPosition = computed<'left' | 'right' | 'top' | 'bottom'>({
