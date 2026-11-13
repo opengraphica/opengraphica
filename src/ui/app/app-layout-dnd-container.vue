@@ -16,7 +16,7 @@
                 ref="headerToolbarComponent"
                 v-if="activeToolbar && activeToolbarPosition === 'top'"
                 :name="activeToolbar"
-                :class="['is-top', { 'is-overlay': !isActiveToolbarExclusive }]"
+                :class="['is-top', { 'is-overlay': !isActiveToolbarExclusive, 'is-exclusive': isActiveToolbarExclusive }]"
             />
         </header>
         <div class="og-layout-dnd-center" :aria-busy="isShowHistoryNotification && !isHistoryNotificationCompleted">
@@ -237,7 +237,7 @@ function calculateDndArea() {
         canvasStore.set('dndAreaWidth', mainRect.width * devicePixelRatio);
         if (footerToolbarComponent.value?.$el) {
             const toolbarRect = footerToolbarComponent.value.$el.getBoundingClientRect();
-            mainRect.height = (toolbarRect.top - canvasStore.state.viewportCanvasOffsetTop) - top - 8;
+            mainRect.height -= toolbarRect.height + 16; // (toolbarRect.top - canvasStore.state.viewportCanvasOffsetTop) - top - 8;
         }
         canvasStore.set('dndAreaHeight', mainRect.height * devicePixelRatio);
     }

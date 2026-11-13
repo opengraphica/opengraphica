@@ -133,10 +133,10 @@
     background: var(--og-menu-drawer-background-color);
     border-radius: 0.875rem;
     position: absolute;
-    top: .5rem;
-    bottom: .5rem;
-    left: .5rem;
-    right: .5rem;
+    top: calc(var(--og-safe-top) + 0.5rem);
+    bottom: calc(var(--og-safe-bottom) + 0.5rem);
+    left: calc(var(--og-safe-left) + 0.5rem);
+    right: calc(var(--og-safe-right) + 0.5rem);
     animation-fill-mode: forwards;
     animation-duration: 0.25s;
     animation-timing-function: ease-in;
@@ -152,11 +152,11 @@
 
     &.is-open-right {
         padding-left: 4rem;
-        right: var(--og-menu-drawer-open-horizontal-reveal-padding, 3.5rem);
+        right: calc(var(--og-safe-right, 0px) + var(--og-menu-drawer-open-horizontal-reveal-padding, 3.5rem));
         animation-name: og-menu-drawer-slide-right-open;
 
         .og-menu-drawer__close {
-            right: var(--og-menu-drawer-close-horizontal-offset, -2.5);
+            right: var(--og-menu-drawer-close-horizontal-offset, -2.5rem);
         }
 
         &.is-closing {
@@ -165,7 +165,7 @@
     }
     &.is-open-left {
         padding-right: 4rem;
-        left: 3.5rem;
+        left: calce(var(--og-safe-left, 0px) + 3.5rem);
         animation-name: og-menu-drawer-slide-left-open;
 
         .og-menu-drawer__close {
@@ -179,12 +179,12 @@
     }
     &.is-open-top {
         padding-bottom: 4rem;
-        top: 3.5rem;
+        top: calc(var(--og-safe-top) + 3.5rem);
         animation-name: og-menu-drawer-slide-top-open;
 
         .og-menu-drawer__close {
             top: -2.75rem;
-            right: .25rem;
+            right: 0.25rem;
         }
 
         &.is-closing {
@@ -193,13 +193,13 @@
     }
     &.is-open-bottom {
         padding-top: 4rem;
-        bottom: 3.5rem;
+        bottom: calc(var(--og-safe-bottom) + 3.5rem);
         animation-name: og-menu-drawer-slide-bottom-open;
 
         .og-menu-drawer__close {
             top: auto;
             bottom: -2.75rem;
-            right: .25rem;
+            right: 0.25rem;
         }
 
         &.is-closing {
@@ -220,7 +220,7 @@
 .og-menu-drawer__close {
     position: absolute;
     top: 1.0625rem;
-    right: 1.2rem;
+    right: calc(var(--og-safe-right) + 1.2rem);
     color: var(--og-menu-drawer-close-icon-color);
 
     &:hover {

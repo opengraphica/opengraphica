@@ -24,6 +24,10 @@
     --og-history-notification-overlay-z-index: 850000;
     --og-modal-collapse-mobile: 600px;
     --og-wait-z-index: 900000;
+    --og-safe-top: 0;
+    --og-safe-right: 0;
+    --og-safe-bottom: 0;
+    --og-safe-left: 0;
 }
 
 html {
@@ -39,6 +43,11 @@ body.og-full-page {
     margin: 0;
     padding: 0;
     overscroll-behavior-y: contain;
+
+    --og-safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+    --og-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+    --og-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+    --og-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
 
     .opengraphica {
         position: absolute;

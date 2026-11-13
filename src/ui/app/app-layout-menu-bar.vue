@@ -330,13 +330,23 @@ watch(() => activeToolGroup.value, () => {
         const buttonElement = button.ref as unknown as HTMLButtonElement;
             return buttonElement?.getAttribute('data-group-target') === activeToolGroup.value;
         })?.ref) as never;
-        showToolGroupExpandButton.value = activeToolGroupControls.value.length > 1;
+        showToolGroupExpandButton.value = activeToolGroupControls.value.length > 1 && activeMenuDrawerComponentName.value == null;
         toolGroupExpandOffsetTop.value = undefined;
         toolGroupExpandOffsetLeft.value = undefined;
         isActiveToolGroupExpanded.value = false;
         repositionToolGroupExpand();
     }, 0);
 }, { immediate: true });
+
+watch(() => activeMenuDrawerComponentName.value, () => {
+    if (activeMenuDrawerComponentName.value) {
+        showToolGroupExpandButton.value = activeToolGroupControls.value.length > 1 && activeMenuDrawerComponentName.value == null;
+    } else {
+        setTimeout(() => {
+            showToolGroupExpandButton.value = activeToolGroupControls.value.length > 1 && activeMenuDrawerComponentName.value == null;
+        }, 200);
+    }
+});
 
 watch([viewportWidth], () => {
     toggleMobileView();

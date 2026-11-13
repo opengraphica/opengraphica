@@ -8322,6 +8322,10 @@
   --og-history-notification-overlay-z-index: 850000;
   --og-modal-collapse-mobile: 600px;
   --og-wait-z-index: 900000;
+  --og-safe-top: 0;
+  --og-safe-right: 0;
+  --og-safe-bottom: 0;
+  --og-safe-left: 0;
 }
 
 html {
@@ -8337,6 +8341,10 @@ body.og-full-page {
   margin: 0;
   padding: 0;
   overscroll-behavior-y: contain;
+  --og-safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --og-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+  --og-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --og-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
 }
 body.og-full-page .opengraphica {
   position: absolute;
@@ -9084,6 +9092,10 @@ body.og-full-page .opengraphica {
 .opengraphica .og-dialogs .el-dialog {
   opacity: 1;
   transition: opacity 0.3s;
+  margin-top: calc(max(var(--og-safe-top, 0px), var(--el-dialog-margin-top, 0px)));
+  margin-left: calc(max(var(--og-safe-left, 0px), var(--el-dialog-margin-top, 0px)));
+  margin-right: calc(max(var(--og-safe-right, 0px), var(--el-dialog-margin-top, 0px)));
+  margin-bottom: calc(max(var(--og-safe-bottom, 0px), var(--el-dialog-margin-top, 0px)));
 }
 .opengraphica .og-dialogs .el-dialog .og-dock.og-dock--loading > :not(.og-dock__spinner) {
   position: absolute !important;
@@ -9100,7 +9112,10 @@ body.og-full-page .opengraphica {
 .opengraphica .og-dialogs .el-dialog.el-dialog--large,
 .opengraphica .og-dialogs .el-dialog.el-dialog--big,
 .opengraphica .og-dialogs .el-dialog.el-dialog--huge {
-    margin: 0.25rem !important;
+    margin-top: calc(var(--og-safe-top, 0px) + 0.25rem) !important;
+    margin-left: calc(var(--og-safe-left, 0px) + 0.25rem) !important;
+    margin-right: calc(var(--og-safe-right, 0px) + 0.25rem) !important;
+    margin-bottom: calc(var(--og-safe-bottom, 0px) + 0.25rem) !important;
     width: calc(100% - 0.5rem) !important;
     max-width: 100% !important;
     overflow: hidden !important;
@@ -9202,19 +9217,28 @@ body.og-full-page .opengraphica {
 @media screen and (max-width: 550px) {
   .opengraphica .og-floating-docks .og-floating-dock.og-floating-dock--visible.og-floating-dock--mobile-fullscreen {
     top: auto;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: calc(-1 * var(--og-safe-left));
+    right: auto;
+    bottom: calc(-1 * var(--og-safe-bottom));
+    width: 100vw;
+    width: 100dvw;
     border-radius: var(--og-border-radius-big) var(--og-border-radius-big) 0 0;
     transform: none !important;
     max-width: none !important;
     box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.2), 0 -4px 6px -4px rgba(0, 0, 0, 0.2);
+    padding-top: 0;
+    padding-left: var(--og-safe-left);
+    padding-right: var(--og-safe-right);
+    padding-bottom: var(--og-safe-bottom);
   }
   .opengraphica .og-floating-docks .og-floating-dock.og-floating-dock--visible.og-floating-dock--mobile-fullscreen .og-floating-dock__grip {
     display: none;
   }
   .opengraphica .og-floating-docks .og-floating-dock.og-floating-dock--visible.og-floating-dock--mobile-fullscreen .og-floating-dock__content {
-    padding: 0.5rem 1rem 1.5rem 1rem;
+    padding-top: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 1.5rem;
     width: 100%;
   }
 }
@@ -9230,6 +9254,7 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-floating-docks .og-floating-dock__content {
   display: flex;
+  position: relative;
   align-items: center;
   flex-wrap: wrap;
   padding: 0.5rem 1rem 0.5rem 0.5rem;
@@ -9287,10 +9312,10 @@ body.og-full-page .opengraphica {
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: var(--og-safe-top, 0px);
+  left: var(--og-safe-left, 0px);
+  right: var(--og-safe-right, 0px);
+  bottom: var(--og-safe-bottom, 0px);
   width: auto;
   height: auto;
   max-width: 100%;
@@ -9473,6 +9498,13 @@ body.og-full-page .opengraphica {
 .opengraphica .og-layout-menu-bar.is-positioned-right.is-menu-drawer-open {
   border-radius: 0 0.875rem 0.875rem 0;
 }
+.opengraphica .og-layout-menu-bar.is-menu-drawer-open .og-menu-tools {
+  opacity: 0 !important;
+  transition: opacity 0.2s !important;
+}
+.opengraphica .og-layout-menu-bar.is-menu-drawer-open .og-menu-bar__tool-group-expand {
+  display: none !important;
+}
 .opengraphica .og-layout-menu-bar > .flex .og-menu-section__title {
   display: flex;
   align-items: center;
@@ -9507,6 +9539,8 @@ body.og-full-page .opengraphica {
   flex-grow: 0;
   display: flex;
   overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.2s;
 }
 .opengraphica .og-layout-menu-bar > .flex > .og-menu-tools > .el-scrollbar {
   width: 100%;
@@ -9563,6 +9597,7 @@ body.og-full-page .opengraphica {
   background-color: var(--og-layout-menu-bar-background-color);
   color: var(--el-text-color-primary);
   border: none;
+  opacity: 1;
   padding: 0;
   position: absolute;
   left: 2.15rem;
@@ -10418,10 +10453,10 @@ body.og-full-page .opengraphica {
   background: var(--og-menu-drawer-background-color);
   border-radius: 0.875rem;
   position: absolute;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  left: 0.5rem;
-  right: 0.5rem;
+  top: calc(var(--og-safe-top) + 0.5rem);
+  bottom: calc(var(--og-safe-bottom) + 0.5rem);
+  left: calc(var(--og-safe-left) + 0.5rem);
+  right: calc(var(--og-safe-right) + 0.5rem);
   animation-fill-mode: forwards;
   animation-duration: 0.25s;
   animation-timing-function: ease-in;
@@ -10437,18 +10472,18 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-menu-drawer.is-open-right {
   padding-left: 4rem;
-  right: var(--og-menu-drawer-open-horizontal-reveal-padding, 3.5rem);
+  right: calc(var(--og-safe-right, 0px) + var(--og-menu-drawer-open-horizontal-reveal-padding, 3.5rem));
   animation-name: og-menu-drawer-slide-right-open;
 }
 .opengraphica .og-menu-drawer.is-open-right .og-menu-drawer__close {
-  right: var(--og-menu-drawer-close-horizontal-offset, -2.5);
+  right: var(--og-menu-drawer-close-horizontal-offset, -2.5rem);
 }
 .opengraphica .og-menu-drawer.is-open-right.is-closing {
   animation-name: og-menu-drawer-slide-right-close;
 }
 .opengraphica .og-menu-drawer.is-open-left {
   padding-right: 4rem;
-  left: 3.5rem;
+  left: calce(var(--og-safe-left, 0px)3.5rem);
   animation-name: og-menu-drawer-slide-left-open;
 }
 .opengraphica .og-menu-drawer.is-open-left .og-menu-drawer__close {
@@ -10460,7 +10495,7 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-menu-drawer.is-open-top {
   padding-bottom: 4rem;
-  top: 3.5rem;
+  top: calc(var(--og-safe-top) + 3.5rem);
   animation-name: og-menu-drawer-slide-top-open;
 }
 .opengraphica .og-menu-drawer.is-open-top .og-menu-drawer__close {
@@ -10472,7 +10507,7 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-menu-drawer.is-open-bottom {
   padding-top: 4rem;
-  bottom: 3.5rem;
+  bottom: calc(var(--og-safe-bottom) + 3.5rem);
   animation-name: og-menu-drawer-slide-bottom-open;
 }
 .opengraphica .og-menu-drawer.is-open-bottom .og-menu-drawer__close {
@@ -10495,7 +10530,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-menu-drawer__close {
   position: absolute;
   top: 1.0625rem;
-  right: 1.2rem;
+  right: calc(var(--og-safe-right) + 1.2rem);
   color: var(--og-menu-drawer-close-icon-color);
 }
 .opengraphica .og-menu-drawer__close:hover {
@@ -11305,6 +11340,15 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-toolbar.is-overlay.is-menu-bar-top {
   bottom: 0.5rem;
+}
+.opengraphica .og-toolbar.is-exclusive {
+  margin-top: calc(-1 * var(--og-safe-top));
+  margin-left: calc(-1 * var(--og-safe-left));
+  padding-top: var(--og-safe-top);
+  padding-left: var(--og-safe-left);
+  padding-right: var(--og-safe-right);
+  width: calc(100% + var(--og-safe-left) + var(--og-safe-right));
+  max-width: calc(100% + var(--og-safe-left) + var(--og-safe-right));
 }
 .opengraphica .og-toolbar .og-toolbar-edit-confirm {
   display: flex;

@@ -53,6 +53,10 @@
     .el-dialog {
         opacity: 1;
         transition: opacity 0.3s;
+        margin-top: calc(max(var(--og-safe-top, 0px), var(--el-dialog-margin-top, 0px)));
+        margin-left: calc(max(var(--og-safe-left, 0px), var(--el-dialog-margin-top, 0px)));
+        margin-right: calc(max(var(--og-safe-right, 0px), var(--el-dialog-margin-top, 0px)));
+        margin-bottom: calc(max(var(--og-safe-bottom, 0px), var(--el-dialog-margin-top, 0px)));
 
         .og-dock.og-dock--loading {
             > :not(.og-dock__spinner) {
@@ -76,7 +80,10 @@
         .el-dialog.el-dialog--large,
         .el-dialog.el-dialog--big,
         .el-dialog.el-dialog--huge {
-            margin: 0.25rem !important;
+            margin-top: calc(var(--og-safe-top, 0px) + 0.25rem) !important;
+            margin-left: calc(var(--og-safe-left, 0px) + 0.25rem) !important;
+            margin-right: calc(var(--og-safe-right, 0px) + 0.25rem) !important;
+            margin-bottom: calc(var(--og-safe-bottom, 0px) + 0.25rem) !important;
             width: calc(100% - 0.5rem) !important;
             max-width: 100% !important;
             overflow: hidden !important;

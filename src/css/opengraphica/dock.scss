@@ -89,20 +89,29 @@
             @media screen and (max-width: 550px) {
                 &.og-floating-dock--mobile-fullscreen {
                     top: auto;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
+                    left: calc(-1 * var(--og-safe-left));
+                    right: auto;
+                    bottom: calc(-1 * var(--og-safe-bottom));
+                    width: 100vw;
+                    width: 100dvw;
                     border-radius: var(--og-border-radius-big) var(--og-border-radius-big) 0 0;
                     transform: none !important;
                     max-width: none !important;
                     box-shadow: 0 -10px 15px -3px rgb(0 0 0 / 0.2), 0 -4px 6px -4px rgb(0 0 0 / 0.2);
+                    padding-top: 0;
+                    padding-left: var(--og-safe-left);
+                    padding-right: var(--og-safe-right);
+                    padding-bottom: var(--og-safe-bottom);
 
                     .og-floating-dock__grip {
                         display: none;
                     }
 
                     .og-floating-dock__content {
-                        padding: 0.5rem 1rem 1.5rem 1rem;
+                        padding-top: 0.5rem;
+                        padding-left: 1rem;
+                        padding-right: 1rem;
+                        padding-bottom: 1.5rem;
                         width: 100%;
                     }
                 }
@@ -123,6 +132,7 @@
 
     .og-floating-dock__content {
         display: flex;
+        position: relative; // For cancel/apply buttons in various docks
         align-items: center;
         flex-wrap: wrap;
         padding: 0.5rem 1rem 0.5rem 0.5rem;

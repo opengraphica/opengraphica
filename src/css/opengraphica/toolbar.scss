@@ -133,6 +133,16 @@
         }
     }
 
+    &.is-exclusive {
+        margin-top: calc(-1 * var(--og-safe-top));
+        margin-left: calc(-1 * var(--og-safe-left));
+        padding-top: var(--og-safe-top);
+        padding-left: var(--og-safe-left);
+        padding-right: var(--og-safe-right);
+        width: calc(100% + var(--og-safe-left) + var(--og-safe-right));
+        max-width: calc(100% + var(--og-safe-left) + var(--og-safe-right));
+    }
+
     .og-toolbar-edit-confirm {
         display: flex;
         align-items: center;
