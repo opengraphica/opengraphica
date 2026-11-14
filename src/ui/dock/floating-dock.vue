@@ -3,10 +3,10 @@
         <div
             ref="dockElement"
             class="og-floating-dock"
-            :class="{
+            :class="[dockClass, {
                 'og-floating-dock--visible': props.visible,
                 'og-floating-dock--mobile-fullscreen': props.mobileFullscreen,
-            }"
+            }]"
             :style="{
                 transform: `translate(${left}px, ${top}px)`,
                 maxWidth: `${maxWidth}px`,
@@ -58,6 +58,10 @@ const props = defineProps({
     mobileFullscreen: {
         type: Boolean,
         default: false,
+    },
+    dockClass: {
+        type: String,
+        default: '',
     },
     contentClass: {
         type: String,

@@ -172,10 +172,12 @@ let resizeDebounceHandle: number | undefined = undefined;
 watch([viewWidth, viewHeight, menuBarPosition, activeToolbar], () => {
     clearTimeout(resizeDebounceHandle);
     resizeDebounceHandle = window.setTimeout(async () => {
-        showDock.value = viewWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint;
-        await nextTick();
-        calculateDndArea();
-        onResizeLayout();
+        if (viewWidth.value > 0) {
+            showDock.value = viewWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint;
+            await nextTick();
+            calculateDndArea();
+            onResizeLayout();
+        }
     }, 400);
 });
 

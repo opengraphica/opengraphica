@@ -67,6 +67,8 @@
         &.og-floating-docks--has-visible-mobile-fullscreen {
             top: auto;
             bottom: 0;
+            right: 0;
+            width: auto;
             z-index: 12;
         }
     }
@@ -75,6 +77,7 @@
         position: absolute;
         top: 0;
         left: 0;
+        right: 0;
         display: flex;
         background: var(--og-layout-menu-bar-background-color);
         box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-shadow-color);
@@ -90,10 +93,9 @@
                 &.og-floating-dock--mobile-fullscreen {
                     top: auto;
                     left: calc(-1 * var(--og-safe-left));
-                    right: auto;
+                    right: calc(-1 * var(--og-safe-right));
                     bottom: calc(-1 * var(--og-safe-bottom));
-                    width: 100vw;
-                    width: 100dvw;
+                    width: auto;
                     border-radius: var(--og-border-radius-big) var(--og-border-radius-big) 0 0;
                     transform: none !important;
                     max-width: none !important;

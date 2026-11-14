@@ -32,6 +32,8 @@ interface AppEmitterEvents {
         immediate?: boolean;
     },
     'app.notify': Partial<NotificationProps> & { onCreated?: (handle: NotificationHandle) => void; };
+    'app.preload.show': undefined;
+    'app.preload.hide': undefined;
     'app.runModule': {
         action?: ModuleDefinition['action'];
         groupName?: string;

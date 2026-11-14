@@ -8322,10 +8322,10 @@
   --og-history-notification-overlay-z-index: 850000;
   --og-modal-collapse-mobile: 600px;
   --og-wait-z-index: 900000;
-  --og-safe-top: 0;
-  --og-safe-right: 0;
-  --og-safe-bottom: 0;
-  --og-safe-left: 0;
+  --og-safe-top: 0px;
+  --og-safe-right: 0px;
+  --og-safe-bottom: 0px;
+  --og-safe-left: 0px;
 }
 
 html {
@@ -9194,6 +9194,8 @@ body.og-full-page .opengraphica {
   .opengraphica .og-floating-docks.og-floating-docks--has-visible-mobile-fullscreen {
     top: auto;
     bottom: 0;
+    right: 0;
+    width: auto;
     z-index: 12;
   }
 }
@@ -9201,6 +9203,7 @@ body.og-full-page .opengraphica {
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
   display: flex;
   background: var(--og-layout-menu-bar-background-color);
   box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-shadow-color);
@@ -9216,10 +9219,9 @@ body.og-full-page .opengraphica {
   .opengraphica .og-floating-docks .og-floating-dock.og-floating-dock--visible.og-floating-dock--mobile-fullscreen {
     top: auto;
     left: calc(-1 * var(--og-safe-left));
-    right: auto;
+    right: calc(-1 * var(--og-safe-right));
     bottom: calc(-1 * var(--og-safe-bottom));
-    width: 100vw;
-    width: 100dvw;
+    width: auto;
     border-radius: var(--og-border-radius-big) var(--og-border-radius-big) 0 0;
     transform: none !important;
     max-width: none !important;

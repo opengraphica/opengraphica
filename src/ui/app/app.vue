@@ -2,6 +2,7 @@
     <component v-if="isAllPluginsLoaded && isThemeLoaded && AppMainComponent" :is="AppMainComponent" />
     <div
         v-if="isShowingPreloadAnimation"
+        ref="preloadContainer"
         class="og-preload"
         :class="{
             'og-preload--fade-out': isHidingPreloadAnimation,    
@@ -68,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, markRaw, nextTick, provide, ref, watch, type Component } from 'vue';
+import { computed, defineComponent, markRaw, nextTick, onMounted, provide, ref, watch, type Component } from 'vue';
 import { useAppPreloadBlocker, isAppPreloading } from '@/composables/app-preload-blocker';
 import { usePlugin, getAppConfig } from '@/composables/app-plugin';
 import preferencesStore from '@/store/preferences';
@@ -82,6 +83,16 @@ export default defineComponent({
         const { loading: isPreloadBlocked } = useAppPreloadBlocker(); 
 
         const assetsBasePath = preferencesStore.state.assetsBasePath;
+
+        const preloadContainer = ref<HTMLDivElement>();
+
+        onMounted(() => {
+            if (preloadContainer.value?.parentElement) {
+                if (!preloadContainer.value.closest('.og-full-page')) {
+                    preloadContainer.value.parentElement.style.position = 'relative';
+                }
+            }
+        });
 
         /*------------------*\
         | Import Vue Plugins |
@@ -149,6 +160,22 @@ export default defineComponent({
         });
 
         /*----------------------*\
+        | Manual Preload Display |
+        \*----------------------*/
+
+        const isManualPreloadDisplay = ref(false);
+
+        appEmitter.on('app.preload.show', () => {
+            isShowingPreloadAnimation.value = true;
+            isHidingPreloadAnimation.value = false;
+            isManualPreloadDisplay.value = true;
+        });
+
+        appEmitter.on('app.preload.hide', () => {
+            isManualPreloadDisplay.value = false;
+        });
+
+        /*----------------------*\
         | Show Preload Animation |
         \*----------------------*/
 
@@ -160,6 +187,7 @@ export default defineComponent({
                 !AppMainComponent.value ||
                 !isThemeLoaded.value ||
                 !isAllPluginsLoaded.value ||
+                isManualPreloadDisplay.value ||
                 isAppPreloading.value
             );
         });
@@ -205,7 +233,7 @@ export default defineComponent({
                 opacity: 0;
                 transition: opacity 0.5s;
             }
-            body.og-full-page .og-preload {
+            .og-preload {
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -351,6 +379,7 @@ export default defineComponent({
 
         return {
             assetsBasePath,
+            preloadContainer,
             isShowingPreloadAnimation,
             isHidingPreloadAnimation,
             isPreloading,

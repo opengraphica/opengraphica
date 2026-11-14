@@ -113,7 +113,7 @@
             v-model:left="effectSettingsDockLeft"
             :visible="floatingDocksVisible"
             mobile-fullscreen
-            content-class="max-w-128"
+            dock-class="min-md:w-128!"
         >
             <div class="w-1 h-8">
                 <div class="absolute right-4 gap-2 flex flex-row items-center justify-end w-full">
