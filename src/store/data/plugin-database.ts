@@ -53,11 +53,16 @@ export async function storePlugin(packageJson: Record<string, any>, fileBlobs: R
     for (const otherPluginId in pluginMetaById.value) {
         const otherPlugin = pluginMetaById.value[otherPluginId];
         if (otherPlugin.name === packageJson.name) {
-            if (compareSemver(packageJson.version, otherPlugin.version) <= 0) {
-                console.warn('[src/store/data/plugin-database.ts] Plugin already exists, and not a newer version.');
+            if (compareSemver(packageJson.version, otherPlugin.version) === 0) {
+                console.warn('[src/store/data/plugin-database.ts] Plugin already exists, with equal version.');
                 return false;
             } else {
+                const stalePluginId = packageJson.pluginId;
                 packageJson.pluginId = otherPlugin.pluginId;
+                for (const key in fileBlobs) {
+                    fileBlobs[key.replace(stalePluginId, otherPlugin.pluginId)] = fileBlobs[key];
+                    delete fileBlobs[key];
+                }
                 break;
             }
         }
@@ -126,17 +131,21 @@ export async function readAllPlugins() {
 
 async function installAllPlugins() {
     const { createEditorPluginApi } = await import('@/composables/editor-plugin-api');
+    const pluginInstallPromises: Promise<void>[] = [];
     for (const pluginId in pluginMetaById.value) {
         const { main } = pluginMetaById.value[pluginId];
         if (!main) continue;
         const editorPluginApiKey = 'editorPluginApi' + pluginId.replace(/\-/g, '');
-        (window as any)[editorPluginApiKey] = createEditorPluginApi(pluginId);
+        const pluginApi = createEditorPluginApi(pluginId);
+        pluginInstallPromises.push(pluginApi._installPromise);
+        (window as any)[editorPluginApiKey] = pluginApi;
         const script = document.createElement('script');
         script.setAttribute('type', 'module');
         script.textContent = `
             try {
                 const { install } = await import('plugins/${pluginId}/${main}');
                 install(window['${editorPluginApiKey}']);
+                window['${editorPluginApiKey}']._notifyPluginInstallSuccess();
             } catch (error) {
                 window['${editorPluginApiKey}']._notifyPluginInstallError(error);
             } finally {
@@ -145,6 +154,7 @@ async function installAllPlugins() {
         `;
         document.head.appendChild(script);
     }
+    await Promise.allSettled(pluginInstallPromises);
 }
 
 export function getPluginMeta(pluginId: string): Record<string, any> {

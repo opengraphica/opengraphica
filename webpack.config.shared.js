@@ -156,6 +156,7 @@ module.exports = function setupConfig(config) {
             ],
             alias: {
                 '@': path.resolve(__dirname, 'src/'),
+                'vue': 'vue/dist/vue.esm-bundler.js',
                 'vue-i18n': 'vue-i18n/dist/vue-i18n.esm-bundler.js',
                 'webdav/web': path.resolve(__dirname, 'node_modules/webdav/dist/web/index.js')
             },

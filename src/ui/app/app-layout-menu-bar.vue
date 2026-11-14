@@ -366,6 +366,10 @@ watch(() => props.layoutPlacement, (layoutPlacement) => {
     }[layoutPlacement] as any;
 }, { immediate: true });
 
+watch(() => editorStore.state.pluginMenuBarToolGroups, () => {
+    actionGroups.value = createActionGroups();
+}, { deep: true });
+
 /*-----------*\
 | Composition |
 \*-----------*/
@@ -474,6 +478,55 @@ function createActionGroups(forceDisplayMode?: string): { [key: string]: MenuBar
                 }
                 sectionActionGroups.push(actionGroup);
             }
+
+            // Merge with plugin tool group definitions
+            if (section === 'tools') {
+                const pluginMenuBarToolGroups = editorStore.state.pluginMenuBarToolGroups;
+                for (const { definition, placeAround } of pluginMenuBarToolGroups) {
+                    definition.id = definition.action?.target ?? '';
+                    if (definition.action?.type === 'toolGroup') {
+                        let toolGroup: MenuBarToolGroupButton | null = null;
+                        for (const existingActionGroup of sectionActionGroups) {
+                            if (
+                                existingActionGroup.action?.type === 'toolGroup'
+                                && existingActionGroup.action?.target === definition.action?.target
+                            ) {
+                                toolGroup = existingActionGroup;
+                                if (toolGroup.controls) {
+                                    for (const newControl of definition.controls ?? []) {
+                                        const existingControl = !toolGroup.controls.find((control) => {
+                                            return control.action?.type === newControl.action?.type
+                                                && control.action?.target === newControl.action?.target;
+                                        });
+                                        if (!existingControl) {
+                                            toolGroup.controls.push(newControl);
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        if (!toolGroup) {
+                            toolGroup = definition;
+                            if (placeAround) {
+                                const otherToolGroupIndex = sectionActionGroups.findIndex((group) => {
+                                    return group.action?.type === 'toolGroup' && group.action?.target === placeAround.otherToolGroup;
+                                });
+                                if (otherToolGroupIndex > -1) {
+                                    sectionActionGroups.splice(
+                                        otherToolGroupIndex + (placeAround.position === 'before' ? 0 : 1), 0, toolGroup
+                                    );
+                                } else {
+                                    sectionActionGroups.push(toolGroup);
+                                }
+                            } else {
+                                sectionActionGroups.push(toolGroup);
+                            }
+                        }
+                    }
+                }
+            }
+
             actionGroups[section] = sectionActionGroups;
         }
     }

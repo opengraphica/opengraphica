@@ -9093,8 +9093,6 @@ body.og-full-page .opengraphica {
   opacity: 1;
   transition: opacity 0.3s;
   margin-top: calc(max(var(--og-safe-top, 0px), var(--el-dialog-margin-top, 0px)));
-  margin-left: calc(max(var(--og-safe-left, 0px), var(--el-dialog-margin-top, 0px)));
-  margin-right: calc(max(var(--og-safe-right, 0px), var(--el-dialog-margin-top, 0px)));
   margin-bottom: calc(max(var(--og-safe-bottom, 0px), var(--el-dialog-margin-top, 0px)));
 }
 .opengraphica .og-dialogs .el-dialog .og-dock.og-dock--loading > :not(.og-dock__spinner) {

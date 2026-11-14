@@ -13,7 +13,7 @@
     >
         <template v-for="overlayName in overlayGroup.overlays" :key="overlayName">
             <component
-                :is="'overlay-' + overlayName"
+                :is="components['overlay-' + overlayName]"
                 :data-overlay-name="overlayName"
                 :css-view-transform="cssViewTransform"
             />
@@ -22,30 +22,32 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, defineAsyncComponent, computed, onErrorCaptured, watch } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { checkWebUpdates } from '@/check-updates';
-import { defineComponent, defineAsyncComponent, computed, onErrorCaptured } from 'vue';
 import editorStore from '@/store/editor';
+import { camelCaseToKebabCase } from '@/lib/string';
+
+const components = {
+    'overlay-clone-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-clone-brush' */ `@/ui/overlay/overlay-clone-brush.vue`)),
+    'overlay-canvas-border': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-canvas-border' */ `@/ui/overlay/overlay-canvas-border.vue`)),
+    'overlay-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-crop-resize' */ `@/ui/overlay/overlay-crop-resize.vue`)),
+    'overlay-deform-blur': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-deform-blur' */ `@/ui/overlay/overlay-deform-blur.vue`)),
+    'overlay-deform-sharpen': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-deform-sharpen' */ `@/ui/overlay/overlay-deform-sharpen.vue`)),
+    'overlay-draw-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-brush' */ `@/ui/overlay/overlay-draw-brush.vue`)),
+    'overlay-draw-bucket-fill': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-bucket-fill' */ `@/ui/overlay/overlay-draw-bucket-fill.vue`)),
+    'overlay-draw-gradient': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-gradient' */ `@/ui/overlay/overlay-draw-gradient.vue`)),
+    'overlay-draw-shape': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-shape' */ `@/ui/overlay/overlay-draw-shape.vue`)),
+    'overlay-effect': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-effect' */ `@/ui/overlay/overlay-effect.vue`)),
+    'overlay-erase-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-erase-brush' */ `@/ui/overlay/overlay-erase-brush.vue`)),
+    'overlay-free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-free-transform' */ `@/ui/overlay/overlay-free-transform.vue`)),
+    'overlay-selection': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-selection' */ `@/ui/overlay/overlay-selection.vue`)),
+    'overlay-text': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-text' */ `@/ui/overlay/overlay-text.vue`)),
+    'overlay-text-selection': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-text' */ `@/ui/overlay/overlay-text-selection.vue`)),
+};
 
 export default defineComponent({
     name: 'AppCanvasOverlays',
-    components: {
-        'overlay-clone-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-clone-brush' */ `@/ui/overlay/overlay-clone-brush.vue`)),
-        'overlay-canvas-border': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-canvas-border' */ `@/ui/overlay/overlay-canvas-border.vue`)),
-        'overlay-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-crop-resize' */ `@/ui/overlay/overlay-crop-resize.vue`)),
-        'overlay-deform-blur': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-deform-blur' */ `@/ui/overlay/overlay-deform-blur.vue`)),
-        'overlay-deform-sharpen': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-deform-sharpen' */ `@/ui/overlay/overlay-deform-sharpen.vue`)),
-        'overlay-draw-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-brush' */ `@/ui/overlay/overlay-draw-brush.vue`)),
-        'overlay-draw-bucket-fill': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-bucket-fill' */ `@/ui/overlay/overlay-draw-bucket-fill.vue`)),
-        'overlay-draw-gradient': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-gradient' */ `@/ui/overlay/overlay-draw-gradient.vue`)),
-        'overlay-draw-shape': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-shape' */ `@/ui/overlay/overlay-draw-shape.vue`)),
-        'overlay-effect': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-effect' */ `@/ui/overlay/overlay-effect.vue`)),
-        'overlay-erase-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-erase-brush' */ `@/ui/overlay/overlay-erase-brush.vue`)),
-        'overlay-free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-free-transform' */ `@/ui/overlay/overlay-free-transform.vue`)),
-        'overlay-selection': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-selection' */ `@/ui/overlay/overlay-selection.vue`)),
-        'overlay-text': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-text' */ `@/ui/overlay/overlay-text.vue`)),
-        'overlay-text-selection': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-text' */ `@/ui/overlay/overlay-text-selection.vue`))
-    },
     props: {
         ignoreTransform: {
             type: Boolean,
@@ -86,8 +88,12 @@ export default defineComponent({
             }
 
             for (const overlay of overlayList) {
+                const pluginToolDefinition = editorStore.get('pluginTools').find((tool) => {
+                    return overlay == 'plugin-' + camelCaseToKebabCase(tool.group) + '-' + camelCaseToKebabCase(tool.name);
+                });
+
                 const blendMode = blendModes[overlay];
-                const isIgnoreTransform = ignoreTransformWith.includes(overlay);
+                const isIgnoreTransform = ignoreTransformWith.includes(overlay) || !!pluginToolDefinition;
                 if (!currentGroup || isIgnoreTransform !== previousIsIgnoreTransform || blendMode !== previousBlendMode) {
                     if (currentGroup) {
                         groups.push(currentGroup);
@@ -99,7 +105,10 @@ export default defineComponent({
                         overlays: [],
                     };
                 }
-                if (currentGroup) {
+                if (currentGroup && (!pluginToolDefinition || pluginToolDefinition.overlay)) {
+                    if (pluginToolDefinition) {
+                        components['overlay-' + overlay] = pluginToolDefinition.overlay;
+                    }
                     currentGroup.overlays.push(overlay);
                 }
                 previousBlendMode = blendMode;
@@ -112,12 +121,34 @@ export default defineComponent({
             return groups;
         });
 
+        watch(() => editorStore.state.activeToolOverlays, async () => {
+            let isNewOverlayLoaded = false;
+            for (const overlay of editorStore.state.activeToolOverlays) {
+                const pluginToolDefinition = editorStore.get('pluginTools').find((tool) => {
+                    return overlay == 'plugin-' + camelCaseToKebabCase(tool.group) + '-' + camelCaseToKebabCase(tool.name);
+                });
+                if (pluginToolDefinition && !pluginToolDefinition.overlay) {
+                    try {
+                        pluginToolDefinition.overlay = await pluginToolDefinition.getOverlay();
+                        components['overlay-' + overlay] = pluginToolDefinition.overlay;
+                        isNewOverlayLoaded = true;
+                    } catch (error) {
+                        console.warn('[src/ui/overlay/overlay.vue] Error retrieving tool plugin overlay.', error);
+                    }
+                }
+            }
+            if (isNewOverlayLoaded) {
+                editorStore.set('activeToolOverlays', [...editorStore.state.activeToolOverlays]);
+            }
+        }, { immediate: true });
+
         onErrorCaptured((error) => {
             checkWebUpdates();
             console.error(error);
         });
 
         return {
+            components,
             overlayGroups,
         };
     }

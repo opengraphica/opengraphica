@@ -29,6 +29,7 @@ export async function installZip({ zip }: InstallZipOptions) {
 
     const blobs: Record<string, Blob> = {};
     for (const key in archive) {
+        if (key.endsWith('/')) continue;
         let mimeType = 'application/javascript';
         if (key.endsWith('.json')) {
             mimeType = 'application/json';
