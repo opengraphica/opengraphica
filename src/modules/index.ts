@@ -1,8 +1,11 @@
 import { ref } from 'vue';
 import moduleGroupConfig from '@/config/module-groups.json';
-import { ModuleGroupDefinition, ModuleDefinition } from '@/types';
+import editorStore from '@/store/editor';
 import appEmitter from '@/lib/emitter';
+import { camelCaseToKebabCase } from '@/lib/string';
 import { checkWebUpdates } from '@/check-updates';
+
+import type { ModuleGroupDefinition, ModuleDefinition } from '@/types';
 
 interface RunModuleOptions {
     hideWaitAnimation?: boolean;
@@ -111,18 +114,27 @@ export async function runModuleByDefinition(module: ModuleDefinition, moduleProp
 }
 
 export async function runModule(moduleGroupName: string, moduleName: string, moduleProperties?: Record<string, unknown>, options: RunModuleOptions = {}) {
-    if (moduleGroups[moduleGroupName]) {
-        const module = moduleGroups[moduleGroupName].modules[moduleName];
-        if (module) {
-            if (moduleGroupName === 'history') {
-                options.hideWaitAnimation = true;
-            }
-            await runModuleByDefinition(module, moduleProperties, options);
-        } else {
-            throw new Error('Unknown module name.');
+    let module: ModuleDefinition = moduleGroups[moduleGroupName]?.modules[moduleName];
+    if (!module) {
+        const pluginModule = editorStore.get('pluginModules').find(
+            (definition) => definition.group === moduleGroupName && definition.name === moduleName
+        );
+        if (pluginModule) {
+            module = {
+                action: {
+                    type: 'ui',
+                    target: 'plugin-' + camelCaseToKebabCase(pluginModule.group) + '-' + camelCaseToKebabCase(pluginModule.name),
+                },
+            };
         }
+    }
+    if (module) {
+        if (moduleGroupName === 'history') {
+            options.hideWaitAnimation = true;
+        }
+        await runModuleByDefinition(module, moduleProperties, options);
     } else {
-        throw new Error('Unknown module group name.');
+        throw new Error('Unknown module name.');
     }
 }
 

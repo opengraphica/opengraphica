@@ -488,6 +488,91 @@ watch([activeTab], ([newActiveTab]) => {
     visitedTabs.value[newActiveTab] = true;
 }, { immediate: true });
 
+const tabMenus = computed(() => {
+    const tabMenus = [
+        {
+            tab: 'file',
+            menu: [
+                {
+                    items: [
+                        {
+                            condition: () => showRestoreImage.value,
+                            icon: 'bi bi-recycle',
+                            name: 'dock.settings.file.menu.restore',
+                            action: 'restore',
+                        },
+                        {
+                            icon: 'bi bi-file-earmark-plus',
+                            name: 'dock.settings.file.menu.new',
+                            action: 'new',
+                        },
+                        {
+                            icon: 'bi bi-folder2-open',
+                            name: 'dock.settings.file.menu.open',
+                            action: 'open',
+                        },
+                        {
+                            condition: () => !!vendorCustomSaveCallback.value,
+                            icon: 'bi bi-download',
+                            name: 'dock.settings.file.menu.save',
+                            action: 'save',
+                        },
+                        {
+                            condition: () => !vendorCustomSaveCallback.value,
+                            icon: 'bi bi-box-arrow-up',
+                            name: 'dock.settings.file.menu.export',
+                            action: 'export',
+                        },
+                        {
+                            condition: () => !vendorCustomSaveCallback.value,
+                            icon: 'bi bi-download',
+                            name: 'dock.settings.file.menu.saveAs',
+                            action: 'saveAs',
+                        },
+                    ],
+                },
+                {
+                    items: [
+                        {
+                            icon: 'bi bi-plus-circle',
+                            name: 'dock.settings.file.menu.insertPhoto',
+                            action: 'insertPhoto',
+                        },
+                        {
+                            icon: 'bi bi-camera',
+                            name: 'dock.settings.file.menu.takePhoto',
+                            action: 'takePhoto',
+                        },
+                        {
+                            condition: () => canShare.value,
+                            icon: 'bi bi-share',
+                            name: 'dock.settings.file.menu.shareImage',
+                            action: 'shareImage',
+                        },
+                    ],
+                },
+                {
+                    items: [
+                        {
+                            condition: () => canQuit.value,
+                            icon: 'bi bi-escape',
+                            name: 'dock.settings.file.menu.quit',
+                            action: 'quit',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            tab: 'view',
+            menu: [
+
+            ]
+        }
+    ];
+    return tabMenus;
+});
+
 // File operations
 const { vendorCustomSaveCallback } = toRefs(preferencesStore.state);
 const showRestoreImage = ref(false);

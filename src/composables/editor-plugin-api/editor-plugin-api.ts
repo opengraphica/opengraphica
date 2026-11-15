@@ -1,4 +1,4 @@
-import editorStore, { type PluginMenuBarToolGroup } from '@/store/editor';
+import editorStore, { type PluginMenuBarToolGroup, type PluginSettingsDockMenuItemDefinition } from '@/store/editor';
 import preferencesStore from '@/store/preferences';
 
 import appEmitter from '@/lib/emitter';
@@ -11,6 +11,53 @@ declare var __webpack_require__: any;
 
 let moduleChunkMap: Record<string, { id: string, chunks: number[] }> | null = null;
 
+interface CreateModuleDefinition {
+    name: string;
+    group: string;
+    dialog: () => Promise<ReturnType<typeof defineComponent | typeof defineAsyncComponent>>;
+}
+async function createModule(options: CreateModuleDefinition) {
+    try {
+        const { name, group, dialog } = options;
+
+        const pluginModules = editorStore.get('pluginModules');
+
+        for (const { name: otherModuleName, group: otherModuleGroup } of pluginModules) {
+            if (name === otherModuleName && group === otherModuleGroup) {
+                throw new Error(`A module with the name "${name}" and group "${group}" already exists.`);
+            }
+        }
+        const moduleGroups = await import('@/config/module-groups.json');
+        for (const otherModuleGroup in moduleGroups) {
+            const modules = moduleGroups[otherModuleGroup].modules;
+            for (const otherModuleName in modules) {
+                if (name === otherModuleName && group === otherModuleGroup) {
+                    throw new Error(`A module with the name "${name}" and group "${group}" already exists.`);
+                }
+            }
+        }
+
+        pluginModules.push({
+            name,
+            group,
+            getDialog: dialog,
+        });
+        editorStore.set('pluginModules', pluginModules);
+    } catch (error) {
+        console.warn('[src/composables/editor-plugin-api.ts] Error when creating module.', error);
+    }
+}
+
+async function createSettingsDockMenuItem(options: PluginSettingsDockMenuItemDefinition) {
+    try {
+        const pluginSettingsDockMenuItems = editorStore.get('pluginSettingsDockMenuItems');
+        pluginSettingsDockMenuItems.push(options);
+        editorStore.set('pluginSettingsDockMenuItems', pluginSettingsDockMenuItems);
+    } catch (error) {
+        console.warn('[src/composables/editor-plugin-api.ts] Error when creating settings dock menu item.', error);
+    }
+}
+
 interface CreateToolDefinition {
     name: string;
     group: string;
@@ -18,7 +65,6 @@ interface CreateToolDefinition {
     overlay: () => Promise<ReturnType<typeof defineComponent | typeof defineAsyncComponent>>;
     toolbar: () => Promise<ReturnType<typeof defineComponent | typeof defineAsyncComponent>>;
 }
-
 async function createTool(options: CreateToolDefinition) {
     try {
         const { name, group, controller, overlay, toolbar } = options;
@@ -46,7 +92,7 @@ async function createTool(options: CreateToolDefinition) {
             getController: controller,
             getOverlay: overlay,
             getToolbar: toolbar,
-        })
+        });
         editorStore.set('pluginTools', pluginTools);
     } catch (error) {
         console.warn('[src/composables/editor-plugin-api.ts] Error when creating tool.', error);
@@ -107,7 +153,7 @@ export function createEditorPluginApi(pluginId: string) {
                 )).json();
             }
             let normalizedPath = path.replace(/@\//g, 'src/');
-            if (!/\.(?:js|json|ts)$/.test(normalizedPath)) {
+            if (!/\.(?:js|json|ts|vue)$/.test(normalizedPath)) {
                 normalizedPath += '.ts';
             }
             const entry = moduleChunkMap?.[normalizedPath];
@@ -135,6 +181,8 @@ export function createEditorPluginApi(pluginId: string) {
 
     return {
         createMenuBarToolGroup,
+        createModule,
+        createSettingsDockMenuItem,
         createTool,
         import: pluginScopedImport,
         _installPromise: pluginInstallPromise,

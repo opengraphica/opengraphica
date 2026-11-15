@@ -1,10 +1,11 @@
+import { Color } from 'three/src/math/Color';
 import { Timer } from 'three/src/core/Timer';
 import { Vector2 } from 'three/src/math/Vector2';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 import { CopyShader } from './copy-shader';
 import { ShaderPass } from './shader-pass';
 import { MaskPass, ClearMaskPass } from './mask-pass';
-import { UnsignedByteType, HalfFloatType, RGBAFormat } from 'three/src/constants';
+import { UnsignedByteType, FloatType, HalfFloatType, RGBAFormat } from 'three/src/constants';
 
 import type { Pass } from './pass';
 import type { WebGLRenderer } from 'three';
@@ -106,6 +107,19 @@ class EffectComposer {
             pass.dispose();
         }
         this.passes = [];
+    }
+
+    clearRenderer() {
+        const previousTarget = this.renderer.getRenderTarget();
+        const previousColor = this.renderer.getClearColor(new Color()).clone();
+        const previousAlpha = this.renderer.getClearAlpha();
+        try {
+            this.renderer.setClearColor(0x000000, 0);
+            this.renderer.clear(true, false, false);
+        } finally {
+            this.renderer.setRenderTarget(previousTarget);
+            this.renderer.setClearColor(previousColor, previousAlpha);
+        }
     }
 
     isLastEnabledPass(passIndex: number) {

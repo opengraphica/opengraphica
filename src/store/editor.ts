@@ -67,6 +67,25 @@ export interface PluginMenuBarToolGroup {
     };
 }
 
+export interface PluginModuleDefinition {
+    name: string;
+    group: string;
+    getDialog: () => Promise<ReturnType<typeof defineComponent | typeof defineAsyncComponent>>;
+    dialog?: ReturnType<typeof defineComponent | typeof defineAsyncComponent>;
+}
+
+export interface PluginSettingsDockMenuItemDefinition {
+    tab: string;
+    item: {
+        icon?: string;
+        name: string;
+    },
+    placeAround?: {
+        otherItemName: string;
+        position: 'before' | 'after';
+    };
+}
+
 export interface PluginToolDefinition {
     name: string;
     group: string;
@@ -113,6 +132,8 @@ interface EditorState {
     lastActiveThemeName: string | null;
     loadingThemeName: string | null;
     pluginMenuBarToolGroups: PluginMenuBarToolGroup[];
+    pluginModules: PluginModuleDefinition[];
+    pluginSettingsDockMenuItems: PluginSettingsDockMenuItemDefinition[];
     pluginTools: PluginToolDefinition[];
     showBackupRestore: boolean;
     tasks: EditorDeferredTask[];
@@ -190,6 +211,8 @@ const store = new PerformantStore<EditorStore>({
         lastActiveThemeName: null,
         loadingThemeName: null,
         pluginMenuBarToolGroups: [],
+        pluginModules: [],
+        pluginSettingsDockMenuItems: [],
         pluginTools: [],
         showBackupRestore: true,
         tasks: [],
@@ -203,7 +226,7 @@ const store = new PerformantStore<EditorStore>({
         tutorialFlags: {},
         waiting: false,
     },
-    nonReactive: ['appRootElement', 'pluginTools'],
+    nonReactive: ['appRootElement', 'pluginModules', 'pluginTools'],
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
     restore: ['activeToolGroupRestore', 'activeToolRestore', 'isTouchUser', 'lastActiveThemeName', 'toolGroupLastActivatedTool', 'tutorialFlags'],
     async onDispatch(actionName: string, value: any, set) {

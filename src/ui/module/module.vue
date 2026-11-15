@@ -3,7 +3,7 @@
         <suspense>
             <template #default>
                 <component
-                    :is="name"
+                    :is="components[name]"
                     :is-dialog="isDialog"
                     :dialog-opened="dialogOpened"
                     v-bind:="props"
@@ -22,34 +22,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, onErrorCaptured } from 'vue';
+import { defineComponent, defineAsyncComponent, onErrorCaptured, ref, watch } from 'vue';
 import { checkWebUpdates } from '@/check-updates';
 import ElLoading from 'element-plus/lib/components/loading/index';
+import editorStore from '@/store/editor';
+import { camelCaseToKebabCase } from '@/lib/string';
+
+const components = {
+    'design-system': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-design-system' */ `@/ui/module/module-design-system.vue`)),
+    'file-add-font': defineAsyncComponent(() => import(/* webpackChunkName: 'module-file-add-font' */ `@/ui/module/module-file-add-font.vue`)),
+    'file-export': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-export' */ `@/ui/module/module-file-export.vue`)),
+    'file-new': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-new' */ `@/ui/module/module-file-new.vue`)),
+    'file-open-confirm': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-open-confirm' */ `@/ui/module/module-file-open-confirm.vue`)),
+    'file-open-webdav-explorer': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-open-webdav-explorer' */ `@/ui/module/module-file-open-webdav-explorer.vue`)),
+    'file-save-as': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-save-as' */ `@/ui/module/module-file-save-as.vue`)),
+    'file-save-webdav-explorer': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-save-webdav-explorer' */ `@/ui/module/module-file-save-webdav-explorer.vue`)),
+    'file-take-photo': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-take-photo' */ `@/ui/module/module-file-take-photo.vue`)),
+    'image-convert-layers-to-collage': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-collage' */ `@/ui/module/module-image-convert-layers-to-collage.vue`)),
+    'image-convert-layers-to-image-sequence': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-image-sequence' */ `@/ui/module/module-image-convert-layers-to-image-sequence.vue`)),
+    'layer-blending-mode': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-blending-mode' */ `@/ui/module/module-layer-blending-mode.vue`)),
+    'layer-effect-browser': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-browser' */ `@/ui/module/module-layer-effect-browser.vue`)),
+    'layer-effect-edit': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-edit' */ `@/ui/module/module-layer-effect-edit.vue`)),
+    'plugin-install-error': defineAsyncComponent(() => import(/* webpackChunkName: 'module-plugin-install-error' */ `@/ui/module/module-plugin-install-error.vue`)),
+    'plugin-install-reload-confirm': defineAsyncComponent(() => import(/* webpackChunkName: 'module-plugin-install-reload-confirm' */ `@/ui/module/module-plugin-install-reload-confirm.vue`)),
+    'rename-layer': defineAsyncComponent(() => import(/* webpackChunkName: 'module-rename-layer' */ `@/ui/module/module-rename-layer.vue`)),
+    'tutorial-welcome': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-tutorial-welcome' */ `@/ui/module/module-tutorial-welcome.vue`)),
+};
 
 export default defineComponent({
     name: 'Module',
     directives: {
         loading: ElLoading.directive
-    },
-    components: {
-        'design-system': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-design-system' */ `@/ui/module/module-design-system.vue`)),
-        'file-add-font': defineAsyncComponent(() => import(/* webpackChunkName: 'module-file-add-font' */ `@/ui/module/module-file-add-font.vue`)),
-        'file-export': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-export' */ `@/ui/module/module-file-export.vue`)),
-        'file-new': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-new' */ `@/ui/module/module-file-new.vue`)),
-        'file-open-confirm': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-open-confirm' */ `@/ui/module/module-file-open-confirm.vue`)),
-        'file-open-webdav-explorer': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-open-webdav-explorer' */ `@/ui/module/module-file-open-webdav-explorer.vue`)),
-        'file-save-as': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-save-as' */ `@/ui/module/module-file-save-as.vue`)),
-        'file-save-webdav-explorer': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-save-webdav-explorer' */ `@/ui/module/module-file-save-webdav-explorer.vue`)),
-        'file-take-photo': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-take-photo' */ `@/ui/module/module-file-take-photo.vue`)),
-        'image-convert-layers-to-collage': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-collage' */ `@/ui/module/module-image-convert-layers-to-collage.vue`)),
-        'image-convert-layers-to-image-sequence': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-image-sequence' */ `@/ui/module/module-image-convert-layers-to-image-sequence.vue`)),
-        'layer-blending-mode': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-blending-mode' */ `@/ui/module/module-layer-blending-mode.vue`)),
-        'layer-effect-browser': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-browser' */ `@/ui/module/module-layer-effect-browser.vue`)),
-        'layer-effect-edit': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-edit' */ `@/ui/module/module-layer-effect-edit.vue`)),
-        'plugin-install-error': defineAsyncComponent(() => import(/* webpackChunkName: 'module-plugin-install-error' */ `@/ui/module/module-plugin-install-error.vue`)),
-        'plugin-install-reload-confirm': defineAsyncComponent(() => import(/* webpackChunkName: 'module-plugin-install-reload-confirm' */ `@/ui/module/module-plugin-install-reload-confirm.vue`)),
-        'rename-layer': defineAsyncComponent(() => import(/* webpackChunkName: 'module-rename-layer' */ `@/ui/module/module-rename-layer.vue`)),
-        'tutorial-welcome': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-tutorial-welcome' */ `@/ui/module/module-tutorial-welcome.vue`))
     },
     props: {
         isDialog: {
@@ -77,6 +80,28 @@ export default defineComponent({
     ],
     setup(props, { emit }) {
 
+        const isPluginModuleLoaded = ref<boolean>(false);
+
+        watch(() => props.name, async () => {
+            const pluginModuleDefinition = editorStore.get('pluginModules').find((module) => {
+                return props.name == 'plugin-' + camelCaseToKebabCase(module.group) + '-' + camelCaseToKebabCase(module.name);
+            });
+            if (pluginModuleDefinition) {
+                if (!pluginModuleDefinition.dialog) {
+                    isPluginModuleLoaded.value = false;
+                    try {
+                        pluginModuleDefinition.dialog = await pluginModuleDefinition.getDialog();
+                    } catch (error) {
+                        console.warn('[src/ui/toolbar/toolbar.vue] Error retrieving tool plugin toolbar.', error);
+                    }
+                    isPluginModuleLoaded.value = true;
+                }
+                if (pluginModuleDefinition.dialog) {
+                    components[props.name] = pluginModuleDefinition.dialog;
+                }
+            }
+        }, { immediate: true });
+
         onErrorCaptured((error) => {
             checkWebUpdates();
             console.error(error);
@@ -103,6 +128,7 @@ export default defineComponent({
         }
 
         return {
+            components,
             onHideModule,
             onShowModule,
             onCloseModule,

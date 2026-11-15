@@ -350,6 +350,8 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         if (!composer) return;
 
         composer.disposeAllPasses();
+        // Prevents bug where readTarget contains old texture (delete layers with merge blend mode).
+        composer.clearRenderer();
     
         let passScenes: Array<Scene> = [];
 
@@ -403,7 +405,9 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         const msaaSamples = highQuality ? Math.min(this.maxMsaaSamples, 4) : this.msaaSamples;
 
         if (composer.passes.length === 0) {
-            composer.addPass(new RenderPass(currentScene, camera));
+            const renderPass = new RenderPass(currentScene, camera);
+            renderPass.isFirstPass = true;
+            composer.addPass(renderPass);
         }
         composer.addPass(new OutputPass(this.imageBackground, this.imageBoundaryMask, camera));
         composer.renderTarget1.samples = msaaSamples;
