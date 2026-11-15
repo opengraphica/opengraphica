@@ -1,6 +1,6 @@
 import {
-    ClampToEdgeWrapping, DoubleSide, LinearFilter, LinearSRGBColorSpace, NearestFilter,
-    SRGBColorSpace, RepeatWrapping, RGBAFormat, UnsignedByteType,
+    LinearFilter, SRGBColorSpace, RGBAFormat,
+    HalfFloatType, UnsignedByteType, NoColorSpace,
 } from 'three/src/constants';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { Object3D } from 'three/src/core/Object3D';
@@ -36,6 +36,8 @@ import type {
     RendererFrontendTakeSnapshotCropOptions, ClassType,
     RendererBucketFillSettings,RendererPickedVectorLayerElement,
 } from '@/types';
+
+const MAX_CPU_PIXEL_FIX_SIZE = 4096;
 
 const noRenderPassModes = new Set(['normal', 'erase']);
 
@@ -501,11 +503,19 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             );
         }
 
+        const gl = this.renderer.getContext();
+        const isHalfFloat = (
+            (this.renderer.capabilities.isWebGL2 || gl.getExtension('OES_texture_half_float'))
+            && imageWidth <= MAX_CPU_PIXEL_FIX_SIZE
+            && imageHeight <= MAX_CPU_PIXEL_FIX_SIZE
+        );
+
         const snapshotRenderTarget = new WebGLRenderTarget(imageWidth, imageHeight, {
-            type: UnsignedByteType,
+            type: isHalfFloat ? HalfFloatType : UnsignedByteType,
             minFilter: LinearFilter,
             magFilter: LinearFilter,
             format: RGBAFormat,
+            colorSpace: NoColorSpace,
             depthBuffer: false,
             stencilBuffer: false,
         });
@@ -618,17 +628,59 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         const buffer = new Uint8Array(imageWidth * imageHeight * 4);
         if (this.snapshotComposer) {
-            await this.renderer.readRenderTargetPixelsAsync(this.snapshotComposer.readBuffer, 0, 0, imageWidth, imageHeight, buffer);
-
-            const MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE = 4096;
-            if (
+            const isApplyAlphaFix = (
                 (
                     options?.disableBackground
                     || this.imageBackground.getAlpha() < 1
                 )
-                && imageWidth < MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE
-                && imageHeight < MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE
-            ) {
+                && imageWidth < MAX_CPU_PIXEL_FIX_SIZE
+                && imageHeight < MAX_CPU_PIXEL_FIX_SIZE
+            );
+
+            if (isHalfFloat) {
+                const halfFloatBuffer = new Uint16Array(imageWidth * imageHeight * 4);
+                await this.renderer.readRenderTargetPixelsAsync(this.snapshotComposer.readBuffer, 0, 0, imageWidth, imageHeight, halfFloatBuffer);
+
+                function convertHalfFloatToUint(value: number): number {
+                    const sign = (value & 0x8000) ? -1 : 1;
+                    const exponent = (value >> 10) & 0x1f;
+                    const fraction = value & 0x03ff;
+                    if (exponent === 0) {
+                        value = sign * 2 ** -14 * (fraction / 1024);
+                    } else if (exponent === 31) {
+                        value = fraction ? NaN : sign * Infinity;
+                    } else {
+                        value = sign * 2 ** (exponent - 15) * (1 + fraction / 1024);
+                    }
+                    return Math.round(Math.max(0, Math.min(1, value)) * 255);
+                }
+
+                for (let i = 0; i < halfFloatBuffer.length; i += 4) {
+                    buffer[i] = convertHalfFloatToUint(halfFloatBuffer[i]);
+                    buffer[i + 1] = convertHalfFloatToUint(halfFloatBuffer[i + 1]);
+                    buffer[i + 2] = convertHalfFloatToUint(halfFloatBuffer[i + 2]);
+                    buffer[i + 3] = convertHalfFloatToUint(halfFloatBuffer[i + 3]);
+
+                    if (isApplyAlphaFix) {
+                        const alpha = buffer[i + 3] / 255;
+                        if (alpha > 0) {
+                            buffer[i] = Math.min(255, Math.round(
+                                linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i] / 255) / alpha) * 255
+                            ));
+                            buffer[i + 1] = Math.min(255, Math.round(
+                                linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 1] / 255) / alpha) * 255
+                            ));
+                            buffer[i + 2] = Math.min(255, Math.round(
+                                linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 2] / 255) / alpha) * 255
+                            ));
+                        }
+                    }
+                }
+            } else {
+                await this.renderer.readRenderTargetPixelsAsync(this.snapshotComposer.readBuffer, 0, 0, imageWidth, imageHeight, buffer);
+            }
+
+            if (isApplyAlphaFix && !isHalfFloat) {
                 for (let i = 0; i < buffer.length; i += 4) {
                     const alpha = buffer[i + 3] / 255;
                     if (alpha > 0) {
