@@ -1041,7 +1041,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 }
             }
         } catch (error) {
-            console.error('[src/canvas/controllers/free-transform.ts] Error while committing transform action. ', error);
+            console.error('[src/tools/controllers/free-transform.ts] Error while committing transform action. ', error);
         }
         this.transformTranslateStart = null;
         this.transformStartLayerData = [];

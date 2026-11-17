@@ -364,7 +364,7 @@ import { generateImageHash } from '@/lib/hash';
 import { notifyInjector } from '@/lib/notify';
 import { throttle } from '@/lib/timing';
 
-import { buildCanvasFilterParamsFromFormData, getCanvasFilterClass } from '@/canvas/filters';
+import { buildCanvasFilterParamsFromFormData, getCanvasFilterClass } from '@/renderers/common/filters';
 
 import { runModule } from '@/modules';
 import { useRenderer } from '@/renderers';

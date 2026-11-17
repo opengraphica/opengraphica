@@ -1,7 +1,7 @@
-import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 import { colorToRgba, colorToHsla, linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha } from '@/lib/color';
 
-import { HueColorSpace, type HueCanvasFilterParams } from '@/canvas/filters/hue';
+import { HueColorSpace, type HueCanvasFilterParams } from '@/renderers/common/filters/hue';
 import type { CanvasFilter } from '@/types';
 
 export function fragment(

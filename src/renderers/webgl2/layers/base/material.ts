@@ -21,7 +21,7 @@ import type {
 export async function createCanvasFilter(name: string): Promise<Webgl2RendererCanvasFilter> {
     const kebabCaseName = camelCaseToKebabCase(name);
     const CanvasFilterClass: ClassType<Webgl2RendererCanvasFilter>
-        = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/canvas/filters/${kebabCaseName}`)).default;
+        = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/common/filters/${kebabCaseName}`)).default;
     const fragmentShader: string
         = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default;
     const canvasFilter = new CanvasFilterClass();

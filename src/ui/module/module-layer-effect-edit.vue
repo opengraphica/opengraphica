@@ -255,7 +255,7 @@ import { activeSelectionMask, appliedSelectionMask, activeSelectionMaskCanvasOff
 
 import { createLayerShaderUniformsAndDefines } from '@/renderers/webgl2/layers/base/material';
 import { createRasterMaterial } from '@/renderers/webgl2/layers/raster/material';
-import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter } from '@/canvas/filters';
+import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter } from '@/renderers/common/filters';
 import { EffectComposer } from '@/renderers/webgl2/backend/postprocessing/effect-composer';
 import { RenderPass } from '@/renderers/webgl2/backend/postprocessing/render-pass';
 import { ShaderPass } from '@/renderers/webgl2/backend/postprocessing/shader-pass';

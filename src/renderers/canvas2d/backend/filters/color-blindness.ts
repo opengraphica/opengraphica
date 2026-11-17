@@ -4,8 +4,8 @@
  * @license Unlicense https://unlicense.org
  */
 
-import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/canvas/filters/color-space';
-import { ColorBlindnessSimulationMethod, ColorBlindnessType, type ColorBlindnessCanvasFilterParams } from '@/canvas/filters/color-blindness';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
+import { ColorBlindnessSimulationMethod, ColorBlindnessType, type ColorBlindnessCanvasFilterParams } from '@/renderers/common/filters/color-blindness';
 
 import type { CanvasFilter } from '@/types';
 

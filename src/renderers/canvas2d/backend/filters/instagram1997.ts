@@ -1,7 +1,7 @@
-import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData, srgbChannelToLinearSrgbChannel, linearSrgbChannelToSrgbChannel } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData, srgbChannelToLinearSrgbChannel, linearSrgbChannelToSrgbChannel } from '@/renderers/common/filters/color-space';
 import { linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha, srgbaToLinearSrgba, linearSrgbaToSrgba } from '@/lib/color';
 
-import { type Instagram1997CanvasFilterParams } from '@/canvas/filters/instagram1997';
+import { type Instagram1997CanvasFilterParams } from '@/renderers/common/filters/instagram1997';
 import type { CanvasFilter } from '@/types';
 
 const overlayFill = { r: 0.95294, g: 0.41568, b: 0.73725, a: 0.3 };

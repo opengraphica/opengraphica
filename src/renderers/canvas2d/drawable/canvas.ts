@@ -1,5 +1,5 @@
 /*
- * This class provides an interface to draw objects called "Drawables" (inside the src/canvas/drawables) folder
+ * This class provides an interface to draw objects called "Drawables" (inside the src/renderers/canvas2d/drawable/drawables) folder
  * to a HTML canvas efficiently. It makes use of the OffscreenCanvas API if available, and only renders the areas
  * of the image which have been updated in the current draw frame.
  */

@@ -1,7 +1,7 @@
-import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 import { linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha } from '@/lib/color';
 
-import { BrightnessMode, type BrightnessCanvasFilterParams } from '@/canvas/filters/brightness';
+import { BrightnessMode, type BrightnessCanvasFilterParams } from '@/renderers/common/filters/brightness';
 import type { CanvasFilter } from '@/types';
 
 export function fragment(

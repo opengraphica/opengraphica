@@ -1,4 +1,4 @@
-import { type GaussianBlurCanvasFilterParams } from '@/canvas/filters/gaussian-blur';
+import { type GaussianBlurCanvasFilterParams } from '@/renderers/common/filters/gaussian-blur';
 import type { CanvasFilter } from '@/types';
 
 export function fragment(

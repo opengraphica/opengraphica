@@ -1,6 +1,6 @@
-import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 
-import { type InstagramInkwellCanvasFilterParams } from '@/canvas/filters/instagram-inkwell';
+import { type InstagramInkwellCanvasFilterParams } from '@/renderers/common/filters/instagram-inkwell';
 import type { CanvasFilter } from '@/types';
 
 export function fragment(

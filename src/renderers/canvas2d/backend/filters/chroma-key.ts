@@ -1,6 +1,6 @@
-import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 import { linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha } from '@/lib/color';
-import { type ChromaKeyCanvasFilterParams } from '@/canvas/filters/chroma-key';
+import { type ChromaKeyCanvasFilterParams } from '@/renderers/common/filters/chroma-key';
 
 import type { CanvasFilter, CanvasFilterEditConfig, RGBAColor } from '@/types';
 

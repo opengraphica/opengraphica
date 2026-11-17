@@ -1,4 +1,4 @@
-import filterClassesByName from '@/canvas/filters/filter-classes-by-name';
+import filterClassesByName from '@/renderers/common/filters/filter-classes-by-name';
 
 import type { FilterBakeResult, FilterBakeError, FilterNewBakeRequest, FilterCancelBakeRequest } from './image-bake.types';
 import type { CanvasFilter } from '@/types';

@@ -1,8 +1,8 @@
-import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 import { linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha, srgbaToLinearSrgba, linearSrgbaToSrgba } from '@/lib/color';
 import { pointDistance2d } from '@/lib/math';
 
-import { type InstagramLofiCanvasFilterParams } from '@/canvas/filters/instagram-lofi';
+import { type InstagramLofiCanvasFilterParams } from '@/renderers/common/filters/instagram-lofi';
 import type { CanvasFilter } from '@/types';
 
 const stop1 = { r: 0.0, g: 0.0, b: 0.0, a: 0.0 };

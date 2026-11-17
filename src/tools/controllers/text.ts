@@ -1241,7 +1241,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     ])
                 });
             } else {
-                console.error('[src/canvas/controllers/text.ts] Attempted to save text layer changes, but some data was out of sync.');
+                console.error('[src/tools/controllers/text.ts] Attempted to save text layer changes, but some data was out of sync.');
             }
         }
     }

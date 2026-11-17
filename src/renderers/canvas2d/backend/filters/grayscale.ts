@@ -1,6 +1,6 @@
-import { transfer8BitImageDataToLinearSrgb, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData, linearSrgbChannelToSrgbChannel } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToLinearSrgb, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData, linearSrgbChannelToSrgbChannel } from '@/renderers/common/filters/color-space';
 
-import { GrayscaleDesaturationMode, type GrayscaleCanvasFilterParams } from '@/canvas/filters/grayscale';
+import { GrayscaleDesaturationMode, type GrayscaleCanvasFilterParams } from '@/renderers/common/filters/grayscale';
 import type { CanvasFilter } from '@/types';
 
 export function fragment(

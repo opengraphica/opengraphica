@@ -1,7 +1,7 @@
-import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 import { colorToHsva, colorToRgba } from '@/lib/color';
 
-import { NegativeInvertColorSpace, type NegativeCanvasFilterParams } from '@/canvas/filters/negative';
+import { NegativeInvertColorSpace, type NegativeCanvasFilterParams } from '@/renderers/common/filters/negative';
 import type { CanvasFilter } from '@/types';
 
 export function fragment(

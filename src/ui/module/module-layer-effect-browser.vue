@@ -82,7 +82,7 @@ import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById, ge
 import { createImageBlobFromCanvas } from '@/lib/image';
 import { camelCaseToKebabCase } from '@/lib/string';
 
-import { getCanvasFilterClass, buildCanvasFilterPreviewParams } from '@/canvas/filters';
+import { getCanvasFilterClass, buildCanvasFilterPreviewParams } from '@/renderers/common/filters';
 
 import { AddLayerFilterAction } from '@/actions/add-layer-filter';
 import { BundleAction } from '@/actions/bundle';

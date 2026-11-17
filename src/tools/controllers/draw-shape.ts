@@ -1131,7 +1131,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 this.selectExtendPathNodes(tagName, this.drawingShapes.slice());
 
             } catch (error) {
-                console.error('[src/canvas/controllers/draw-shape.ts] Error when creating shape layer updates ', error);
+                console.error('[src/tools/controllers/draw-shape.ts] Error when creating shape layer updates ', error);
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
         }
@@ -2194,7 +2194,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             }
 
         } catch (error) {
-            console.error('[src/canvas/controllers/draw-shape.ts] Error while committing transform action. ', error);
+            console.error('[src/tools/controllers/draw-shape.ts] Error while committing transform action. ', error);
         }
         this.transformShapeTranslateStart = null;
         this.transformShapeLayerData = [];
@@ -2876,7 +2876,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     await historyStore.dispatch('unreserve', { token: deleteReserveToken });
                 }
             } catch (error) {
-                console.error('[src/canvas/controllers/draw-shape.ts] Error when deleting shapes ', error);
+                console.error('[src/tools/controllers/draw-shape.ts] Error when deleting shapes ', error);
                 await historyStore.dispatch('unreserve', { token: deleteReserveToken });
             }
 

@@ -1,7 +1,7 @@
-import { transfer8BitImageDataToLinearSrgb, transferSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToLinearSrgb, transferSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 import { linearSrgbaToOklab, labaToLcha } from '@/lib/color';
 
-import { GradientMapColorSpace, type GradientMapCanvasFilterParams } from '@/canvas/filters/gradient-map';
+import { GradientMapColorSpace, type GradientMapCanvasFilterParams } from '@/renderers/common/filters/gradient-map';
 import { sampleGradient } from '@/lib/gradient';
 
 import type { CanvasFilter, WorkingFileGradientColorSpace } from '@/types';

@@ -1,7 +1,7 @@
-import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 import { srgbaToLinearSrgba } from '@/lib/color';
 
-import { type WhiteBalanceCanvasFilterParams } from '@/canvas/filters/white-balance';
+import { type WhiteBalanceCanvasFilterParams } from '@/renderers/common/filters/white-balance';
 import type { CanvasFilter } from '@/types';
 
 export function fragment(

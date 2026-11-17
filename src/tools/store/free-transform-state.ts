@@ -306,7 +306,7 @@ export async function applyTransform() {
             blockInteraction: true,
         });
     } catch (error) {
-        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during apply transform.', error);
+        console.error('[src/tools/store/free-transform-state.ts] Error occurred during apply transform.', error);
     }
 }
 
@@ -321,7 +321,7 @@ export async function trimEmptySpace() {
             blockInteraction: true,
         });
     } catch (error) {
-        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during trim empty space.', error);
+        console.error('[src/tools/store/free-transform-state.ts] Error occurred during trim empty space.', error);
     }
 }
 
@@ -336,7 +336,7 @@ export async function layerToImageBounds() {
             blockInteraction: true,
         });
     } catch (error) {
-        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during expand empty space.', error);
+        console.error('[src/tools/store/free-transform-state.ts] Error occurred during expand empty space.', error);
     }
 }
 
@@ -357,7 +357,7 @@ export async function stretchToImageBounds() {
             blockInteraction: true,
         });
     } catch (error) {
-        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during stretch to image bounds.', error);
+        console.error('[src/tools/store/free-transform-state.ts] Error occurred during stretch to image bounds.', error);
     }
 }
 

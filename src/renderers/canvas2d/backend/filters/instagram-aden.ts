@@ -1,7 +1,7 @@
-import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 import { linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha, srgbaToLinearSrgba, linearSrgbaToSrgba } from '@/lib/color';
 
-import { type InstagramAdenCanvasFilterParams } from '@/canvas/filters/instagram-aden';
+import { type InstagramAdenCanvasFilterParams } from '@/renderers/common/filters/instagram-aden';
 import type { CanvasFilter } from '@/types';
 
 const overlayFill = { r: 0.25882, g: 0.03921, b: 0.05490, a: 0.2 };

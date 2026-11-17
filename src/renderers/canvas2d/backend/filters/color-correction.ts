@@ -1,4 +1,4 @@
-import { type ColorCorrectionCanvasFilterParams } from '@/canvas/filters/color-correction';
+import { type ColorCorrectionCanvasFilterParams } from '@/renderers/common/filters/color-correction';
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
 export function fragment(

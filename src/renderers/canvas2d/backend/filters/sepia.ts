@@ -1,4 +1,4 @@
-import { type SepiaCanvasFilterParams } from '@/canvas/filters/sepia';
+import { type SepiaCanvasFilterParams } from '@/renderers/common/filters/sepia';
 import type { CanvasFilter } from '@/types';
 
 export function fragment(

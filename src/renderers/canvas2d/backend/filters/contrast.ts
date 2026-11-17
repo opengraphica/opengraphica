@@ -1,4 +1,4 @@
-import { type ContrastCanvasFilterParams } from '@/canvas/filters/contrast';
+import { type ContrastCanvasFilterParams } from '@/renderers/common/filters/contrast';
 import type { CanvasFilter } from '@/types';
 
 export function fragment(

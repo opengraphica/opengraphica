@@ -1,7 +1,7 @@
-import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/canvas/filters/color-space';
+import { transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '@/renderers/common/filters/color-space';
 import { pointDistance2d } from '@/lib/math';
 
-import { type InstagramValenciaCanvasFilterParams } from '@/canvas/filters/instagram-valencia';
+import { type InstagramValenciaCanvasFilterParams } from '@/renderers/common/filters/instagram-valencia';
 import type { CanvasFilter } from '@/types';
 
 const stop1 = { r: 0.50196, g: 0.30588, b: 0.05882 };

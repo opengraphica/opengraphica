@@ -584,7 +584,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
                 }
             } catch (error) {
-                console.error('[src/canvas/controllers/draw-brush.ts] Error when creating draw layer updates ', error);
+                console.error('[src/tools/controllers/draw-brush.ts] Error when creating draw layer updates ', error);
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
         }
