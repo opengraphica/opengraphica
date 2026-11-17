@@ -654,6 +654,23 @@
                 "mix": "Mix"
             }
         },
+        "mechanicalVignette": {
+            "name": "Mechanical Vignette",
+            "help": "Simulates the shadowing on the edge of an image caused by a centered circular barrel that blocks light from entering the camera sensor.\n\n* **Pupil Distance** - The distance of the exterior circular opening of the lens from the sensor.\n* **Pupil Radius** - The radius of the pupil's circular opening.\n* **Barrel Distance** - The distance of an interior circular opening inside the lens next to the sensor.\n* **Barrel Radius** - The radius of the barrel's circular opening.",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "simulate": "Simulate",
+                    "remove": "Remove"
+                },
+                "sensorWidth": "Sensor Width",
+                "sensorHeight": "Sensor Height",
+                "exitPupilDistance": "Pupil Distance",
+                "exitPupilRadius": "Pupil Radius",
+                "barrelOpeningDistance": "Barrel Distance",
+                "barrelOpeningRadius": "Barrel Radius"
+            }
+        },
         "monteCarloBlur": {
             "name": "Monte Carlo Blur",
             "help": "Simulates the type of noisy blur you would see when taking a photograph in low light with a real camera.\n\n* **Iterations** - How many rays of light are computed per pixel.\n* **Size** - The radius of the blur.",
@@ -669,6 +686,20 @@
                     "64": "64"
                 },
                 "size": "Size"
+            }
+        },
+        "naturalVignette": {
+            "name": "Natural Vignette",
+            "help": "Also known as natural illumination falloff, this simulates shadowing on the edge of a camera sensor due to light rays from off-axis parts of the scene reaching the sensor at an angle.\n\nThis effect is more pronounced on wide-angle camera lenses that aren't designed so that light hits the sensor perpendicularly.",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "simulate": "Simulate",
+                    "remove": "Remove"
+                },
+                "sensorWidth": "Sensor Width",
+                "sensorHeight": "Sensor Height",
+                "focalLength": "Focal Length"
             }
         },
         "negative": {
@@ -763,6 +794,9 @@
         },
         "instagramFilter": {
             "name": "Instagram Filter"
+        },
+        "lightShadow": {
+            "name": "Light & Shadow"
         },
         "noise": {
             "name": "Noise"

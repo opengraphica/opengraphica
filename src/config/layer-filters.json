@@ -99,6 +99,15 @@
         "group": "distort"
     },
 
+    "mechanicalVignette": {
+        "name": "layerFilter.mechanicalVignette.name",
+        "group": "lightShadow"
+    },
+    "naturalVignette": {
+        "name": "layerFilter.naturalVignette.name",
+        "group": "lightShadow"
+    },
+
     "filmGrain": {
         "name": "layerFilter.filmGrain.name",
         "group": "noise"

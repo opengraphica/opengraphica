@@ -257,6 +257,35 @@
                                     </el-col>
                                 </el-row>
                             </template>
+                            <template v-else-if="editConfigField.type === 'float'">
+                                <el-row>
+                                    <el-col :span="4" :xs="6">
+                                        <og-button
+                                            type="button"
+                                            class="w-full"
+                                            @click="editingFilterParams[paramName] = Math.max(getEditConfigMin(editConfigField), editingFilterParams[paramName] - editConfigField.step)"
+                                        >-</og-button>
+                                    </el-col>
+                                    <el-col :span="16" :xs="12">
+                                        <el-input-number
+                                            :modelValue="editingFilterParams[paramName] as number"
+                                            :min="getEditConfigMin(editConfigField)"
+                                            :max="getEditConfigMax(editConfigField)"
+                                            :precision="0"
+                                            :suffixText="editConfigField.units"
+                                            class="el-input--text-right"
+                                            @update:modelValue="editingFilterParams[paramName] = $event"
+                                        />
+                                    </el-col>
+                                    <el-col :span="4" :xs="6">
+                                        <og-button
+                                            type="button"
+                                            class="w-full"
+                                            @click="editingFilterParams[paramName] = Math.min(getEditConfigMax(editConfigField), editingFilterParams[paramName] + editConfigField.step)"
+                                        >+</og-button>
+                                    </el-col>
+                                </el-row>
+                            </template>
                             <template v-else-if="editConfigField.type === 'integer' && editConfigField.options">
                                 <el-select
                                     v-model="editingFilterParams[paramName] as number"

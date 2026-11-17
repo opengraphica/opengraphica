@@ -1,5 +1,6 @@
 import type { RGBAColor } from './color';
 import type { WorkingFileGradientColorStop } from './working-file';
+import type { MeasuringUnits } from './metrics';
 
 export interface CanvasRenderingContext2DEnhanced extends CanvasRenderingContext2D {
     get2dTransformArray(): [number, number, number, number, number, number];
@@ -45,6 +46,8 @@ export interface CanvasFilterEditConfigInteger extends CanvasFilterEditConfigFie
 export interface CanvasFilterEditConfigFloat extends CanvasFilterEditConfigFieldCommon {
     type: 'float';
     default: number;
+    step: number;
+    units: MeasuringUnits;
     preview?: number;
 }
 
