@@ -726,6 +726,17 @@
                 "offsetY": "Offset Y"
             }
         },
+        "radialSpeedLines": {
+            "name": "Radial Speed Lines",
+            "help": "Draws motion lines in a radial pattern; commonly used in manga. Most values are a random range.\n* **Radius** - How far the lines will be drawn towards the center.\n* **Spacing** - The space between clumps of lines.\n* **Clumping** - How many lines will be drawn next to each other in each clump.\n* **Thickness** - Maximum line thickness.\n* **Seed** - Randomize the lines.",
+            "param": {
+                "centerRadius": "Radius",
+                "lineSpacing": "Spacing",
+                "lineClumping": "Clumping",
+                "lineThickness": "Thickness",
+                "seed": "Seed"
+            }
+        },
         "saturation": {
             "name": "Saturation",
             "param": {
@@ -783,6 +794,9 @@
         }
     },
     "layerFilterGroup": {
+        "artistic": {
+            "name": "Artistic"
+        },
         "blur": {
             "name": "Blur"
         },
