@@ -1,414 +1,372 @@
 <template>
     <el-tabs class="el-tabs--icon-tabs" v-model="activeTab" v-loading="loading">
-        <el-tab-pane name="file">
+        <el-tab-pane v-for="tabDefinition of tabDefinitions" :key="tabDefinition.tab" :name="tabDefinition.tab">
             <template #label>
                 <div class="leading-5">
-                    <i class="bi bi-archive leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3">{{ t('dock.settings.file.tabTitle') }}</div>
+                    <i class="leading-[1.375] block text-center text-lg !mt-1" :class="tabDefinition.icon" aria-hidden="true" />
+                    <div class="!mb-3">{{ t(`dock.settings.${tabDefinition.tab}.tabTitle`) }}</div>
                 </div>
             </template>
-            <template v-if="visitedTabs['file'] === true">
+            <template v-if="visitedTabs[tabDefinition.tab] === true">
                 <el-scrollbar>
-                    <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated !mb-1" @select="onMenuSelect('file', $event)">
-                        <el-menu-item v-if="showRestoreImage" index="restore">
-                            <i class="bi bi-recycle"></i>
-                            <span>{{ t('dock.settings.file.menu.restore') }}</span>
-                        </el-menu-item>
-                        <el-menu-item index="new">
-                            <i class="bi bi-file-earmark-plus"></i>
-                            <span>{{ t('dock.settings.file.menu.new') }}</span>
-                        </el-menu-item>
-                        <el-menu-item index="open">
-                            <i class="bi bi-folder2-open"></i>
-                            <span>{{ t('dock.settings.file.menu.open') }}</span>
-                        </el-menu-item>
-                        <template v-if="vendorCustomSaveCallback">
-                            <el-menu-item index="save">
-                                <i class="bi bi-download"></i>
-                                <span>{{ t('dock.settings.file.menu.save') }}</span>
-                            </el-menu-item>
-                        </template>
-                        <template v-else>
-                            <el-menu-item index="export">
-                                <i class="bi bi-box-arrow-up"></i>
-                                <span>{{ t('dock.settings.file.menu.export') }}</span>
-                            </el-menu-item>
-                            <el-menu-item index="saveAs">
-                                <i class="bi bi-download"></i>
-                                <span>{{ t('dock.settings.file.menu.saveAs') }}</span>
-                            </el-menu-item>
-                        </template>
-                        <el-divider />
-                        <el-menu-item index="insertPhoto">
-                            <i class="bi bi-plus-circle"></i>
-                            <span>{{ t('dock.settings.file.menu.insertPhoto') }}</span>
-                        </el-menu-item>
-                        <el-menu-item index="takePhoto">
-                            <i class="bi bi-camera"></i>
-                            <span>{{ t('dock.settings.file.menu.takePhoto') }}</span>
-                        </el-menu-item>
-                        <el-menu-item v-if="canShare" index="shareImage">
-                            <i class="bi bi-share"></i>
-                            <span>{{ t('dock.settings.file.menu.shareImage') }}</span>
-                        </el-menu-item>
-                        <template v-if="canQuit">
-                            <el-divider />
-                            <el-menu-item index="quit">
-                                <i class="bi bi-escape"></i>
-                                <span>{{ t('dock.settings.file.menu.quit') }}</span>
-                            </el-menu-item>
-                        </template>
-                    </el-menu>
-                </el-scrollbar>
-            </template>
-        </el-tab-pane>
-        <el-tab-pane name="image">
-            <template #label>
-                <div class="leading-5">
-                    <i class="bi bi-image leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3">{{ t('dock.settings.image.tabTitle') }}</div>
-                </div>
-            </template>
-            <template v-if="visitedTabs['image'] === true">
-                <el-scrollbar>
-                    <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated !mb-1" @select="onMenuSelect('image', $event)">
-                        <el-menu-item index="cropResize">
-                            <i class="bi bi-crop"></i>
-                            <span>{{ t('dock.settings.image.menu.cropResize') }}</span>
-                        </el-menu-item>
-                        <el-divider />
-                        <el-menu-item index="cut">
-                            <i class="bi bi-scissors"></i>
-                            <span>{{ t('dock.settings.image.menu.cut') }}</span>
-                        </el-menu-item>
-                        <el-menu-item index="copy">
-                            <i class="bi bi-files"></i>
-                            <span>{{ t('dock.settings.image.menu.copy') }}</span>
-                        </el-menu-item>
-                        <el-menu-item index="copyAll">
-                            <i class="bi bi-files"></i>
-                            <span>{{ t('dock.settings.image.menu.copyAllLayers') }}</span>
-                        </el-menu-item>
-                        <el-menu-item index="paste">
-                            <i class="bi bi-clipboard"></i>
-                            <span>{{ t('dock.settings.image.menu.paste') }}</span>
-                        </el-menu-item>
-                        <el-collapse class="el-collapse--menu-item mt-1">
-                            <el-collapse-item v-el-collapse-item-smart-scroll>
-                                <template v-slot:title>
-                                    {{ t('dock.settings.image.menu.transformLayers.groupTitle') }}
-                                </template>
-                                <el-menu-item index="flipLayersX">
-                                    <i class="bi bi-arrows-collapse-vertical"></i>
-                                    <span>{{ t('dock.settings.image.menu.transformLayers.flipX') }}</span>
-                                </el-menu-item>
-                                <el-menu-item index="flipLayersY">
-                                    <i class="bi bi-arrows-collapse"></i>
-                                    <span>{{ t('dock.settings.image.menu.transformLayers.flipY') }}</span>
-                                </el-menu-item>
-                                <el-menu-item index="rotateLayersClockwise">
-                                    <i class="bi bi-arrow-clockwise"></i>
-                                    <span>{{ t('dock.settings.image.menu.transformLayers.rotateClockwise') }}</span>
-                                </el-menu-item>
-                                <el-menu-item index="rotateLayersCounterclockwise">
-                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                    <span>{{ t('dock.settings.image.menu.transformLayers.rotateCounterclockwise') }}</span>
-                                </el-menu-item>
-                            </el-collapse-item>
-                        </el-collapse>
-                        <el-collapse class="el-collapse--menu-item mb-1">
-                            <el-collapse-item v-el-collapse-item-smart-scroll>
-                                <template v-slot:title>
-                                    {{ t('dock.settings.image.menu.convertLayers.groupTitle') }}
-                                </template>
-                                <el-menu-item index="convertLayersToCollage">
-                                    <i class="bi bi-arrow-return-right"></i>
-                                    <span>{{ t('dock.settings.image.menu.convertLayers.toCollage') }}</span>
-                                </el-menu-item>
-                                <el-menu-item index="convertLayersToImageSequence">
-                                    <i class="bi bi-arrow-return-right"></i>
-                                    <span>{{ t('dock.settings.image.menu.convertLayers.toImageSequence') }}</span>
-                                </el-menu-item>
-                                <el-menu-item index="convertLayersFlatten">
-                                    <i class="bi bi-arrow-return-right"></i>
-                                    <span>{{ t('dock.settings.image.menu.convertLayers.flatten') }}</span>
-                                </el-menu-item>
-                            </el-collapse-item>
-                        </el-collapse>
-                    </el-menu>
-                </el-scrollbar>
-            </template>
-        </el-tab-pane>
-        <el-tab-pane name="view">
-            <template #label>
-                <div class="leading-5">
-                    <i class="bi bi-display leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3">{{ t('dock.settings.view.tabTitle') }}</div>
-                </div>
-            </template>
-            <template v-if="visitedTabs['view'] === true">
-                <el-scrollbar>
-                    <el-form novalidate="novalidate" action="javascript:void(0)" class="!mb-1 !mt-1">
-                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.zoom')">
-                            <el-button-group class="el-button-group--flex">
-                                <el-button size="small" plain :aria-label="t('dock.settings.view.zoomOut')" :title="t('dock.settings.view.zoomOut')" @click="isZoomLevelTouched = true; zoomLevel *= 1/1.25">
-                                    <i class="bi bi-zoom-out" aria-hidden="true" />
-                                </el-button>
-                                <el-input-number v-model.lazy="zoomLevel" suffix-text="%" size="small" class="el-input--text-center" style="width: 5rem" @input="isZoomLevelTouched = true" />
-                                <el-button size="small" plain :aria-label="t('dock.settings.view.zoomIn')" :title="t('dock.settings.view.zoomIn')" @click="isZoomLevelTouched = true; zoomLevel *= 1.25;">
-                                    <i class="bi bi-zoom-in" aria-hidden="true" />
-                                </el-button>
-                            </el-button-group>
-                        </el-form-item>
-                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.rotate')">
-                            <el-button-group class="el-button-group--flex">
-                                <el-button size="small" plain :aria-label="t('dock.settings.view.rotateCounterClockwise')" :title="t('dock.settings.view.rotateCounterClockwise')" @click="isRotationAngleTouched = true; rotationAngle -= 15">
-                                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
-                                </el-button>
-                                <el-input-number v-model.lazy="rotationAngle" suffix-text="°" size="small" class="el-input--text-center" style="width: 5rem" @input="isRotationAngleTouched = true" />
-                                <el-button size="small" plain :aria-label="t('dock.settings.view.rotateClockwise')" :title="t('dock.settings.view.rotateClockwise')" @click="isRotationAngleTouched = true; rotationAngle += 15">
-                                    <i class="bi bi-arrow-clockwise" aria-hidden="true" />
-                                </el-button>
-                            </el-button-group>
-                        </el-form-item>
-                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.reset')">
-                            <el-button-group>
-                                <el-button size="small" plain @click="onResetViewFit">
-                                    {{ t('dock.settings.view.fit') }}
-                                </el-button>
-                                <el-button size="small" plain @click="onResetViewZoom">1:1</el-button>
-                                <el-button size="small" plain @click="onResetViewRotation">0°</el-button>
-                            </el-button-group>
-                        </el-form-item>
-                        <el-divider class="!my-2" />
-                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.touchRotate.label')">
-                            <el-radio-group
-                                v-model="touchRotationPreference"
-                                size="small">
-                                <el-radio-button
-                                    v-for="option in touchRotationOptions"
-                                    :key="option.value"
-                                    :label="option.value">
-                                    {{ t(option.label) }}
-                                </el-radio-button>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-divider class="!my-2" />
-                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.window')">
-                            <el-button v-if="isFullscreen" size="small" plain @click="onExitFullscreen()">
-                                <i class="bi bi-fullscreen-exit mr-2" aria-hidden="true" />
-                                {{ t('dock.settings.view.exitFullscreen') }}
-                            </el-button>
-                            <el-button v-else size="small" plain @click="onEnterFullscreen()">
-                                <i class="bi bi-fullscreen mr-2" aria-hidden="true" />
-                                {{ t('dock.settings.view.enterFullscreen') }}
-                            </el-button>
-                        </el-form-item>
-                    </el-form>
-                </el-scrollbar>
-            </template>
-        </el-tab-pane>
-        <el-tab-pane name="history">
-            <template #label>
-                <div class="leading-5">
-                    <i class="bi bi-clock-history leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3">{{ t('dock.settings.history.tabTitle') }}</div>
-                </div>
-            </template>
-            <template v-if="visitedTabs['history'] === true">
-                <el-scrollbar>
-                    <div class="flex justify-center px-4 pt-2">
-                        <el-button-group>
-                            <el-button size="small" :disabled="!canUndo" round plain aria-label="Undo" @click="onHistoryUndo()">
-                                <i class="bi bi-arrow-90deg-left mr-1" aria-hidden="true" /> {{ t('dock.settings.history.undo') }}
-                            </el-button>
-                            <el-button size="small" :disabled="!canRedo" round plain aria-label="Redo" @click="onHistoryRedo()">
-                                <i class="bi bi-arrow-90deg-right mr-1" aria-hidden="true" /> {{ t('dock.settings.history.redo') }}
-                            </el-button>
-                        </el-button-group>
-                    </div>
-                    <div v-if="historyActionStack.length === 0" class="px-4 py-3">
-                        <el-alert
-                            type="info"
-                            :title="t('dock.settings.history.noHistory')"
-                            show-icon
-                            :closable="false">
-                        </el-alert>
-                    </div>
-                    <el-timeline v-else class="!px-5 !pt-4">
-                        <el-timeline-item
-                            v-if="historyActionStack.length > 0"
-                            class="!pb-1"
-                            type="primary">
-                            <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(0)">
-                                [{{ t('dock.settings.history.baseImage') }}]
-                            </el-link>
-                        </el-timeline-item>
-                        <el-timeline-item
-                            v-for="(action, index) of historyActionStack"
-                            :key="action.id + '_' + index"
-                            :type="historyActionStackIndex > index ? 'primary' : undefined"
-                            class="!pb-1">
-                            <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)">
-                                {{ t(action.description) }}
-                            </el-link>
-                        </el-timeline-item>
-                    </el-timeline>
-                </el-scrollbar>
-            </template>
-        </el-tab-pane>
-        <el-tab-pane name="prefs">
-            <template #label>
-                <div class="leading-5">
-                    <i class="bi bi-toggle-on leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3">{{ t('dock.settings.prefs.tabTitle') }}</div>
-                </div>
-            </template>
-            <template v-if="visitedTabs['prefs'] === true">
-                <el-scrollbar>
-                    <el-form novalidate="novalidate" autocomplete="off" action="javascript:void(0)">
-                        <!-- Prefs: Theme -->
-                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.prefs.theme')">
-                            <el-radio-group
-                                v-model="activeTheme"
-                                :disabled="!!loadingThemeName"
-                                size="small">
-                                <el-radio-button
-                                    v-for="option in themeOptions"
-                                    v-loading="option.value === loadingThemeName"
-                                    :key="option.value"
-                                    :label="option.value">
-                                    {{ t(option.label) }}
-                                </el-radio-button>
-                            </el-radio-group>
-                        </el-form-item>
-                        <!-- Prefs: Language -->
-                        <el-form-item class="el-form-item--menu-item !mb-1 el-form-item--has-content-right" :label="t('dock.settings.prefs.language')">
-                            <el-select v-model="languageOverride" size="small" style="width: 6rem;">
-                                <el-option-group>
-                                    <el-option value="" :label="'[' + t('dock.settings.prefs.default') + ']'" />
-                                </el-option-group>
-                                <el-option-group>
-                                    <el-option
-                                        v-for="option in languageOptions"
-                                        :key="option.value ?? undefined"
-                                        :value="option.value ?? ''"
-                                        :label="option.label"
-                                    />
-                                </el-option-group>
-                            </el-select>
-                        </el-form-item>
-                        <el-collapse class="el-collapse--menu-item" @change="onPrefsCollapseChange">
-                            <!-- Prefs: Plugins -->
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.plugins.groupTitle')">
-                                <div class="px-5 pb-4">
-                                    <div v-for="pluginMeta of allPluginMeta" :key="pluginMeta.pluginId" class="flex justify-between mb-2">
-                                        <span class="whitespace-nowrap overflow-hidden text-ellipsis">
-                                            <span class="bi bi-plugin mr-1" aria-hidden="true" />
-                                            {{ pluginMeta.name }}
-                                            <span v-if="pluginMeta.version" class="ml-1" style="color: var(--el-color-info)">{{ pluginMeta.version }}</span>
-                                        </span>
-                                        <a role="button" href="#" class="whitespace-nowrap" style="color: var(--el-color-danger)" @click.prevent="onUninstallPlugin(pluginMeta.pluginId)">
-                                            <span class="bi bi-x" aria-hidden="true" /> {{ t('dock.settings.prefs.plugins.uninstall') }}
-                                        </a>
-                                    </div>
-                                    <og-button type="button" outline solid small class="w-full mt-2!" @click="onSelectPluginFile">
-                                        {{ t('dock.settings.prefs.plugins.selectFile') }}
-                                    </og-button>
-                                </div>
-                            </el-collapse-item>
-                            <!-- Prefs: Editor -->
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.editor.groupTitle')">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.menuBarPosition')">
-                                    <el-select v-model="preferenceMenuBarPosition" size="small" style="width: 6rem;">
-                                        <el-option value="top" :label="t('option.top')" />
-                                        <el-option value="bottom" :label="t('option.bottom')" />
-                                        <el-option value="left" :label="t('option.left')" />
-                                        <el-option value="right" :label="t('option.right')" />
-                                    </el-select>
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.showWelcomeScreen')">
-                                    <el-switch v-model="showWelcomeScreenAtStart" />
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.showTips')">
-                                    <el-switch v-model="showTutorialNotifications" />
-                                </el-form-item>
-                            </el-collapse-item>
-                            <!-- Prefs: WebDAV Storage -->
-                            <el-collapse-item
-                                v-el-collapse-item-smart-scroll
-                                :title="t('dock.settings.prefs.networkStorage.groupTitle')"
+                    <el-menu
+                        v-if="tabDefinition.menu"
+                        class="el-menu--medium el-menu--borderless el-menu--inactivated !mb-1"
+                        @select="onMenuSelect(tabDefinition.tab, $event)"
+                    >
+                        <template v-for="(menuGroup, menuGroupIndex) of tabDefinition.menu">
+                            <el-collapse
+                                v-if="menuGroup.collapse && (menuGroup.condition ? menuGroup.condition() : true)"
+                                class="el-collapse--menu-item"
+                                :class="{ 'mt-1': !(tabDefinition.menu[menuGroupIndex - 1]?.collapse) }"
                             >
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.networkStorage.enableWebdavServer')">
-                                    <el-switch v-model="preferenceEnableWebdav" />
-                                </el-form-item>
-                                <el-form-item-group v-if="preferenceEnableWebdav" ref="webdavStorageGroup" class="px-4!">
-                                    <el-form-item :label="t('dock.settings.prefs.networkStorage.webdavServerUrl')">
-                                        <el-input v-model="preferenceWebdavShareUrl" :placeholder="t('dock.settings.prefs.networkStorage.webdavServerUrlPlaceholder')"
-                                            @blur="updatePreferenceWebdavShareUrl" @keydown.enter="updatePreferenceWebdavShareUrl"
-                                        />
-                                    </el-form-item>
-                                    <el-form-item :label="t('dock.settings.prefs.networkStorage.webdavUsername')">
-                                        <el-input v-model="preferenceWebdavUsername" autocomplete="off" @blur="updatePreferenceWebdavUsername" @keydown.enter="updatePreferenceWebdavUsername" />
-                                    </el-form-item>
-                                    <el-form-item :label="t('dock.settings.prefs.networkStorage.webdavPassword')">
-                                        <el-input v-model="preferenceWebdavPassword" autocomplete="off" class="el-input--password"
-                                            @copy.prevent @cut.prevent @blur="updatePreferenceWebdavPassword" @keydown.enter="updatePreferenceWebdavPassword"
-                                        />
-                                    </el-form-item>
-                                </el-form-item-group>
-                            </el-collapse-item>
-                            <!-- Prefs: Debugging -->
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.debugging.groupTitle')">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.debugging.useMobileDebugger')">
-                                    <el-switch v-model="useMobileDebugger" />
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.performance.renderer.label')">
-                                    <el-select v-model="preferenceRenderer" size="small" style="width: 6rem;">
-                                        <el-option value="webgl2" :label="t('dock.settings.prefs.performance.renderer.webgl2')" />
-                                        <el-option value="webgl2-offscreen" :label="t('dock.settings.prefs.performance.renderer.webgl2Offscreen')" />
-                                        <el-option value="wgpu-wasm" :label="t('dock.settings.prefs.performance.renderer.wgpuWasm')" />
-                                    </el-select>
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.performance.optimizeLargeImage')">
-                                    <el-switch v-model="preferenceOptimizeLargeImages" />
-                                </el-form-item>
-                                <el-form-item v-if="preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.performance.fixAdjacentLayerSeams')">
-                                    <el-switch v-model="performanceFixLayerSeams" />
-                                </el-form-item>
-                                <el-form-item v-if="!preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.performance.highQualityScaling')">
-                                    <el-switch v-model="preferenceHighQualityScaling" />
-                                </el-form-item>
-                            </el-collapse-item>
-                            <!-- Prefs: Help -->
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.help.groupTitle')">
-                                <div class="el-form-item el-form-item--menu-item">
-                                    <el-link href="https://github.com/opengraphica/opengraphica/issues/" type="primary" target="_blank">
-                                        <span>{{ t('dock.settings.prefs.help.reportIssue') }}</span>
-                                        <i class="bi bi-box-arrow-up-right ml-2"></i>
-                                    </el-link>
-                                </div>
-                                <div class="el-form-item el-form-item--menu-item">
-                                    <el-link href="javascript:void(0)" type="primary" @click="onClickShowDesignSystem()">
-                                        <span>{{ t('dock.settings.prefs.help.designSystem') }}</span>
-                                        <i class="bi bi-box-arrow-up-right ml-2"></i>
-                                    </el-link>
-                                </div>
-                            </el-collapse-item>
-                            <!-- Prefs: Update -->
-                            <el-collapse-item v-if="canUpdateApp" v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.update.groupTitle')">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.update.checkForUpdates')">
-                                    <el-switch v-model="preferenceCheckForAppUpdates" />
-                                </el-form-item>
-                            </el-collapse-item>
-                        </el-collapse>
-                        <!-- Prefs: Reset -->
-                        <div class="px-5 pt-4 pb-4">
-                            <el-button size="small" class="w-full" @click="onClickResetSettings">
-                                {{ t('dock.settings.prefs.editor.resetSettings') }}
-                            </el-button>
-                        </div>
+                                <template v-for="collapseItem of menuGroup.collapse" :key="collapseItem.title">
+                                    <el-collapse-item
+                                        v-if="(collapseItem.condition ? collapseItem.condition() : true)"
+                                        v-el-collapse-item-smart-scroll
+                                    >
+                                        <template v-slot:title>
+                                            {{ t(collapseItem.title) }}
+                                        </template>
+                                        <template v-for="menuItem of collapseItem.items" :key="menuItem.action + menuItem.name">
+                                            <el-menu-item v-if="(menuItem.condition) ? menuItem.condition() : true" :index="menuItem.action">
+                                                <i :class="menuItem.icon" aria-hidden="true" />
+                                                <span>{{ t(menuItem.name) }}</span>
+                                            </el-menu-item>
+                                        </template>
+                                    </el-collapse-item>
+                                </template>
+                            </el-collapse>
+                            <template v-else-if="!menuGroup.collapse">
+                                <template v-for="menuItem of menuGroup.items" :key="menuItem.action + menuItem.name">
+                                    <el-menu-item v-if="(menuItem.condition) ? menuItem.condition() : true" :index="menuItem.action">
+                                        <i :class="menuItem.icon" aria-hidden="true" />
+                                        <span>{{ t(menuItem.name) }}</span>
+                                    </el-menu-item>
+                                </template>
+                                <el-divider v-if="
+                                    menuGroupIndex < tabDefinition.menu.length - 1
+                                    && !tabDefinition.menu[menuGroupIndex + 1]?.collapse
+                                    && (
+                                        !tabDefinition.menu[menuGroupIndex + 1].condition
+                                        || (
+                                            tabDefinition.menu[menuGroupIndex + 1].condition
+                                            && tabDefinition.menu[menuGroupIndex + 1].condition?.()
+                                        )
+                                    )
+                                " />
+                            </template>
+                        </template>
+                    </el-menu>
+                    <el-form v-if="tabDefinition.form" novalidate="novalidate" action="javascript:void(0)" class="!mb-1 !mt-1">
+                        <template v-for="(formGroup, formGroupIndex) of tabDefinition.form">
+                            <el-collapse
+                                v-if="formGroup.collapse && (formGroup.condition ? formGroup.condition() : true)"
+                                class="el-collapse--menu-item"
+                                :class="{ 'mt-1': !(tabDefinition.form[formGroupIndex - 1]?.collapse) }"
+                                @change="onPrefsCollapseChange"
+                            >
+                                <template v-for="collapseItem of formGroup.collapse" :key="collapseItem.title">
+                                    <el-collapse-item
+                                        v-if="(collapseItem.condition ? collapseItem.condition() : true)"
+                                        v-el-collapse-item-smart-scroll
+                                    >
+                                        <template v-slot:title>
+                                            {{ t(collapseItem.title) }}
+                                        </template>
+                                        <template v-for="formItem of collapseItem.items" :key="formItem.slot">
+                                            <template v-if="(formItem.condition) ? formItem.condition() : true">
+                                                <!-- Prefs: Plugins List -->
+                                                <template v-if="formItem.slot === 'prefs-plugins-list'">
+                                                    <div class="px-5">
+                                                        <div v-for="pluginMeta of allPluginMeta" :key="pluginMeta.pluginId" class="flex justify-between mb-2">
+                                                            <span class="whitespace-nowrap overflow-hidden text-ellipsis">
+                                                                <span class="bi bi-plugin mr-1" aria-hidden="true" />
+                                                                {{ pluginMeta.name }}
+                                                                <span v-if="pluginMeta.version" class="ml-1" style="color: var(--el-color-info)">{{ pluginMeta.version }}</span>
+                                                            </span>
+                                                            <a role="button" href="#" class="whitespace-nowrap" style="color: var(--el-color-danger)" @click.prevent="onUninstallPlugin(pluginMeta.pluginId)">
+                                                                <span class="bi bi-x" aria-hidden="true" /> {{ t('dock.settings.prefs.plugins.uninstall') }}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <!-- Prefs: Plugins Actions -->
+                                                <template v-if="formItem.slot === 'prefs-plugins-actions'">
+                                                    <div class="px-5 pb-4">
+                                                        <og-button type="button" outline solid small class="w-full mt-2!" @click="onSelectPluginFile">
+                                                            {{ t('dock.settings.prefs.plugins.selectFile') }}
+                                                        </og-button>
+                                                    </div>
+                                                </template>
+                                                <!-- Prefs: Editor Menu Bar Position -->
+                                                <template v-if="formItem.slot === 'prefs-editor-menu-bar-position'">
+                                                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.menuBarPosition')">
+                                                        <el-select v-model="preferenceMenuBarPosition" size="small" style="width: 6rem;">
+                                                            <el-option value="top" :label="t('option.top')" />
+                                                            <el-option value="bottom" :label="t('option.bottom')" />
+                                                            <el-option value="left" :label="t('option.left')" />
+                                                            <el-option value="right" :label="t('option.right')" />
+                                                        </el-select>
+                                                    </el-form-item>
+                                                </template>
+                                                <!-- Prefs: Editor Show Welcome Screen -->
+                                                <template v-if="formItem.slot === 'prefs-editor-show-welcome-screen'">
+                                                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.showWelcomeScreen')">
+                                                        <el-switch v-model="showWelcomeScreenAtStart" />
+                                                    </el-form-item>
+                                                </template>
+                                                <!-- Prefs: Editor Show Tips -->
+                                                <template v-if="formItem.slot === 'prefs-editor-show-tips'">
+                                                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.showTips')">
+                                                        <el-switch v-model="showTutorialNotifications" />
+                                                    </el-form-item>
+                                                </template>
+                                                <!-- Prefs: Network Storage WebDAV -->
+                                                <template v-if="formItem.slot === 'prefs-network-storage-webdav'">
+                                                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.networkStorage.enableWebdavServer')">
+                                                        <el-switch v-model="preferenceEnableWebdav" />
+                                                    </el-form-item>
+                                                    <el-form-item-group v-if="preferenceEnableWebdav" ref="webdavStorageGroup" class="px-4!">
+                                                        <el-form-item :label="t('dock.settings.prefs.networkStorage.webdavServerUrl')">
+                                                            <el-input v-model="preferenceWebdavShareUrl" :placeholder="t('dock.settings.prefs.networkStorage.webdavServerUrlPlaceholder')"
+                                                                @blur="updatePreferenceWebdavShareUrl" @keydown.enter="updatePreferenceWebdavShareUrl"
+                                                            />
+                                                        </el-form-item>
+                                                        <el-form-item :label="t('dock.settings.prefs.networkStorage.webdavUsername')">
+                                                            <el-input v-model="preferenceWebdavUsername" autocomplete="off" @blur="updatePreferenceWebdavUsername" @keydown.enter="updatePreferenceWebdavUsername" />
+                                                        </el-form-item>
+                                                        <el-form-item :label="t('dock.settings.prefs.networkStorage.webdavPassword')">
+                                                            <el-input v-model="preferenceWebdavPassword" autocomplete="off" class="el-input--password"
+                                                                @copy.prevent @cut.prevent @blur="updatePreferenceWebdavPassword" @keydown.enter="updatePreferenceWebdavPassword"
+                                                            />
+                                                        </el-form-item>
+                                                    </el-form-item-group>
+                                                </template>
+                                                <!-- Prefs: Debugging Load Mobile Debugger -->
+                                                <template v-if="formItem.slot === 'prefs-debugging-load-mobile-debugger'">
+                                                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.debugging.useMobileDebugger')">
+                                                        <el-switch v-model="useMobileDebugger" />
+                                                    </el-form-item>
+                                                </template>
+                                                <!-- Prefs: Debugging Renderer -->
+                                                <template v-if="formItem.slot === 'prefs-debugging-renderer'">
+                                                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.performance.renderer.label')">
+                                                        <el-select v-model="preferenceRenderer" size="small" style="width: 6rem;">
+                                                            <el-option value="webgl2" :label="t('dock.settings.prefs.performance.renderer.webgl2')" />
+                                                            <el-option value="webgl2-offscreen" :label="t('dock.settings.prefs.performance.renderer.webgl2Offscreen')" />
+                                                            <el-option value="wgpu-wasm" :label="t('dock.settings.prefs.performance.renderer.wgpuWasm')" />
+                                                        </el-select>
+                                                    </el-form-item>
+                                                </template>
+                                                <!-- Prefs: Help Links -->
+                                                <template v-if="formItem.slot === 'prefs-help-links'">
+                                                    <div class="el-form-item el-form-item--menu-item">
+                                                        <el-link href="https://github.com/opengraphica/opengraphica/issues/" type="primary" target="_blank">
+                                                            <span>{{ t('dock.settings.prefs.help.reportIssue') }}</span>
+                                                            <i class="bi bi-box-arrow-up-right ml-2"></i>
+                                                        </el-link>
+                                                    </div>
+                                                    <div class="el-form-item el-form-item--menu-item">
+                                                        <el-link href="javascript:void(0)" type="primary" @click="onClickShowDesignSystem()">
+                                                            <span>{{ t('dock.settings.prefs.help.designSystem') }}</span>
+                                                            <i class="bi bi-box-arrow-up-right ml-2"></i>
+                                                        </el-link>
+                                                    </div>
+                                                </template>
+                                                <!-- Prefs: Update Check -->
+                                                <template v-if="formItem.slot === 'prefs-update-check'">
+                                                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.update.checkForUpdates')">
+                                                        <el-switch v-model="preferenceCheckForAppUpdates" />
+                                                    </el-form-item>
+                                                </template>
+                                            </template>
+                                        </template>
+                                    </el-collapse-item>
+                                </template>
+                            </el-collapse>
+                            <template v-else-if="!formGroup.collapse">
+                                <template v-for="formItem of formGroup.items" :key="formItem.slot">
+                                    <template v-if="(formItem.condition) ? formItem.condition() : true">
+                                        <!-- View: Zoom -->
+                                        <template v-if="formItem.slot === 'view-zoom'">
+                                            <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.zoom')">
+                                                <el-button-group class="el-button-group--flex">
+                                                    <el-button size="small" plain :aria-label="t('dock.settings.view.zoomOut')" :title="t('dock.settings.view.zoomOut')" @click="isZoomLevelTouched = true; zoomLevel *= 1/1.25">
+                                                        <i class="bi bi-zoom-out" aria-hidden="true" />
+                                                    </el-button>
+                                                    <el-input-number v-model.lazy="zoomLevel" suffix-text="%" size="small" class="el-input--text-center" style="width: 5rem" @input="isZoomLevelTouched = true" />
+                                                    <el-button size="small" plain :aria-label="t('dock.settings.view.zoomIn')" :title="t('dock.settings.view.zoomIn')" @click="isZoomLevelTouched = true; zoomLevel *= 1.25;">
+                                                        <i class="bi bi-zoom-in" aria-hidden="true" />
+                                                    </el-button>
+                                                </el-button-group>
+                                            </el-form-item>
+                                        </template>
+                                        <!-- View: Rotate -->
+                                        <template v-else-if="formItem.slot === 'view-rotate'">
+                                            <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.rotate')">
+                                                <el-button-group class="el-button-group--flex">
+                                                    <el-button size="small" plain :aria-label="t('dock.settings.view.rotateCounterClockwise')" :title="t('dock.settings.view.rotateCounterClockwise')" @click="isRotationAngleTouched = true; rotationAngle -= 15">
+                                                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
+                                                    </el-button>
+                                                    <el-input-number v-model.lazy="rotationAngle" suffix-text="°" size="small" class="el-input--text-center" style="width: 5rem" @input="isRotationAngleTouched = true" />
+                                                    <el-button size="small" plain :aria-label="t('dock.settings.view.rotateClockwise')" :title="t('dock.settings.view.rotateClockwise')" @click="isRotationAngleTouched = true; rotationAngle += 15">
+                                                        <i class="bi bi-arrow-clockwise" aria-hidden="true" />
+                                                    </el-button>
+                                                </el-button-group>
+                                            </el-form-item>
+                                        </template>
+                                        <!-- View: Reset -->
+                                        <template v-else-if="formItem.slot === 'view-reset'">
+                                            <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.reset')">
+                                                <el-button-group>
+                                                    <el-button size="small" plain @click="onResetViewFit">
+                                                        {{ t('dock.settings.view.fit') }}
+                                                    </el-button>
+                                                    <el-button size="small" plain @click="onResetViewZoom">1:1</el-button>
+                                                    <el-button size="small" plain @click="onResetViewRotation">0°</el-button>
+                                                </el-button-group>
+                                            </el-form-item>
+                                        </template>
+                                        <!-- View: Touch Rotate -->
+                                        <template v-else-if="formItem.slot === 'view-touch-rotate'">
+                                            <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.touchRotate.label')">
+                                                <el-radio-group
+                                                    v-model="touchRotationPreference"
+                                                    size="small">
+                                                    <el-radio-button
+                                                        v-for="option in touchRotationOptions"
+                                                        :key="option.value"
+                                                        :label="option.value">
+                                                        {{ t(option.label) }}
+                                                    </el-radio-button>
+                                                </el-radio-group>
+                                            </el-form-item>
+                                        </template>
+                                        <!-- View: Window Fullscreen -->
+                                        <template v-else-if="formItem.slot === 'view-window-fullscreen'">
+                                            <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.window')">
+                                                <el-button v-if="isFullscreen" size="small" plain @click="onExitFullscreen()">
+                                                    <i class="bi bi-fullscreen-exit mr-2" aria-hidden="true" />
+                                                    {{ t('dock.settings.view.exitFullscreen') }}
+                                                </el-button>
+                                                <el-button v-else size="small" plain @click="onEnterFullscreen()">
+                                                    <i class="bi bi-fullscreen mr-2" aria-hidden="true" />
+                                                    {{ t('dock.settings.view.enterFullscreen') }}
+                                                </el-button>
+                                            </el-form-item>
+                                        </template>
+                                        <!-- Prefs: Theme -->
+                                        <template v-else-if="formItem.slot === 'prefs-theme'">
+                                            <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.prefs.theme')">
+                                                <el-radio-group
+                                                    v-model="activeTheme"
+                                                    :disabled="!!loadingThemeName"
+                                                    size="small">
+                                                    <el-radio-button
+                                                        v-for="option in themeOptions"
+                                                        v-loading="option.value === loadingThemeName"
+                                                        :key="option.value"
+                                                        :label="option.value">
+                                                        {{ t(option.label) }}
+                                                    </el-radio-button>
+                                                </el-radio-group>
+                                            </el-form-item>
+                                        </template>
+                                        <!-- Prefs: Language -->
+                                        <template v-else-if="formItem.slot === 'prefs-language'">
+                                            <el-form-item class="el-form-item--menu-item !mb-1 el-form-item--has-content-right" :label="t('dock.settings.prefs.language')">
+                                                <el-select v-model="languageOverride" size="small" style="width: 6rem;">
+                                                    <el-option-group>
+                                                        <el-option value="" :label="'[' + t('dock.settings.prefs.default') + ']'" />
+                                                    </el-option-group>
+                                                    <el-option-group>
+                                                        <el-option
+                                                            v-for="option in languageOptions"
+                                                            :key="option.value ?? undefined"
+                                                            :value="option.value ?? ''"
+                                                            :label="option.label"
+                                                        />
+                                                    </el-option-group>
+                                                </el-select>
+                                            </el-form-item>
+                                        </template>
+                                        <!-- Prefs: Reset Settings -->
+                                        <template v-if="formItem.slot === 'prefs-reset-settings'">
+                                            <div class="px-5 pt-4 pb-4">
+                                                <el-button size="small" class="w-full" @click="onClickResetSettings">
+                                                    {{ t('dock.settings.prefs.editor.resetSettings') }}
+                                                </el-button>
+                                            </div>
+                                        </template>
+                                    </template>
+                                </template>
+                                <el-divider v-if="
+                                    formGroupIndex < tabDefinition.form.length - 1
+                                        && !tabDefinition.form[formGroupIndex + 1]?.collapse
+                                        && (
+                                            !tabDefinition.form[formGroupIndex + 1].condition
+                                            || (
+                                                tabDefinition.form[formGroupIndex + 1].condition
+                                                && tabDefinition.form[formGroupIndex + 1].condition?.()
+                                            )
+                                        )
+                                    "
+                                    class="my-2!"
+                                />
+                            </template>
+                        </template>
                     </el-form>
+                    <template v-if="tabDefinition.layout">
+                        <template v-for="(layoutGroup, layoutGroupIndex) of tabDefinition.layout">
+                            <template v-for="layoutItem of layoutGroup.items" :key="layoutItem.slot">
+                                <!-- History: Actions -->
+                                <template v-if="layoutItem.slot === 'history-actions'">
+                                    <div class="flex justify-center px-4 pt-2">
+                                        <el-button-group>
+                                            <el-button size="small" :disabled="!canUndo" round plain aria-label="Undo" @click="onHistoryUndo()">
+                                                <i class="bi bi-arrow-90deg-left mr-1" aria-hidden="true" /> {{ t('dock.settings.history.undo') }}
+                                            </el-button>
+                                            <el-button size="small" :disabled="!canRedo" round plain aria-label="Redo" @click="onHistoryRedo()">
+                                                <i class="bi bi-arrow-90deg-right mr-1" aria-hidden="true" /> {{ t('dock.settings.history.redo') }}
+                                            </el-button>
+                                        </el-button-group>
+                                    </div>
+                                </template>
+                                <!-- History: Timeline -->
+                                <template v-else-if="layoutItem.slot === 'history-timeline'">
+                                    <div v-if="historyActionStack.length === 0" class="px-4 py-3">
+                                        <el-alert
+                                            type="info"
+                                            :title="t('dock.settings.history.noHistory')"
+                                            show-icon
+                                            :closable="false">
+                                        </el-alert>
+                                    </div>
+                                    <el-timeline v-else class="!px-5 !pt-4">
+                                        <el-timeline-item
+                                            v-if="historyActionStack.length > 0"
+                                            class="!pb-1"
+                                            type="primary">
+                                            <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(0)">
+                                                [{{ t('dock.settings.history.baseImage') }}]
+                                            </el-link>
+                                        </el-timeline-item>
+                                        <el-timeline-item
+                                            v-for="(action, index) of historyActionStack"
+                                            :key="action.id + '_' + index"
+                                            :type="historyActionStackIndex > index ? 'primary' : undefined"
+                                            class="!pb-1">
+                                            <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)">
+                                                {{ t(action.description) }}
+                                            </el-link>
+                                        </el-timeline-item>
+                                    </el-timeline>
+                                </template>
+                            </template>
+                            <el-divider v-if="layoutGroupIndex < tabDefinition.layout.length - 1" class="my-2!" />
+                        </template>
+                    </template>
                 </el-scrollbar>
             </template>
         </el-tab-pane>
@@ -446,6 +404,7 @@ import OgButton from '@/ui/element/button.vue';
 import vElCollapseItemSmartScroll from '@/directives/el-collapse-item-smart-scroll';
 
 import languages from '@/config/languages.json';
+
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { HistoryState } from '@/store/history';
@@ -455,6 +414,7 @@ import { hasWorkingFile } from '@/store/data/working-file-database';
 
 import appEmitter from '@/lib/emitter';
 import { pickFile } from '@/lib/file';
+import { runShortcutAction } from '@/lib/keyboard';
 import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
 import { throttle } from '@/lib/timing';
 import { runModule } from '@/modules';
@@ -488,10 +448,58 @@ watch([activeTab], ([newActiveTab]) => {
     visitedTabs.value[newActiveTab] = true;
 }, { immediate: true });
 
-const tabMenus = computed(() => {
-    const tabMenus = [
+interface DockSettingsTabDefinition {
+    tab: string;
+    icon: string;
+    menu?: Array<{
+        condition?: () => boolean;
+        items?: Array<{
+            condition?: () => boolean;
+            icon: string;
+            name: string;
+            action: string;
+        }>;
+        collapse?: Array<{
+            title: string;
+            condition?: () => boolean;
+            items: Array<{
+                condition?: () => boolean;
+                icon: string;
+                name: string;
+                action: string;
+            }>;
+        }>;
+    }>;
+    form?: Array<{
+        condition?: () => boolean;
+        items?: Array<{
+            condition?: () => boolean;
+            slot: string;
+        }>;
+        collapse?: Array<{
+            title: string;
+            condition?: () => boolean;
+            items: Array<{
+                condition?: () => boolean;
+                slot: string;
+            }>;
+        }>;
+    }>;
+    layout?: Array<{
+        collapseTitle?: string;
+        condition?: () => boolean;
+        items: Array<{
+            condition?: () => boolean;
+            slot: string;
+        }>;
+    }>;
+}
+
+const tabDefinitions = computed(() => {
+    const tabDefinitions: DockSettingsTabDefinition[] = [
         {
             tab: 'file',
+            icon: 'bi bi-archive',
             menu: [
                 {
                     items: [
@@ -564,13 +572,332 @@ const tabMenus = computed(() => {
             ],
         },
         {
-            tab: 'view',
+            tab: 'image',
+            icon: 'bi bi-image',
             menu: [
-
-            ]
-        }
+                {
+                    items: [
+                        {
+                            icon: 'bi bi-crop',
+                            name: 'dock.settings.image.menu.cropResize',
+                            action: 'cropResize',
+                        },
+                    ],
+                },
+                {
+                    items: [
+                        {
+                            icon: 'bi bi-scissors',
+                            name: 'dock.settings.image.menu.cut',
+                            action: 'cut',
+                        },
+                        {
+                            icon: 'bi bi-files',
+                            name: 'dock.settings.image.menu.copy',
+                            action: 'copy',
+                        },
+                        {
+                            icon: 'bi bi-files',
+                            name: 'dock.settings.image.menu.copyAllLayers',
+                            action: 'copyAll',
+                        },
+                        {
+                            icon: 'bi bi-clipboard',
+                            name: 'dock.settings.image.menu.paste',
+                            action: 'paste',
+                        },
+                    ],
+                },
+                {
+                    collapse: [
+                        {
+                            title: 'dock.settings.image.menu.transformLayers.groupTitle',
+                            items: [
+                                {
+                                    icon: 'bi bi-arrows-collapse-vertical',
+                                    name: 'dock.settings.image.menu.transformLayers.flipX',
+                                    action: 'flipLayersX',
+                                },
+                                {
+                                    icon: 'bi bi-arrows-collapse',
+                                    name: 'dock.settings.image.menu.transformLayers.flipY',
+                                    action: 'flipLayersY',
+                                },
+                                {
+                                    icon: 'bi bi-arrow-clockwise',
+                                    name: 'dock.settings.image.menu.transformLayers.rotateClockwise',
+                                    action: 'rotateLayersClockwise',
+                                },
+                                {
+                                    icon: 'bi bi-arrow-counterclockwise',
+                                    name: 'dock.settings.image.menu.transformLayers.rotateCounterclockwise',
+                                    action: 'rotateLayersCounterclockwise',
+                                },
+                            ],
+                        },
+                        {
+                            title: 'dock.settings.image.menu.convertLayers.groupTitle',
+                            items: [
+                                {
+                                    icon: 'bi bi-arrow-return-right',
+                                    name: 'dock.settings.image.menu.convertLayers.toCollage',
+                                    action: 'convertLayersToCollage',
+                                },
+                                {
+                                    icon: 'bi bi-arrow-return-right',
+                                    name: 'dock.settings.image.menu.convertLayers.toImageSequence',
+                                    action: 'convertLayersToImageSequence',
+                                },
+                                {
+                                    icon: 'bi bi-arrow-return-right',
+                                    name: 'dock.settings.image.menu.convertLayers.flatten',
+                                    action: 'convertLayersFlatten',
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            tab: 'view',
+            icon: 'bi bi-display',
+            form: [
+                {
+                    items: [
+                        {
+                            slot: 'view-zoom',
+                        },
+                        {
+                            slot: 'view-rotate',
+                        },
+                        {
+                            slot: 'view-reset',
+                        },
+                    ],
+                },
+                {
+                    items: [
+                        {
+                            slot: 'view-touch-rotate',
+                        },
+                    ],
+                },
+                {
+                    items: [
+                        {
+                            slot: 'view-window-fullscreen'
+                        },
+                    ],
+                }
+            ],
+        },
+        {
+            tab: 'history',
+            icon: 'bi bi-clock-history',
+            layout: [
+                {
+                    items: [
+                        {
+                            slot: 'history-actions',
+                        },
+                        {
+                            slot: 'history-timeline',
+                        },
+                    ],
+                }
+            ],
+        },
+        {
+            tab: 'prefs',
+            icon: 'bi bi-toggle-on',
+            form: [
+                {
+                    items: [
+                        {
+                            slot: 'prefs-theme',
+                        },
+                        {
+                            slot: 'prefs-language',
+                        },
+                    ],
+                },
+                {
+                    collapse: [
+                        {
+                            title: 'dock.settings.prefs.plugins.groupTitle',
+                            items: [
+                                {
+                                    slot: 'prefs-plugins-list',
+                                },
+                                {
+                                    slot: 'prefs-plugins-actions',
+                                },
+                            ]
+                        },
+                        {
+                            title: 'dock.settings.prefs.editor.groupTitle',
+                            items: [
+                                {
+                                    slot: 'prefs-editor-menu-bar-position',
+                                },
+                                {
+                                    slot: 'prefs-editor-show-welcome-screen',
+                                },
+                                {
+                                    slot: 'prefs-editor-show-tips',
+                                },
+                            ],
+                        },
+                        {
+                            title: 'dock.settings.prefs.networkStorage.groupTitle',
+                            items: [
+                                {
+                                    slot: 'prefs-network-storage-webdav',
+                                },
+                            ],
+                        },
+                        {
+                            title: 'dock.settings.prefs.debugging.groupTitle',
+                            items: [
+                                {
+                                    slot: 'prefs-debugging-load-mobile-debugger',
+                                },
+                                {
+                                    slot: 'prefs-debugging-renderer',
+                                },
+                            ],
+                        },
+                        {
+                            title: 'dock.settings.prefs.help.groupTitle',
+                            items: [
+                                {
+                                    slot: 'prefs-help-links',
+                                },
+                            ],
+                        },
+                        {
+                            title: 'dock.settings.prefs.update.groupTitle',
+                            condition: () => canUpdateApp.value,
+                            items: [
+                                {
+                                    condition: () => canUpdateApp.value,
+                                    slot: 'prefs-update-check',
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    items: [
+                        {
+                            slot: 'prefs-reset-settings',
+                        },
+                    ]
+                }
+            ],
+        },
     ];
-    return tabMenus;
+
+    for (const pluginMenuItem of editorStore.state.pluginSettingsDockMenuItems) {
+        let tabDefinition = tabDefinitions.find((definition) => definition.tab === pluginMenuItem.tab);
+        if (!tabDefinition) {
+            tabDefinition = {
+                tab: pluginMenuItem.tab,
+                icon: pluginMenuItem.tab ?? 'bi bi-plugin',
+            };
+        }
+        if (!tabDefinition.menu) {
+            tabDefinition.menu = [];
+        }
+        const actionTabPrefix = 'plugin-' + pluginMenuItem.tab + '-';
+        const newMenuItem = {
+            icon: pluginMenuItem.item.icon ?? 'bi bi-plugin',
+            name: `dock.settings.${pluginMenuItem.tab}.menu.${pluginMenuItem.item.name}`,
+            action: actionTabPrefix + pluginMenuItem.item.name,
+        }
+        if (pluginMenuItem.placeAround) {
+            const { otherItemName, position } = pluginMenuItem.placeAround;
+            findOtherMenuItem:
+            for (const menuGroup of tabDefinition.menu) {
+                if (menuGroup.items) {
+                    for (const itemGroup of menuGroup.items) {
+                        if (itemGroup.name === otherItemName.replace(actionTabPrefix, '')) {
+                            menuGroup.items.splice(position === 'before' ? 0 : 1, 0, newMenuItem);
+                            break findOtherMenuItem;
+                        }
+                    }
+                }
+                if (menuGroup.collapse) {
+                    for (const collapseItem of menuGroup.collapse) {
+                        for (const itemGroup of collapseItem.items) {
+                            if (itemGroup.name === otherItemName.replace(actionTabPrefix, '')) {
+                                collapseItem.items.splice(position === 'before' ? 0 : 1, 0, newMenuItem);
+                                break findOtherMenuItem;
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            tabDefinition.menu.push({
+                items: [newMenuItem],
+            });
+        }
+    }
+
+    for (const definition of tabDefinitions) {
+        if (definition.menu || definition.form) {
+            const menuOrForm = definition.menu || definition.form!;
+            for (const menuGroup of menuOrForm) {
+                combineConditions:
+                {
+                    if (menuGroup.items) {
+                        if (menuGroup.condition) break combineConditions;
+                        let conditions: Array<() => boolean> = [];
+                        for (const menuItem of menuGroup.items) {
+                            if (!menuItem.condition) {
+                                break combineConditions;
+                            }
+                            conditions.push(menuItem.condition);
+                        }
+                        menuGroup.condition = () => {
+                            for (const condition of conditions) {
+                                if (condition()) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+                    }
+                }
+                if (menuGroup.collapse) {
+                    for (const collapseItem of menuGroup.collapse) {
+                        combineConditions:
+                        {
+                            if (collapseItem.condition) break combineConditions;
+                            let conditions: Array<() => boolean> = [];
+                            for (const menuItem of collapseItem.items) {
+                                if (!menuItem.condition) {
+                                    break combineConditions;
+                                }
+                                conditions.push(menuItem.condition);
+                            }
+                            collapseItem.condition = () => {
+                                for (const condition of conditions) {
+                                    if (condition()) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return tabDefinitions;
 });
 
 // File operations
@@ -767,7 +1094,7 @@ const languageOverride = computed<string>({
     }
 });
 function onPrefsCollapseChange() {
-    webdavStorageGroup.value?.calculateLabelMinWidth();
+    webdavStorageGroup.value?.[0]?.calculateLabelMinWidth();
 }
 // Preferences - Plugins
 async function onSelectPluginFile() {
@@ -920,91 +1247,102 @@ async function onMenuSelect(group: string, index: string) {
     loading.value = true;
     await nextTick();
     try {
-        switch (group) {
-            case 'file':
-                switch (index) {
-                    case 'restore':
-                        await runModule('file', 'restoreBackup');
-                        editorStore.set('showBackupRestore', false);
-                        break;
-                    case 'new':
-                        await runModule('file', 'new');
-                        editorStore.set('showBackupRestore', false);
-                        break;
-                    case 'open':
-                        await runModule('file', 'open');
-                        editorStore.set('showBackupRestore', false);
-                        break;
-                    case 'export':
-                        await runModule('file', 'export');
-                        break;
-                    case 'save':
-                        if (vendorCustomSaveCallback.value) {
-                            vendorCustomSaveCallback.value();
-                        }
-                        break;
-                    case 'saveAs':
-                        await runModule('file', 'saveAs');
-                        break;
-                    case 'insertPhoto':
-                        await runModule('file', 'insertPhoto');
-                        editorStore.set('showBackupRestore', false);
-                        break;
-                    case 'takePhoto':
-                        await runModule('file', 'takePhoto');
-                        editorStore.set('showBackupRestore', false);
-                        break;
-                    case 'shareImage':
-                        await runModule('file', 'shareImage');
-                        break;
-                    case 'quit':
-                        window.Electron?.quit();
-                        break;
+
+        if (index.startsWith('plugin-')) {
+            for (const pluginMenuItem of editorStore.state.pluginSettingsDockMenuItems) {
+                const actionIndex = 'plugin-' + pluginMenuItem.tab + '-' + pluginMenuItem.item.name;
+                if (actionIndex === index) {
+                    runShortcutAction(pluginMenuItem.action);
+                    break;
                 }
-                break;
-            case 'image':
-                switch (index) {
-                    case 'cropResize':
-                        await editorStore.dispatch('setActiveTool', {
-                            group: 'image',
-                            tool: 'cropResize'
-                        });
-                        break;
-                    case 'cut':
-                        await runModule('image', 'cut');
-                        break;
-                    case 'copy':
-                        await runModule('image', 'copy');
-                        break;
-                    case 'copyAll':
-                        await runModule('image', 'copyAll');
-                        break;
-                    case 'paste':
-                        await runModule('image', 'paste');
-                        break;
-                    case 'flipLayersX':
-                        await runModule('image', 'flipLayersX');
-                        break;
-                    case 'flipLayersY':
-                        await runModule('image', 'flipLayersY');
-                        break;
-                    case 'rotateLayersClockwise':
-                        await runModule('image', 'rotateLayersClockwise');
-                        break;
-                    case 'rotateLayersCounterclockwise':
-                        await runModule('image', 'rotateLayersCounterclockwise');
-                        break;
-                    case 'convertLayersToCollage':
-                        await runModule('image', 'convertLayersToCollage');
-                        break;
-                    case 'convertLayersToImageSequence':
-                        await runModule('image', 'convertLayersToImageSequence');
-                        break;
-                    case 'convertLayersFlatten':
-                        await runModule('image', 'convertLayersFlatten');
-                        break;
-                }
-                break;
+            }
+        } else {
+            switch (group) {
+                case 'file':
+                    switch (index) {
+                        case 'restore':
+                            await runModule('file', 'restoreBackup');
+                            editorStore.set('showBackupRestore', false);
+                            break;
+                        case 'new':
+                            await runModule('file', 'new');
+                            editorStore.set('showBackupRestore', false);
+                            break;
+                        case 'open':
+                            await runModule('file', 'open');
+                            editorStore.set('showBackupRestore', false);
+                            break;
+                        case 'export':
+                            await runModule('file', 'export');
+                            break;
+                        case 'save':
+                            if (vendorCustomSaveCallback.value) {
+                                vendorCustomSaveCallback.value();
+                            }
+                            break;
+                        case 'saveAs':
+                            await runModule('file', 'saveAs');
+                            break;
+                        case 'insertPhoto':
+                            await runModule('file', 'insertPhoto');
+                            editorStore.set('showBackupRestore', false);
+                            break;
+                        case 'takePhoto':
+                            await runModule('file', 'takePhoto');
+                            editorStore.set('showBackupRestore', false);
+                            break;
+                        case 'shareImage':
+                            await runModule('file', 'shareImage');
+                            break;
+                        case 'quit':
+                            window.Electron?.quit();
+                            break;
+                    }
+                    break;
+                case 'image':
+                    switch (index) {
+                        case 'cropResize':
+                            await editorStore.dispatch('setActiveTool', {
+                                group: 'image',
+                                tool: 'cropResize'
+                            });
+                            break;
+                        case 'cut':
+                            await runModule('image', 'cut');
+                            break;
+                        case 'copy':
+                            await runModule('image', 'copy');
+                            break;
+                        case 'copyAll':
+                            await runModule('image', 'copyAll');
+                            break;
+                        case 'paste':
+                            await runModule('image', 'paste');
+                            break;
+                        case 'flipLayersX':
+                            await runModule('image', 'flipLayersX');
+                            break;
+                        case 'flipLayersY':
+                            await runModule('image', 'flipLayersY');
+                            break;
+                        case 'rotateLayersClockwise':
+                            await runModule('image', 'rotateLayersClockwise');
+                            break;
+                        case 'rotateLayersCounterclockwise':
+                            await runModule('image', 'rotateLayersCounterclockwise');
+                            break;
+                        case 'convertLayersToCollage':
+                            await runModule('image', 'convertLayersToCollage');
+                            break;
+                        case 'convertLayersToImageSequence':
+                            await runModule('image', 'convertLayersToImageSequence');
+                            break;
+                        case 'convertLayersFlatten':
+                            await runModule('image', 'convertLayersFlatten');
+                            break;
+                    }
+                    break;
+            }
         }
     } catch (error: any) {
         console.error(error);

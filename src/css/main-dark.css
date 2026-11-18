@@ -9064,7 +9064,7 @@ body.og-full-page .opengraphica {
   width: 100rem !important;
   max-width: 90%;
 }
-.opengraphica .og-dialogs .el-dialog--fullscreen {
+.opengraphica .og-dialogs .el-dialog.el-dialog--fullscreen {
   display: flex;
   flex-direction: column;
   width: 100% !important;
@@ -9073,20 +9073,20 @@ body.og-full-page .opengraphica {
   margin: 0;
   border-radius: 0;
 }
-.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body {
+.opengraphica .og-dialogs .el-dialog.el-dialog--fullscreen .el-dialog__body {
   flex-grow: 1;
   overflow: hidden;
 }
-.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module {
+.opengraphica .og-dialogs .el-dialog.el-dialog--fullscreen .el-dialog__body .og-module {
   height: 100%;
 }
-.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs {
+.opengraphica .og-dialogs .el-dialog.el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs {
   height: 100%;
 }
-.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs > .el-tabs__content {
+.opengraphica .og-dialogs .el-dialog.el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs > .el-tabs__content {
   height: 100%;
 }
-.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs > .el-tabs__content > .el-tab-pane {
+.opengraphica .og-dialogs .el-dialog.el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs > .el-tabs__content > .el-tab-pane {
   height: 100%;
 }
 .opengraphica .og-dialogs .el-dialog {

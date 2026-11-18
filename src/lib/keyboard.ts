@@ -24,7 +24,7 @@ interface ShortcutDefinition {
     ctrl: boolean;
     shift: boolean;
     action: {
-        type: 'dock' | 'toolGroup' | 'runModule' | 'appEmit';
+        type: 'dock' | 'toolGroup' | 'tool' | 'runModule' | 'appEmit';
         target: string;
     };
 }
@@ -117,31 +117,41 @@ async function onDocumentKeyDown(e: KeyboardEvent) {
                     shortcut.shift === isShiftKeyPressed.value
                 ) {
                     e.preventDefault();
-                    if (shortcut.action.type === 'toolGroup') {
-                        (async () => {
-                            const editorStore = (await import('@/store/editor')).default;
-                            editorStore.dispatch('setActiveTool', { group: shortcut.action.target });
-                        });
-                    } else if (shortcut.action.type === 'dock') {
-                        appEmitter.emit('app.dialogs.openFromDock', { name: shortcut.action.target });
-                    } else if (shortcut.action.type === 'runModule') {
-                        const actionSplit = shortcut.action.target.split('/');
-                        try {
-                            await runModule(actionSplit[0], actionSplit[1]);
-                        } catch (error) {
-                            appEmitter.emit('app.notify', {
-                                title: t(`moduleGroup.${actionSplit[0]}.modules.${actionSplit[1]}.name`),
-                                message: 'Error running action: ' + error,
-                                duration: 5000
-                            });
-                        }
-                    } else if (shortcut.action.type === 'appEmit') {
-                        appEmitter.emit(shortcut.action.target as any);
-                    }
+                    runShortcutAction(shortcut.action);
                     break;
                 }
             }
         }
+    }
+}
+
+export async function runShortcutAction(action: ShortcutDefinition['action']) {
+    if (action.type === 'toolGroup') {
+        (async () => {
+            const editorStore = (await import('@/store/editor')).default;
+            editorStore.dispatch('setActiveTool', { group: action.target });
+        });
+    } else if (action.type === 'tool') {
+        (async () => {
+            const editorStore = (await import('@/store/editor')).default;
+            const [ group, tool ] = action.target.split(';');
+            editorStore.dispatch('setActiveTool', { group, tool });
+        });
+    } else if (action.type === 'dock') {
+        appEmitter.emit('app.dialogs.openFromDock', { name: action.target });
+    } else if (action.type === 'runModule') {
+        const actionSplit = action.target.split('/');
+        try {
+            await runModule(actionSplit[0], actionSplit[1]);
+        } catch (error) {
+            appEmitter.emit('app.notify', {
+                title: t(`moduleGroup.${actionSplit[0]}.modules.${actionSplit[1]}.name`),
+                message: 'Error running action: ' + error,
+                duration: 5000
+            });
+        }
+    } else if (action.type === 'appEmit') {
+        appEmitter.emit(action.target as any);
     }
 }
 

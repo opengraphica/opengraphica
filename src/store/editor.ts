@@ -76,9 +76,14 @@ export interface PluginModuleDefinition {
 
 export interface PluginSettingsDockMenuItemDefinition {
     tab: string;
+    tabIcon?: string;
     item: {
         icon?: string;
         name: string;
+    },
+    action: {
+        type: 'dock' | 'toolGroup' | 'tool' | 'runModule' | 'appEmit';
+        target: string;
     },
     placeAround?: {
         otherItemName: string;

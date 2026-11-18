@@ -19,7 +19,7 @@
         width: 100rem !important;
         max-width: 90%;
     }
-    .el-dialog--fullscreen {
+    .el-dialog.el-dialog--fullscreen {
         display: flex;
         flex-direction: column;
         width: 100% !important;
