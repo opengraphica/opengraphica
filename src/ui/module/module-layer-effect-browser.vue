@@ -12,7 +12,7 @@
             <el-horizontal-scrollbar-arrows
                 style="grid-column: 1 / -1;"
                 class="h-auto! -mx-4!"
-                scroll-content-class="gap-2! py-2 round-2!"
+                scroll-content-class="items-stretch! gap-2! py-2 round-2!"
             >
                 <template
                     v-for="filter of category.filters"
@@ -32,7 +32,7 @@
                                 :src="filterPreviewThumbnails[filter.id]"
                                 :style="{
                                     'width': '100%',
-                                    'height': previewImageHeight,
+                                    'height': '100%',
                                     'aspect-ratio': previewImageAspectRatio,
                                     'background-image': 'url(\'' + assetsBasePath + 'images/transparency-bg.png\')',
                                     'background-repeat': 'repeat',
@@ -45,13 +45,13 @@
                                 :src="`${assetsBasePath}images/module/layer/layer-effect-browser/thumbnail/${filter.kebabId}.png`"
                                 :style="{
                                     'width': '100%',
-                                    'height': previewImageHeight,
+                                    'height': '100%',
                                     'aspect-ratio': previewImageAspectRatio,
                                 }"
                                 loading="lazy"
                             >
                         </div>
-                        <div class="p-2 text-center">{{ t(filter.name) }}</div>
+                        <div class="p-2 flex grow-1 text-center items-center justify-center">{{ t(filter.name) }}</div>
                     </el-card>
                 </template>
             </el-horizontal-scrollbar-arrows>

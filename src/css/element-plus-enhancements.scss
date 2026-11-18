@@ -176,6 +176,12 @@
             transform: scale(102.5%);
             transition: transform 0.3s;
         }
+
+        .el-card__body {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
     }
 
     .el-collapse--menu-item {

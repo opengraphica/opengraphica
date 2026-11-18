@@ -28555,6 +28555,11 @@ body.og-full-page .opengraphica {
   transform: scale(102.5%);
   transition: transform 0.3s;
 }
+.opengraphica .el-card--link .el-card__body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 .opengraphica .el-collapse--menu-item .el-collapse-item__header {
   font-size: 0.875rem;
   padding-left: 1.25rem;
