@@ -335,6 +335,29 @@ async function dispatchRunAction(
 async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
     if (store.get('canUndo')) {
 
+        // Wait for reserved actions to complete
+        let actionReserveQueue = store.get('actionReserveQueue');
+        while (actionReserveQueue.length > 0) {
+            let reserveIgnoreResolve!: () => void;
+            let reserveIgnorePromise = new Promise<void>(resolve => { reserveIgnoreResolve = resolve; });
+            let reserveIgnoreTimeoutHandle = setTimeout(async () => {
+                actionReserveQueue = store.get('actionReserveQueue');
+                const reserve = actionReserveQueue.shift();
+                set('actionReserveQueue', actionReserveQueue);
+                try { reserve?.resolve(); } catch (error) {}
+                reserveIgnoreResolve();
+            }, 5000);
+            await Promise.any([
+                (async () => {
+                    const reserveQueueItem = actionReserveQueue[0];
+                    await reserveQueueItem.promise;
+                })(),
+                reserveIgnorePromise,
+            ]);
+            clearTimeout(reserveIgnoreTimeoutHandle);
+            actionReserveQueue = store.get('actionReserveQueue');
+        }
+
         try {
             appEmitter.emit('editor.history.beforeStep', {
                 trigger: 'undo',

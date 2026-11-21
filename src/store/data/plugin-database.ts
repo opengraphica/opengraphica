@@ -1,5 +1,6 @@
 import { computed, readonly, ref } from 'vue';
 import { compareSemver } from '@/lib/semver';
+import editorStore from '@/store/editor';
 
 let database: IDBDatabase | null = null;
 let databaseInitPromise: Promise<void> | null = null;
@@ -116,10 +117,14 @@ export async function readAllPlugins() {
         filesRequest.onerror = reject;
     });
 
+    const pluginImportMap = editorStore.state.pluginImportMap;
     const importMapImports: Record<string, string> = {};
     for (const file of filesResults) {
-        importMapImports[file.id] = URL.createObjectURL(file.data);
+        const objectUrl = URL.createObjectURL(file.data);
+        pluginImportMap[file.id] = objectUrl;
+        importMapImports[file.id] = objectUrl;
     }
+    editorStore.set('pluginImportMap', pluginImportMap);
 
     const importMapScript = document.createElement('script');
     importMapScript.setAttribute('type', 'importmap');

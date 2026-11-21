@@ -26,7 +26,8 @@
                     @click="showDndDropOverlay = false"
                 />
                 <app-docks />
-                <div id="og-popover-container" />
+                <div id="og-popover-container" class="og-popover-container" />
+                <div id="og-notification-container" class="og-notification-container" />
             </template>
         </template>
     </div>

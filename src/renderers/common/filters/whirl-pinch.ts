@@ -32,7 +32,7 @@ export default class WhirlPinchCanvasFilter implements CanvasFilter<WhirlPinchCa
                 type: 'percentage',
                 default: 0.5,
                 min: 0,
-                max: 1,
+                max: 2,
             },
             centerX: {
                 type: 'percentage',

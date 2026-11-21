@@ -5,11 +5,42 @@ import appEmitter from '@/lib/emitter';
 
 import type { defineComponent, defineAsyncComponent } from 'vue';
 import type BaseCanvasController from '@/tools/controllers/base';
-import type { ClassType } from '@/types';
+import type { CanvasFilter, ClassType } from '@/types';
 
 declare var __webpack_require__: any;
 
 let moduleChunkMap: Record<string, { id: string, chunks: number[] }> | null = null;
+
+interface CreateFilterDefinition {
+    name: string;
+    group: string;
+    schemaClass: () => Promise<ClassType<CanvasFilter>>;
+    fragmentShader: () => Promise<string>;
+}
+async function createFilter(options: CreateFilterDefinition) {
+    try {
+        const { name, group, schemaClass, fragmentShader } = options;
+
+        const pluginFilters = editorStore.get('pluginFilters');
+
+        const layerFilters = await import('@/config/layer-filters.json');
+        for (const otherFilterName in layerFilters) {
+            if (name === otherFilterName) {
+                throw new Error(`A filter with the name "${name}" already exists.`);
+            }
+        }
+
+        pluginFilters.push({
+            name,
+            group,
+            getSchemaClass: schemaClass,
+            getFragmentShader: fragmentShader,
+        });
+        editorStore.set('pluginFilters', pluginFilters);
+    } catch (error) {
+        console.warn('[src/composables/editor-plugin-api.ts] Error when creating filter.', error);
+    }
+}
 
 interface CreateModuleDefinition {
     name: string;
@@ -144,6 +175,9 @@ export function createEditorPluginApi(pluginId: string) {
                         type: 'json',
                     },
                 });
+            } else if (/\.(?:frag|vert)$/.test(path)) {
+                const url = editorStore.state.pluginImportMap[path.replace(/^#\//g, 'plugins/' + pluginId + '/')];
+                return await (await fetch(url)).text();
             }
             return import(/*webpackIgnore: true*/ path.replace(/^#\//g, 'plugins/' + pluginId + '/'));
         } else if (path.startsWith('@/')) {
@@ -180,6 +214,7 @@ export function createEditorPluginApi(pluginId: string) {
     };
 
     return {
+        createFilter,
         createMenuBarToolGroup,
         createModule,
         createSettingsDockMenuItem,

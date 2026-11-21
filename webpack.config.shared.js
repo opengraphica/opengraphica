@@ -75,7 +75,7 @@ module.exports = function setupConfig(config) {
                     options: {
                         appendTsSuffixTo: [/\.vue$/],
                         ignoreDiagnostics: [2322]
-                    }
+                    },
                 },
                 {
                     test: /\.js$/,

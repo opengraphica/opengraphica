@@ -560,6 +560,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
                 for (const [layerIndex, layer] of drawingOnLayers.entries()) {
                     if (layer.type === 'raster') {
+                        canvasStore.set('dirty', true);
                         const tiles = await collectedTiles[layerIndex];
                         if (tiles) {
                             layerActions.push(

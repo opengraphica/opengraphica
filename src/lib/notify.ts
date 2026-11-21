@@ -9,10 +9,19 @@ export function notifyInjector(injectName: string): any {
 
 export function notifyPolyfill($notify: Notify): Notify {
     const notifyFn = (options?: NotificationParams): NotificationHandle => {
+        if (!options) {
+            options = {};
+        }
+        if (typeof options === 'object') {
+            const offsetString: string = getComputedStyle(document.body).getPropertyValue('--og-safe-top').trim();
+            if (offsetString.endsWith('px')) {
+                (options as any).offset = parseFloat(offsetString.replace('px', ''));
+            }
+        }
         const notificationHandle = $notify(options);
         const notifications = document.querySelectorAll('body > .el-notification');
         if (notifications.length > 0) {
-            (document.querySelector('.opengraphica') as Element).appendChild(
+            document.getElementById('og-notification-container')?.appendChild(
                 notifications[notifications.length - 1]
             );
         }
