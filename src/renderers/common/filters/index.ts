@@ -2,11 +2,32 @@ import { camelCaseToKebabCase } from '@/lib/string';
 import { Texture } from 'three/src/textures/Texture';
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
-import type { Webgl2RendererCanvasFilter, WorkingFileLayerFilter } from '@/types';
+import type { PluginFilterDefinition } from '@/store/editor';
+import type { CanvasFilter, Webgl2RendererCanvasFilter, WorkingFileLayerFilter } from '@/types';
 
-export async function getCanvasFilterClass(name: string): Promise<new (...args: any) => Webgl2RendererCanvasFilter> {
+class DefaultCanavsFilter implements CanvasFilter {
+    public name = 'default';
+    public params = {};
+    getEditConfig() {
+        return {};
+    }
+}
+
+export async function getCanvasFilterClass(name: string, pluginFilters?: PluginFilterDefinition[]): Promise<new (...args: any) => Webgl2RendererCanvasFilter> {
     const kebabCaseName = camelCaseToKebabCase(name);
-    return (await import(/* webpackChunkName: 'layer-filter-[request]' */ `./${kebabCaseName}`)).default;
+    let CanvasFilterClass;
+    const pluginFilter = pluginFilters?.find((pluginFilter) => pluginFilter.name === name);
+    if (pluginFilter) {
+        CanvasFilterClass = pluginFilter.schemaClass ?? pluginFilter.getSchemaClass();
+        pluginFilter.schemaClass = CanvasFilterClass;
+    } else {
+        try {
+            CanvasFilterClass = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `./${kebabCaseName}`)).default;
+        } catch (error) {
+            CanvasFilterClass = DefaultCanavsFilter;
+        }
+    }
+    return CanvasFilterClass;
 }
 
 interface CreateFiltersOptions {
@@ -48,7 +69,7 @@ export function applyCanvasFilter(imageData: ImageData, canvasFilter: Webgl2Rend
 
 export function buildCanvasFilterParamsFromFormData(canvasFilter: Webgl2RendererCanvasFilter, formData: Record<string,unknown>): Record<string, unknown> {
     const params: Record<string, unknown> = {};
-    const editConfig = canvasFilter.getEditConfig();
+    const editConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
     for (const paramName in editConfig) {
         const paramConfig = editConfig[paramName];
         if (paramConfig.type === 'computedFloat') {
@@ -62,7 +83,7 @@ export function buildCanvasFilterParamsFromFormData(canvasFilter: Webgl2Renderer
 }
 
 export function buildCanvasFilterPreviewParams(canvasFilter: Webgl2RendererCanvasFilter): Record<string, unknown> {
-    const filterEditConfig = canvasFilter.getEditConfig();
+    const filterEditConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
     const previewParams: Record<string, unknown> = {};
     for (const paramName in filterEditConfig) {
         previewParams[paramName] = filterEditConfig[paramName]?.preview ?? filterEditConfig[paramName].default;

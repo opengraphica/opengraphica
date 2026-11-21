@@ -42,7 +42,7 @@
                             >
                             <img
                                 v-else
-                                :src="`${assetsBasePath}images/module/layer/layer-effect-browser/thumbnail/${filter.kebabId}.png`"
+                                :src="getStaticThumbnail(filter)"
                                 :style="{
                                     'width': '100%',
                                     'height': '100%',
@@ -76,6 +76,7 @@ import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.
 import ElLoading from 'element-plus/lib/components/loading/index';
 import historyStore from '@/store/history';
 
+import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById, getSelectedLayers } from '@/store/working-file';
 
@@ -161,6 +162,21 @@ const categorizedFilters = computed<LayerFilterCategoryTemplateModel[]>(() => {
             name: layerFilter.name
         });
     }
+    for (const pluginFilter of editorStore.get('pluginFilters')) {
+        if (!encounteredCategories.has(pluginFilter.group)) {
+            categories.push({
+                name: `layerFilterGroup.${pluginFilter.group}.name`,
+                filters: []
+            });
+            encounteredCategories.set(pluginFilter.group, categories.length - 1);
+        }
+        const existingCategory = categories[encounteredCategories.get(pluginFilter.group)];
+        existingCategory.filters.push({
+            id: pluginFilter.name,
+            kebabId: camelCaseToKebabCase(pluginFilter.name),
+            name: `layerFilter.${pluginFilter.name}.name`,
+        });
+    }
     return categories;
 });
 
@@ -186,6 +202,13 @@ onMounted(() => {
             const newPreviewThumbnails: Record<string, string> = {};
             loadingLayerFilterNames.value = Object.keys(layerFilterList);
 
+            for (const pluginFilter of editorStore.get('pluginFilters')) {
+                loadingLayerFilterNames.value.push(pluginFilter.name);
+                const previewThumbnail = pluginFilter.previewThumbnail ?? await pluginFilter.getPreviewThumbnail();
+                pluginFilter.previewThumbnail = previewThumbnail;
+                newPreviewThumbnails[pluginFilter.name] = URL.createObjectURL(pluginFilter.previewThumbnail);
+            }
+
             previewImageHeight.value = ((targetHeight / targetWidth) * 100) + '%';
             previewImageAspectRatio.value = `1 / 1`;
             filterPreviewThumbnails.value = newPreviewThumbnails;
@@ -210,17 +233,21 @@ onUnmounted(() => {
     }
 });
 
+function getStaticThumbnail(filter: LayerFilterTemplateModel) {
+    return `${assetsBasePath}images/module/layer/layer-effect-browser/thumbnail/${filter.kebabId}.png`;
+}
+
 async function generateNextFilterPreview(previewCtx: ImageBitmapRenderingContext, targetWidth: number, targetHeight: number) {
     const layerFilterName = loadingLayerFilterNames.value.shift();
     if (!layerFilterName || !selectedLayer.value) return;
 
-    const canvasFilter = new (await getCanvasFilterClass(layerFilterName))();
+    const canvasFilter = new (await getCanvasFilterClass(layerFilterName, editorStore.get('pluginFilters')))();
 
     const filtersWithPreview: WorkingFileLayerFilter[] = [
         ...selectedLayer.value.filters,
         {
             name: layerFilterName,
-            params: buildCanvasFilterPreviewParams(canvasFilter)
+            params: buildCanvasFilterPreviewParams(canvasFilter),
         }
     ]
     const layerPreviewBitmap = await renderer.takeSnapshot(targetWidth, targetHeight, {
@@ -245,7 +272,7 @@ async function onSelectFilter(filterName: string) {
     const addFilterActions: AddLayerFilterAction[] = [];
     for (const id of selectedLayerIds) {
         const filterParams: Record<string, unknown> = {};
-        const editParamsConfig = canvasFilter.getEditConfig();
+        const editParamsConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
         for (const paramName in editParamsConfig) {
             filterParams[paramName] = editParamsConfig[paramName].preview ?? editParamsConfig[paramName].default;
         }

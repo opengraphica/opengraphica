@@ -18,7 +18,16 @@ import type {
     WorkingFileLayerFilter, CanvasFilterEditConfigGradient
 } from '@/types';
 
+const pluginFiltersByName: Record<string, Webgl2RendererCanvasFilter> = {};
+
+export async function registerPluginFilter(filter: Webgl2RendererCanvasFilter) {
+    pluginFiltersByName[filter.name] = filter;
+}
+
 export async function createCanvasFilter(name: string): Promise<Webgl2RendererCanvasFilter> {
+    if (pluginFiltersByName[name]) {
+        return pluginFiltersByName[name];
+    }
     const kebabCaseName = camelCaseToKebabCase(name);
     const CanvasFilterClass: ClassType<Webgl2RendererCanvasFilter>
         = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/common/filters/${kebabCaseName}`)).default;
@@ -123,7 +132,7 @@ export function createLayerShaderUniformsAndDefines(
     let textures: Texture[] = [];
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         if (canvasFilter == null || (canvasFilter.overrideDisabled ?? canvasFilter.disabled) === true) continue;
-        const editConfig = canvasFilter.getEditConfig();
+        const editConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
         const computedParamNames: string[] = [];
         const paramsList = canvasFilter.overrideParams ?? canvasFilter.params;
         const paramValues: Record<string, unknown> = {};
@@ -229,7 +238,7 @@ export async function createLayerShader(
     let hasSampleBackbuffer = false;
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         if (canvasFilter == null || (canvasFilter.overrideDisabled ?? canvasFilter.disabled) === true) continue;
-        const editConfig = canvasFilter.getEditConfig();
+        const editConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
         let filterVertexShader = '';
         let filterFragmentShader = canvasFilter.fragmentShader;
 

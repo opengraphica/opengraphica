@@ -52,6 +52,8 @@ export class Webgl2RendererFrontend implements RendererFrontend {
 
     backendCallQueue: Promise<void> = Promise.resolve();
 
+    registeredPluginFilterNames: Set<string> = new Set();
+
     async queueBackendCall<T>(callback: AsyncCallback<T>): Promise<T> {
         let resolveResult!: (value: T | PromiseLike<T>) => void;
         let rejectResult!: (reason?: unknown) => void;
@@ -216,6 +218,11 @@ export class Webgl2RendererFrontend implements RendererFrontend {
 
         this.onEditorHistoryStep = this.onEditorHistoryStep.bind(this);
         appEmitter.on('editor.history.step', this.onEditorHistoryStep);
+
+        this.onPluginFilterAdd = this.onPluginFilterAdd.bind(this);
+        appEmitter.on('editor.plugin.addFilter', this.onPluginFilterAdd);
+
+        this.onPluginFilterAdd();
 
         let viewDirtyTrail = false;
         const setViewDirtyTrail = () => {
@@ -396,6 +403,24 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         if (!event) return;
         if (event.action.id === 'updateLayerBlendingMode') {
             this.rendererBackend.queueCreateLayerPasses();
+        }
+    }
+
+    async onPluginFilterAdd() {
+        for (const pluginFilter of editorStore.get('pluginFilters')) {
+            if (this.registeredPluginFilterNames.has(pluginFilter.name)) continue;
+            this.registeredPluginFilterNames.add(pluginFilter.name);
+            const fragmentShader = pluginFilter.fragmentShader ?? await pluginFilter.getFragmentShader();
+            pluginFilter.fragmentShader = fragmentShader;
+            const SchemaClass = pluginFilter.schemaClass ?? await pluginFilter.getSchemaClass();
+            pluginFilter.schemaClass = SchemaClass;
+            const schema = new SchemaClass();
+            this.rendererBackend.registerPluginFilter({
+                name: pluginFilter.name,
+                params: schema.params,
+                fragmentShader: fragmentShader,
+                editConfig: schema.getEditConfig(),
+            });
         }
     }
 

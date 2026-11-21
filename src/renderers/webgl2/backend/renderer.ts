@@ -63,6 +63,7 @@ export interface Webgl2RendererBackendPublic {
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     getMaxTextureSize(): Promise<number>;
+    registerPluginFilter(filter: Webgl2RendererCanvasFilter): Promise<void>;
     setFontFetchDefinitions(definitions: Record<string, FontFamilyFetchDefinition>): Promise<void>;
     enableImageBoundaryMask(enabled: boolean): Promise<void>;
     setBackgroundColor(r: number, g: number, b: number, alpha: number): Promise<void>;
@@ -246,6 +247,11 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
     async getMaxTextureSize(): Promise<number> {
         return this.renderer?.capabilities?.maxTextureSize ?? Infinity;
+    }
+
+    async registerPluginFilter(filter: Webgl2RendererCanvasFilter): Promise<void> {
+        const { registerPluginFilter } = await import('@/renderers/webgl2/layers/base/material');
+        registerPluginFilter(filter);
     }
 
     async setFontFetchDefinitions(definitions: Record<string, FontFamilyFetchDefinition>): Promise<void> {

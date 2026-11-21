@@ -9,8 +9,10 @@ import BaseCanvasController from '@/tools/controllers/base';
 import BaseCanvasMovementController from '@/tools/controllers/base-movement';
 import toolGroupsConfig from '@/config/tool-groups.json';
 
+import appEmitter from '@/lib/emitter';
 import { camelCaseToKebabCase } from '@/lib/string';
 import { loadStylesheet } from '@/lib/stylesheet';
+
 import canvasStore from './canvas';
 import workingFileStore from './working-file';
 
@@ -63,6 +65,8 @@ export interface FloatingDockRect {
 export interface PluginFilterDefinition {
     name: string;
     group: string;
+    getPreviewThumbnail: () => Promise<Blob>;
+    previewThumbnail?: Blob;
     getSchemaClass: () => Promise<ClassType<CanvasFilter>>;
     schemaClass?: ClassType<CanvasFilter>;
     getFragmentShader: () => Promise<string>;
@@ -245,9 +249,14 @@ const store = new PerformantStore<EditorStore>({
         tutorialFlags: {},
         waiting: false,
     },
-    nonReactive: ['appRootElement', 'pluginModules', 'pluginTools'],
+    nonReactive: ['appRootElement', 'pluginFilters', 'pluginModules', 'pluginTools'],
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
     restore: ['activeToolGroupRestore', 'activeToolRestore', 'isTouchUser', 'lastActiveThemeName', 'toolGroupLastActivatedTool', 'tutorialFlags'],
+    onSet(key, value, set) {
+        if (key === 'pluginFilters') {
+            appEmitter.emit('editor.plugin.addFilter');
+        }
+    },
     async onDispatch(actionName: string, value: any, set) {
         switch (actionName) {
             case 'addTutorialFlag':

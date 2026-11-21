@@ -102,6 +102,8 @@ export interface CanvasFilter<T extends Object = Record<string, unknown>> {
     getEditConfig(): CanvasFilterEditConfig;
 }
 
-export interface Webgl2RendererCanvasFilter<T extends Object = Record<string, unknown>> extends CanvasFilter<T> {
+export interface Webgl2RendererCanvasFilter<T extends Object = Record<string, unknown>> extends Omit<CanvasFilter<T>, 'getEditConfig'> {
     fragmentShader: string;
+    getEditConfig?: () => CanvasFilterEditConfig;
+    editConfig?: CanvasFilterEditConfig;
 }

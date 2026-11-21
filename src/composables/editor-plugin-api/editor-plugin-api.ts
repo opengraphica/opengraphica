@@ -14,12 +14,13 @@ let moduleChunkMap: Record<string, { id: string, chunks: number[] }> | null = nu
 interface CreateFilterDefinition {
     name: string;
     group: string;
+    previewThumbnail: () => Promise<Blob>;
     schemaClass: () => Promise<ClassType<CanvasFilter>>;
     fragmentShader: () => Promise<string>;
 }
 async function createFilter(options: CreateFilterDefinition) {
     try {
-        const { name, group, schemaClass, fragmentShader } = options;
+        const { name, group, previewThumbnail, schemaClass, fragmentShader } = options;
 
         const pluginFilters = editorStore.get('pluginFilters');
 
@@ -33,6 +34,7 @@ async function createFilter(options: CreateFilterDefinition) {
         pluginFilters.push({
             name,
             group,
+            getPreviewThumbnail: previewThumbnail,
             getSchemaClass: schemaClass,
             getFragmentShader: fragmentShader,
         });
@@ -178,6 +180,9 @@ export function createEditorPluginApi(pluginId: string) {
             } else if (/\.(?:frag|vert)$/.test(path)) {
                 const url = editorStore.state.pluginImportMap[path.replace(/^#\//g, 'plugins/' + pluginId + '/')];
                 return await (await fetch(url)).text();
+            } else if (/\.(?:bmp|gif|jpg|jpx|jpeg|png|tiff|webp)$/.test(path)) {
+                const url = editorStore.state.pluginImportMap[path.replace(/^#\//g, 'plugins/' + pluginId + '/')];
+                return await (await fetch(url)).blob();
             }
             return import(/*webpackIgnore: true*/ path.replace(/^#\//g, 'plugins/' + pluginId + '/'));
         } else if (path.startsWith('@/')) {

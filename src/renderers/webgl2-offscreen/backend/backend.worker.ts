@@ -57,6 +57,13 @@ self.onmessage = ({ data }) => {
                 });
             });
             break;
+        case BackendWorkerMessage.REGISTER_PLUGIN_FILTER:
+            rendererBackend.registerPluginFilter(data.filter).then(() => {
+                self.postMessage({
+                    type: BackendWorkerMessage.REGISTER_PLUGIN_FILTER_RESULT,
+                });
+            });
+            break;
         case BackendWorkerMessage.SET_FONT_FETCH_DEFINITIONS:
             rendererBackend.setFontFetchDefinitions(data.definitions).then(() => {
                 self.postMessage({

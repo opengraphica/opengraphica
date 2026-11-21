@@ -376,6 +376,7 @@ import { UpdateLayerFilterParamsAction } from '@/actions/update-layer-filter-par
 
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
+import editorStore from '@/store/editor';
 import { createStoredImage, deleteStoredImage, getStoredImageOrCanvas } from '@/store/image';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getSelectedLayers } from '@/store/working-file';
 import {
@@ -511,8 +512,8 @@ async function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterI
     editingFilter.value = layer.filters[filterIndex];
     editingFilterIndex.value = filterIndex;
     editingFilterEnabled.value = !editingFilter.value.disabled;
-    editingFilterRendererClass.value = new (await getCanvasFilterClass(editingFilter.value.name))();
-    editingFilterConfig.value = editingFilterRendererClass.value.getEditConfig();
+    editingFilterRendererClass.value = new (await getCanvasFilterClass(editingFilter.value.name, editorStore.get('pluginFilters')))();
+    editingFilterConfig.value = editingFilterRendererClass.value.editConfig ?? editingFilterRendererClass.value.getEditConfig?.()!;
 
     for (const paramName in editingFilterParams) {
         if (editingFilterParams.hasOwnProperty(paramName)) {

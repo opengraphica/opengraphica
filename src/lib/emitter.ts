@@ -87,6 +87,7 @@ interface AppEmitterEvents {
             description: string;
         }
     };
+    'editor.plugin.addFilter': undefined;
     'editor.tool.arrowDown': undefined;
     'editor.tool.arrowLeft': undefined;
     'editor.tool.arrowRight': undefined;

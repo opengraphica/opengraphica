@@ -12,6 +12,7 @@ import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
     WorkingFileLayer, WorkingFileLayerMask,
     RendererBucketFillSettings, RendererPickedVectorLayerElement,
+    Webgl2RendererCanvasFilter,
 } from '@/types';
 
 export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPublic {
@@ -154,6 +155,14 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
             type: BackendWorkerMessage.GET_MAX_TEXTURE_SIZE,
         });
         return (await this.messageReceived(BackendWorkerMessage.GET_MAX_TEXTURE_SIZE_RESULT)).maxTextureSize;
+    }
+
+    async registerPluginFilter(filter: Webgl2RendererCanvasFilter): Promise<void> {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.REGISTER_PLUGIN_FILTER,
+            filter,
+        });
+        return (await this.messageReceived(BackendWorkerMessage.REGISTER_PLUGIN_FILTER_RESULT));
     }
 
     async setFontFetchDefinitions(definitions: Record<string, FontFamilyFetchDefinition>): Promise<void> {
