@@ -39,5 +39,8 @@ vec4 processPixelize(vec4 color, vec2 uv) {
         }
     }
 
-    return newColor * 0.25;
+    newColor /= 4.0;
+    newColor.rgb /= max(newColor.a, 0.00001);
+
+    return newColor;
 }

@@ -16,8 +16,11 @@ vec4 processMonteCarloBlur(vec4 color, vec2 uv) {
         pixelSeed = fract(3712.65 * pixelSeed + 0.61432);
         pixelSeed = (pixelSeed - 0.5) * 2.0;
         randomValue.y = pixelSeed;
-        newColor += sampleBackbuffer(uv + randomValue * randomScale) / float(cIterations);
+        newColor += sampleBackbuffer(uv + randomValue * randomScale);
     }
+
+    newColor /= float(cIterations);
+    newColor.rgb /= max(newColor.a, 0.00001);
 
     return newColor;
 }

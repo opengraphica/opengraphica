@@ -118,7 +118,9 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                 } else {
                     await updateRasterMaterials(this.materials, {
                         srcTexture: this.draftTexture ?? this.sourceTexture,
+                        canvasFilters: this.filtersOverride ?? this.filters,
                         opacity: this.opacity,
+                        isHalfFloat: this.isHalfFloat,
                     })
                 }
                 this.plane && (this.plane.material = this.materials[this.materials.length - 1]);
@@ -165,6 +167,8 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         const backend = getWebgl2RendererBackend();
         const originalRenderTarget = backend.renderer.getRenderTarget();
         const originalViewport = new Vector4();
+        const originalAutoClear = backend.renderer.autoClear;
+        backend.renderer.autoClear = true;
         backend.renderer.getViewport(originalViewport);
         backend.renderer.setViewport(0, 0, this.sourceTexture.width, this.sourceTexture.height);
         for (let [materialIndex, currentMaterial] of this.materials.entries()) {
@@ -178,6 +182,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                 backend.renderer.render(this.prepassScene, this.prepassCamera);
             }
         }
+        backend.renderer.autoClear = originalAutoClear;
         backend.renderer.setRenderTarget(originalRenderTarget);
         backend.renderer.setViewport(originalViewport);
     }

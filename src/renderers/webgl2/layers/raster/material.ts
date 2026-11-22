@@ -185,23 +185,55 @@ export async function updateRasterMaterials(
     materials: ShaderMaterial[],
     params: RasterMaterialUpdateParams
 ) {
-    const firstMaterial = materials[0];
-    if (firstMaterial) {
-        if (firstMaterial.uniforms.srcTexture.value !== params.srcTexture) {
-            if (!params.srcTexture?.userData.isDraft) {
-                firstMaterial.uniforms.srcTexture.value?.dispose(); // Prevent GPU memory leak. If it's still needed, THREE will re-upload.
-            }
-            firstMaterial.uniforms.srcTexture.value = params.srcTexture;
-            if (params.srcTexture) {
-                for (const material of materials) {
+    let isSourceTextureUpdate = false;
+
+    for (const [materialIndex, material] of materials.entries()) {
+        if (materialIndex === 0) {
+            if (material.uniforms.srcTexture.value !== params.srcTexture) {
+                isSourceTextureUpdate = true;
+                if (!params.srcTexture?.userData.isDraft) {
+                    material.uniforms.srcTexture.value?.dispose(); // Prevent GPU memory leak. If it's still needed, THREE will re-upload.
+                }
+                material.uniforms.srcTexture.value = params.srcTexture;
+                if (params.srcTexture) {
                     material.defines.cLayerWidth = params.srcTexture?.width;
                     material.defines.cLayerHeight = params.srcTexture?.height;
                 }
             }
+        } else {
+            createRenderTarget:
+            if (isSourceTextureUpdate && params.srcTexture) {
+                material.defines.cLayerWidth = params.srcTexture?.width;
+                material.defines.cLayerHeight = params.srcTexture?.height;
+                const { width: renderTargetWidth, height: renderTargetHeight } = limitMaxDimension(
+                    params.srcTexture.width,
+                    params.srcTexture.height,
+                    params.canvasFilters?.[0]?.maxPassTextureSize ?? Infinity
+                );
+                if (material.userData.srcRenderTarget?.width === renderTargetWidth && material.userData.srcRenderTarget?.height === renderTargetHeight) {
+                    break createRenderTarget;
+                }
+                const renderTargetIndex = material.userData.disposableTextures.findIndex(
+                    (otherRenderTarget) => otherRenderTarget === material.userData.srcRenderTarget
+                );
+                if (renderTargetIndex > -1) {
+                    material.userData.disposableTextures.splice(renderTargetIndex, 1);
+                }
+                material.userData.srcRenderTarget?.dispose();
+                const renderTarget = new WebGLRenderTarget(renderTargetWidth, renderTargetHeight, {
+                    format: RGBAFormat,
+                    type: params.isHalfFloat ? HalfFloatType : UnsignedByteType,
+                    depthBuffer: false,
+                    stencilBuffer: false,
+                });
+                material.userData.srcRenderTarget = renderTarget;
+                material.userData.disposableTextures.push(renderTarget);
+                material.uniforms.srcTexture = {
+                    value: renderTarget.texture,
+                };
+            }
         }
-    }
 
-    for (const material of materials) {
         const colorSpaceConversion = params.colorSpaceConversion ?? 0;
         if (colorSpaceConversion !== material.defines.cColorSpaceConversion) {
             material.defines.cColorSpaceConversion = colorSpaceConversion;

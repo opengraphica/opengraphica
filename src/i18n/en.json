@@ -543,10 +543,10 @@
         },
         "gaussianBlur": {
             "name": "Gaussian Blur",
+            "help": "Blurs the image using Gaussian functions invented by Carl Friedrich Gauss. This blur resembles viewing the image through a translucent screen, which is distinctly different from the bokeh effect created by an out-of-focus camera lens.",
             "param": {
-                "size": "Size",
-                "xIntensity": "X Intensity",
-                "yIntensity": "Y Intensity"
+                "xRadius": "X Radius",
+                "yRadius": "Y Radius"
             }
         },
         "gradientMap": {

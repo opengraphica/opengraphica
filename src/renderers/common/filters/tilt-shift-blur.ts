@@ -10,6 +10,7 @@ export interface TiltShiftBlurCanvasFilterParams {
 export default class TiltShiftBlurCanvasFilter implements CanvasFilter<TiltShiftBlurCanvasFilterParams> {
     public name = 'tiltShiftBlur';
     public params: TiltShiftBlurCanvasFilterParams = {};
+    public passes = 2;
 
     public getEditConfig() {
         return {
