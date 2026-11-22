@@ -350,7 +350,7 @@ export async function createLayerShader(
                                 +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
                                 +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
                                 +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
-                                +       'filterColorResult.a + filterColorBuffer.a * (1.0 - filterColorResult.a)'
+                                +       'filterColorResult.a * filterMaskAlpha + filterColorBuffer.a * (1.0 - filterMaskAlpha)'
                                 +   ');\n';
                         }
                     }
@@ -376,7 +376,7 @@ export async function createLayerShader(
                         +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
                         +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
                         +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
-                        +       'filterColorResult.a + filterColorBuffer.a * (1.0 - filterColorResult.a)'
+                        +       'filterColorResult.a * filterMaskAlpha + filterColorBuffer.a * (1.0 - filterMaskAlpha)'
                         +   ');'
                     );
                 }
