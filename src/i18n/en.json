@@ -734,6 +734,8 @@
                 "lineSpacing": "Spacing",
                 "lineClumping": "Clumping",
                 "lineThickness": "Thickness",
+                "horizontalOffset": "Horizontal",
+                "verticalOffset": "Vertical",
                 "seed": "Seed"
             }
         },

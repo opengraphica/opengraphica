@@ -1,11 +1,13 @@
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
 export interface RadialSpeedLinesCanvasFilterParams {
-    centerRadius?: number;
-    lineSpacing?: number;
-    lineClumping?: number;
-    lineThickness?: number;
-    randomization?: number;
+    centerRadius?: number[];
+    lineSpacing?: number[];
+    lineClumping?: number[];
+    lineThickness?: number[];
+    horizontalOffset?: number;
+    verticalOffset?: number;
+    seed?: number;
 }
 
 export default class RadialSpeedLinesCanvasFilter implements CanvasFilter<RadialSpeedLinesCanvasFilterParams> {
@@ -40,6 +42,18 @@ export default class RadialSpeedLinesCanvasFilter implements CanvasFilter<Radial
                 default: [0.2, 0.2],
                 preview: [0.05, 0.2],
                 min: 0,
+                max: 1,
+            },
+            horizontalOffset: {
+                type: 'percentage',
+                default: 0,
+                min: -1,
+                max: 1,
+            },
+            verticalOffset: {
+                type: 'percentage',
+                default: 0,
+                min: -1,
                 max: 1,
             },
             seed: {

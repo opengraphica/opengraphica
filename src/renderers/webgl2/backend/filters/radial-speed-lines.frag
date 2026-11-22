@@ -9,6 +9,8 @@ uniform vec2 pCenterRadius;
 uniform vec2 pLineSpacing;
 uniform vec2 pLineClumping;
 uniform vec2 pLineThickness;
+uniform float pHorizontalOffset;
+uniform float pVerticalOffset;
 uniform float pSeed;
 
 vec4 processRadialSpeedLines(vec4 color, vec2 uv) {
@@ -16,9 +18,10 @@ vec4 processRadialSpeedLines(vec4 color, vec2 uv) {
     float pixelScale = max(resolution.y, 1.0);
     float pixelAA = 0.5 / pixelScale;
 
-    vec2 center = (uv - 0.5) * resolution / pixelScale;
+    vec2 centerOffset = vec2(pHorizontalOffset, pVerticalOffset) * 0.5 * resolution / pixelScale;
+    vec2 center = (uv - 0.5) * resolution / pixelScale - centerOffset;
     float radius = length(center);
-    float maxRadius = max(0.5 * length(resolution / pixelScale), 0.0001);
+    float maxRadius = max(length(0.5 * resolution / pixelScale + centerOffset), 0.0001);
 
     float maxThickness = (1.0 - cbrt(1.0 - pLineThickness.y)) * (PI / 64.0);
 
