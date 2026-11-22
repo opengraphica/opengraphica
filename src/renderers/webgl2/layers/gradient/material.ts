@@ -76,7 +76,7 @@ export async function createGradientMaterial(
 ) {
     const uuid = uuidv4();
 
-    const shader = await createLayerShader({
+    const shader = (await createLayerShader({
         vertexShaderSetup: gradientMaterialVertexShaderSetup,
         vertexShaderMain: gradientMaterialVertexShaderMain,
         fragmentShaderSetup: gradientMaterialFragmentShaderSetup,
@@ -84,7 +84,7 @@ export async function createGradientMaterial(
         canvasFilters: canvasFilters ?? [],
         width: canvasWidth ?? 1,
         height: canvasHeight ?? 1,
-    });
+    }))[0];
 
     const material = new ShaderMaterial({
         transparent: true,

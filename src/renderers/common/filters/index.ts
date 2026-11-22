@@ -40,7 +40,22 @@ export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLay
         if (!filterConfig.disabled || options.createDisabled) {
             const canvasFilter = new (await getCanvasFilterClass(filterConfig.name))();
             const kebabCaseName = camelCaseToKebabCase(filterConfig.name);
-            canvasFilter.fragmentShader = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default
+            let fragmentShaders: string[] = [];
+            const passCount = canvasFilter.passes || 1;
+            if (passCount > 1) {
+                for (let i = 0; i < passCount; i++) {
+                    const passKebabCaseName = kebabCaseName + '-' + i;
+                    fragmentShaders.push(
+                        (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${passKebabCaseName}.frag`)).default
+                    );
+                }
+            } else {
+                fragmentShaders.push(
+                    (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default
+                );
+            }
+            canvasFilter.fragmentShader = fragmentShaders[0];
+            canvasFilter.fragmentShaders = fragmentShaders;
             canvasFilter.maskId = filterConfig.maskId;
             canvasFilter.params = filterConfig.params ?? {};
             canvasFilters.push(canvasFilter);

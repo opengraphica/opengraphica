@@ -23,7 +23,7 @@ export interface VectorMaterialUpdateParams {
 }
 
 export async function createVectorMaterial(params: VectorMaterialUpdateParams) {
-    const shader = await createLayerShader({
+    const shader = (await createLayerShader({
         vertexShaderSetup: rasterMaterialVertexShaderSetup,
         vertexShaderMain: rasterMaterialVertexShaderMain,
         fragmentShaderSetup: rasterMaterialFragmentShaderSetup,
@@ -31,7 +31,7 @@ export async function createVectorMaterial(params: VectorMaterialUpdateParams) {
         canvasFilters: params.canvasFilters ?? [],
         width: params.dimensions?.x ?? 1,
         height: params.dimensions?.y ?? 1,
-    });
+    }))[0];
 
     const material = new ShaderMaterial({
         transparent: true,

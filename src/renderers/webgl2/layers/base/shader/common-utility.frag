@@ -222,6 +222,10 @@ vec3 labToLch(in vec3 lab) {
     );
 }
 
+float gaussianNormpdf(in float x, in float sigma) {
+    return 0.39894 * exp(-0.5 * x * x / (sigma * sigma)) / sigma;
+}
+
 float pcgWhiteNoise(uint seed) {
     uint x = seed * 747796405u + 2891336453u;
     uint word = ((x >> ((x >> 28u) + 4u)) ^ x) * 277803737u;

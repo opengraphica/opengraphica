@@ -9,6 +9,7 @@ import { camelCaseToKebabCase } from '@/lib/string';
 import blendingModesFragmentShaderSetup from '@/renderers/webgl2/layers/base/shader/blending-modes.setup.frag';
 import blendingModesFragmentShaderMain from '@/renderers/webgl2/layers/base/shader/blending-modes.main.frag';
 import commonUtilityFragmentShader from '@/renderers/webgl2/layers/base/shader/common-utility.frag';
+import filterPassBaseFragmentShader from '@/renderers/webgl2/layers/base/shader/filter-pass-base.frag';
 
 import { getWebgl2RendererBackend } from '@/renderers/webgl2/backend';
 
@@ -31,10 +32,23 @@ export async function createCanvasFilter(name: string): Promise<Webgl2RendererCa
     const kebabCaseName = camelCaseToKebabCase(name);
     const CanvasFilterClass: ClassType<Webgl2RendererCanvasFilter>
         = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/common/filters/${kebabCaseName}`)).default;
-    const fragmentShader: string
-        = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default;
     const canvasFilter = new CanvasFilterClass();
-    canvasFilter.fragmentShader = fragmentShader;
+    let fragmentShaders: string[] = [];
+    const passCount = canvasFilter.passes || 1;
+    if (passCount > 1) {
+        for (let i = 0; i < passCount; i++) {
+            const passKebabCaseName = kebabCaseName + '-' + i;
+            fragmentShaders.push(
+                (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${passKebabCaseName}.frag`)).default
+            );
+        }
+    } else {
+        fragmentShaders.push(
+            (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default
+        );
+    }
+    canvasFilter.fragmentShader = fragmentShaders[0];
+    canvasFilter.fragmentShaders = fragmentShaders;
     return canvasFilter;
 }
 
@@ -201,7 +215,7 @@ export interface CreateLayerShaderOptions {
     useAutomaticLayerTextureMipmaps?: boolean;
 }
 
-export interface CreateLayerShaderResult {
+export interface CreateLayerShaderPass {
     fragmentShader: string,
     vertexShader: string,
     uniforms: Record<string, IUniform>,
@@ -211,199 +225,244 @@ export interface CreateLayerShaderResult {
 
 export async function createLayerShader(
     options: CreateLayerShaderOptions,
-): Promise<CreateLayerShaderResult> {
+): Promise<CreateLayerShaderPass[]> {
+    
     const {
         fragmentShaderMain, fragmentShaderSetup, vertexShaderMain, vertexShaderSetup,
         canvasFilters, width, height, useAutomaticLayerTextureMipmaps,
     } = options;
 
-    let vertexShader = '';
-    let fragmentShader = '';
+    const shaderPasses: CreateLayerShaderPass[] = [];
 
-    const { uniforms, defines, textures } = createLayerShaderUniformsAndDefines(width, height, canvasFilters);
-    defines.cLayerBlendingMode = 0;
-    defines.cHighQualityRender = 0;
-
-    const rendererBackend = getWebgl2RendererBackend();
-
-    let vertexShaderMainCalls: string[] = [];
-    let fragmentShaderMainCalls: string[] = [];
-
-    const alreadyIncludedFilters = new Set<string>();
-    const useFunctionNameStack: Array<[string, string | undefined]> = [];
-
-    fragmentShader = 'vec4 materialMain(vec2 uv);\n' + fragmentShader;
-
-    let hasMaskTextures = false;
-    let hasSampleBackbuffer = false;
-    for (const [index, canvasFilter] of canvasFilters.entries()) {
+    // Since an individual filter can have multiple passes, we need to split into separate shaders.
+    const filtersByPass: Webgl2RendererCanvasFilter[][] = [];
+    let currentPassFilters: Webgl2RendererCanvasFilter[] = [];
+    for (const canvasFilter of canvasFilters) {
         if (canvasFilter == null || (canvasFilter.overrideDisabled ?? canvasFilter.disabled) === true) continue;
-        const editConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
-        let filterVertexShader = '';
-        let filterFragmentShader = canvasFilter.fragmentShader;
-
-        const maskTexture = await rendererBackend.getMaskTexture(canvasFilter.maskId ?? -1);
-        if (maskTexture) {
-            maskTexture.needsUpdate = true;
-            hasMaskTextures = true;
-            uniforms[`filterMask${index}Map`] = {
-                value: maskTexture,
-            };
-        }
-
-        const searchProcessFunctionName = 'process' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
-        const useProcessFunctionName = searchProcessFunctionName + index;
-        const searchBakeFunctionName = 'bake' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
-        let useBakeFunctionName: string | undefined = searchBakeFunctionName + index;
-        if (filterVertexShader?.includes(searchProcessFunctionName)) {
-            if (alreadyIncludedFilters.has(canvasFilter.name)) {
-                filterVertexShader = filterVertexShader.replace(/const int.*?;/g, '');
-            }
-            filterVertexShader = filterVertexShader.replace(searchProcessFunctionName + '(', useProcessFunctionName + '(');
-            vertexShaderMainCalls.push('    filterPositionResult = ' + useProcessFunctionName + '(filterPositionResult);');
-        }
-        if (filterFragmentShader?.includes(searchProcessFunctionName)) {
-            if (filterFragmentShader?.includes(searchBakeFunctionName)) {
-                filterFragmentShader = filterFragmentShader.replace(searchBakeFunctionName + '(', useBakeFunctionName + '(');
-            } else {
-                useBakeFunctionName = undefined;
-            }
-            if (alreadyIncludedFilters.has(canvasFilter.name)) {
-                filterFragmentShader = filterFragmentShader.replace(/const int.*?;/g, '');
-            }
-            if (filterFragmentShader.includes('sampleBackbuffer(')) {
-                hasSampleBackbuffer = true;
-                filterFragmentShader = filterFragmentShader.replace(/sampleBackbuffer\(/g, `sampleBackbuffer${index}(`);
-
-                fragmentShader += `vec4 sampleBackbuffer${index}(vec2 uv) {\n`
-                    + '    vec4 filterColorResult = materialMain(uv);\n';
-                if (hasMaskTextures) {
-                    fragmentShader += '    float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
+        const passCount = canvasFilter.passes || 1;
+        if (passCount === 1) {
+            currentPassFilters.push(canvasFilter);
+        } else {
+            for (let i = 0; i < passCount; i++) {
+                currentPassFilters.push({
+                    ...canvasFilter,
+                    editConfig: canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!,
+                    pass: i
+                });
+                if (i < passCount - 1) {
+                    filtersByPass.push(currentPassFilters);
+                    currentPassFilters = [];
                 }
-                for (const [functionIndex, [processFunctionName, bakeFunctionName]] of useFunctionNameStack.entries()) {
-                    const functionMaskTexture = uniforms[`filterMask${functionIndex}Map`];
-                    if (functionMaskTexture) {
-                        fragmentShader += `    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${functionIndex}Map, uv).a;\n`;
-                    }
-                    if (bakeFunctionName) {
-                        fragmentShader += '    if (cHighQualityRender == 1) {\n'
-                            + `        filterColorResult = ${bakeFunctionName}(filterColorResult, uv);\n`
-                            + `    } else {\n`;
-                    }
-                    fragmentShader += `    filterColorResult = ${processFunctionName}(filterColorResult, uv);\n`;
-                    if (bakeFunctionName) {
-                        fragmentShader += '    }\n';
-                    }
-                    if (functionMaskTexture) {
-                        fragmentShader += '    filterColorResult = vec4('
-                            +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
-                            +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
-                            +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
-                            +       'filterColorResult.a + filterColorBuffer.a * (1.0 - filterColorResult.a)'
-                            +   ');\n';
-                    }
-                }
-                fragmentShader += '    return filterColorResult;\n}\n\n';
-                fragmentShaderMainCalls = [];
-            }
-            filterFragmentShader = filterFragmentShader.replace(searchProcessFunctionName + '(', useProcessFunctionName + '(');
-            if (maskTexture) {
-                fragmentShaderMainCalls.push(`    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${index}Map, vUv).a;`);
-            }
-            if (useBakeFunctionName) {
-                fragmentShaderMainCalls.push('    if (cHighQualityRender == 1) {\n'
-                    + `        filterColorResult = ${useBakeFunctionName}(filterColorResult, vUv);\n`
-                    + `    } else {\n`);
-            }
-            fragmentShaderMainCalls.push('    filterColorResult = ' + useProcessFunctionName + '(filterColorResult, vUv);');
-            if (useBakeFunctionName) {
-                fragmentShaderMainCalls.push('    }\n');
-            }
-            if (maskTexture) {
-                fragmentShaderMainCalls.push(
-                    '    filterColorResult = vec4('
-                    +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
-                    +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
-                    +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
-                    +       'filterColorResult.a + filterColorBuffer.a * (1.0 - filterColorResult.a)'
-                    +   ');'
-                );
             }
         }
-        
-        for (const editParamName in editConfig) {
-            const isConstant = (editConfig[editParamName].constant);
-            const searchParamName = isConstant
-                ? 'c' + editParamName[0].toUpperCase() + editParamName.slice(1)
-                : 'p' + editParamName[0].toUpperCase() + editParamName.slice(1);
-            const replaceParamName = isConstant
-                ? 'constant' + index + '_' + editParamName
-                : 'param' + index + '_' + editParamName;
+    }
+    if (currentPassFilters.length > 0) {
+        filtersByPass.push(currentPassFilters);
+    }
+    if (filtersByPass.length === 0) {
+        filtersByPass.push([]);
+    }
+
+    // The first pass renders the layer's main shader + filters with a single pass.
+    // Subsequent passes read a render target containing the texture of the previous pass,
+    // in addition to the texture at the start of the current filter's first pass.
+    for (const [passIndex, passFilters] of filtersByPass.entries()) {
+        let vertexShader = '';
+        let fragmentShader = '';
+
+        const { uniforms, defines, textures } = createLayerShaderUniformsAndDefines(width, height, passFilters);
+        defines.cLayerBlendingMode = 0;
+        defines.cHighQualityRender = 0;
+
+        const rendererBackend = getWebgl2RendererBackend();
+
+        let vertexShaderMainCalls: string[] = [];
+        let fragmentShaderMainCalls: string[] = [];
+
+        const alreadyIncludedFilters = new Set<string>();
+        const useFunctionNameStack: Array<[string, string | undefined]> = [];
+
+        fragmentShader = 'vec4 materialMain(vec2 uv);\n' + fragmentShader;
+
+        let hasMaskTextures = false;
+        let hasSampleBackbuffer = false;
+        for (const [index, canvasFilter] of passFilters.entries()) {
+            if (canvasFilter == null || (canvasFilter.overrideDisabled ?? canvasFilter.disabled) === true) continue;
+            const editConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
+            let filterVertexShader = '';
+            const canvasFilterPass = canvasFilter.pass ?? 0;
+            let filterFragmentShader = canvasFilterPass > 0 ? canvasFilter.fragmentShaders?.[canvasFilterPass] : canvasFilter.fragmentShader;
+
+            const maskTexture = await rendererBackend.getMaskTexture(canvasFilter.maskId ?? -1);
+            if (maskTexture) {
+                maskTexture.needsUpdate = true;
+                hasMaskTextures = true;
+                uniforms[`filterMask${index}Map`] = {
+                    value: maskTexture,
+                };
+            }
+
+            const searchProcessFunctionName = 'process' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
+            const useProcessFunctionName = searchProcessFunctionName + index;
+            const searchBakeFunctionName = 'bake' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
+            let useBakeFunctionName: string | undefined = searchBakeFunctionName + index;
+            if (filterVertexShader?.includes(searchProcessFunctionName)) {
+                if (alreadyIncludedFilters.has(canvasFilter.name)) {
+                    filterVertexShader = filterVertexShader.replace(/const int.*?;/g, '');
+                }
+                filterVertexShader = filterVertexShader.replace(searchProcessFunctionName + '(', useProcessFunctionName + '(');
+                vertexShaderMainCalls.push('    filterPositionResult = ' + useProcessFunctionName + '(filterPositionResult);');
+            }
+            if (filterFragmentShader?.includes(searchProcessFunctionName)) {
+                if (filterFragmentShader?.includes(searchBakeFunctionName)) {
+                    filterFragmentShader = filterFragmentShader.replace(searchBakeFunctionName + '(', useBakeFunctionName + '(');
+                } else {
+                    useBakeFunctionName = undefined;
+                }
+                if (alreadyIncludedFilters.has(canvasFilter.name)) {
+                    filterFragmentShader = filterFragmentShader.replace(/const int.*?;/g, '');
+                }
+                if (filterFragmentShader.includes('sampleBackbuffer(')) {
+                    hasSampleBackbuffer = true;
+                    filterFragmentShader = filterFragmentShader.replace(/sampleBackbuffer\(/g, `sampleBackbuffer${index}(`);
+
+                    fragmentShader += `vec4 sampleBackbuffer${index}(vec2 uv) {\n`
+                        + '    vec4 filterColorResult = materialMain(uv);\n';
+                    if (hasMaskTextures) {
+                        fragmentShader += '    float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
+                    }
+                    for (const [functionIndex, [processFunctionName, bakeFunctionName]] of useFunctionNameStack.entries()) {
+                        const functionMaskTexture = uniforms[`filterMask${functionIndex}Map`];
+                        if (functionMaskTexture) {
+                            fragmentShader += `    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${functionIndex}Map, uv).a;\n`;
+                        }
+                        if (bakeFunctionName) {
+                            fragmentShader += '    if (cHighQualityRender == 1) {\n'
+                                + `        filterColorResult = ${bakeFunctionName}(filterColorResult, uv);\n`
+                                + `    } else {\n`;
+                        }
+                        fragmentShader += `    filterColorResult = ${processFunctionName}(filterColorResult, uv);\n`;
+                        if (bakeFunctionName) {
+                            fragmentShader += '    }\n';
+                        }
+                        if (functionMaskTexture) {
+                            fragmentShader += '    filterColorResult = vec4('
+                                +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
+                                +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
+                                +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
+                                +       'filterColorResult.a + filterColorBuffer.a * (1.0 - filterColorResult.a)'
+                                +   ');\n';
+                        }
+                    }
+                    fragmentShader += '    return filterColorResult;\n}\n\n';
+                    fragmentShaderMainCalls = [];
+                }
+                filterFragmentShader = filterFragmentShader.replace(searchProcessFunctionName + '(', useProcessFunctionName + '(');
+                if (maskTexture) {
+                    fragmentShaderMainCalls.push(`    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${index}Map, vUv).a;`);
+                }
+                if (useBakeFunctionName) {
+                    fragmentShaderMainCalls.push('    if (cHighQualityRender == 1) {\n'
+                        + `        filterColorResult = ${useBakeFunctionName}(filterColorResult, vUv);\n`
+                        + `    } else {\n`);
+                }
+                fragmentShaderMainCalls.push('    filterColorResult = ' + useProcessFunctionName + '(filterColorResult, vUv);');
+                if (useBakeFunctionName) {
+                    fragmentShaderMainCalls.push('    }\n');
+                }
+                if (maskTexture) {
+                    fragmentShaderMainCalls.push(
+                        '    filterColorResult = vec4('
+                        +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
+                        +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
+                        +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
+                        +       'filterColorResult.a + filterColorBuffer.a * (1.0 - filterColorResult.a)'
+                        +   ');'
+                    );
+                }
+            }
             
+            for (const editParamName in editConfig) {
+                const isConstant = (editConfig[editParamName].constant);
+                const searchParamName = isConstant
+                    ? 'c' + editParamName[0].toUpperCase() + editParamName.slice(1)
+                    : 'p' + editParamName[0].toUpperCase() + editParamName.slice(1);
+                const replaceParamName = isConstant
+                    ? 'constant' + index + '_' + editParamName
+                    : 'param' + index + '_' + editParamName;
+                
+                if (filterVertexShader) {
+                    filterVertexShader = filterVertexShader.replaceAll(searchParamName, replaceParamName);
+                }
+                if (filterFragmentShader) {
+                    filterFragmentShader = filterFragmentShader.replaceAll(searchParamName, replaceParamName);
+                }
+            }
             if (filterVertexShader) {
-                filterVertexShader = filterVertexShader.replaceAll(searchParamName, replaceParamName);
+                vertexShader += filterVertexShader + '\n';
             }
             if (filterFragmentShader) {
-                filterFragmentShader = filterFragmentShader.replaceAll(searchParamName, replaceParamName);
+                fragmentShader += filterFragmentShader + '\n';
             }
+            if (maskTexture) {
+                fragmentShader += `uniform sampler2D filterMask${index}Map;\n`;
+            }
+            alreadyIncludedFilters.add(canvasFilter.name);
+            useFunctionNameStack.push([useProcessFunctionName, useBakeFunctionName]);
         }
-        if (filterVertexShader) {
-            vertexShader += filterVertexShader + '\n';
+
+        let vertexFilterCode = '';
+        if (vertexShaderMainCalls.length > 0) {
+            vertexFilterCode += '    vec4 filterPositionResult = gl_Position;\n' + vertexShaderMainCalls.join('\n') + '\n    gl_Position = filterPositionResult;';
         }
-        if (filterFragmentShader) {
-            fragmentShader += filterFragmentShader + '\n';
+        let fragmentFilterCode = '';
+        if (!hasSampleBackbuffer || hasMaskTextures) {
+            fragmentFilterCode += '    gl_FragColor = materialMain(vUv);';
         }
-        if (maskTexture) {
-            fragmentShader += `uniform sampler2D filterMask${index}Map;\n`;
+        if (fragmentShaderMainCalls.length > 0) {
+            if (hasMaskTextures) {
+                fragmentFilterCode += '    float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
+            }
+            fragmentFilterCode += '    vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
         }
-        alreadyIncludedFilters.add(canvasFilter.name);
-        useFunctionNameStack.push([useProcessFunctionName, useBakeFunctionName]);
+        fragmentFilterCode += '\n' + blendingModesFragmentShaderMain + '\n';
+
+        let sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
+            + '    return texture2D(layerTexture, uv);\n'
+            + '}\n';
+        if (useAutomaticLayerTextureMipmaps) {
+            sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
+            + '    return texture2D(layerTexture, uv);\n'
+            + '}\n';
+        } else if (hasSampleBackbuffer) {
+            sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
+            + '    vec2 layerResolution = vec2(float(cLayerWidth), float(cLayerHeight));\n'
+            + '    vec2 uvDx = dFdx(vUv * layerResolution);\n'
+            + '    vec2 uvDy = dFdy(vUv * layerResolution);\n'
+            + '    float lod = floor(log2(max(max(length(uvDx), length(uvDy)), 1.0)) + 0.5);\n'
+            + '    return textureLod(layerTexture, uv, lod);\n'
+            + '}\n';
+        }
+
+        vertexShader = vertexShaderSetup + '\n'
+            + vertexShader
+            + '\n' + vertexShaderMain.replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
+        fragmentShader = commonUtilityFragmentShader + '\n'
+            + blendingModesFragmentShaderSetup + '\n'
+            + fragmentShaderSetup + '\n'
+            + sampleLayerTextureSetup + '\n'
+            + fragmentShader + '\n'
+            + (passIndex > 0 ? filterPassBaseFragmentShader : fragmentShaderMain)
+                .replace('//[INJECT_FILTERS_HERE]', fragmentFilterCode);
+        
+        shaderPasses.push({
+            vertexShader,
+            fragmentShader,
+            uniforms,
+            defines,
+            textures,
+        });
     }
 
-    let vertexFilterCode = '';
-    if (vertexShaderMainCalls.length > 0) {
-        vertexFilterCode += '    vec4 filterPositionResult = gl_Position;\n' + vertexShaderMainCalls.join('\n') + '\n    gl_Position = filterPositionResult;';
-    }
-    let fragmentFilterCode = '';
-    if (!hasSampleBackbuffer || hasMaskTextures) {
-        fragmentFilterCode += '    gl_FragColor = materialMain(vUv);';
-    }
-    if (fragmentShaderMainCalls.length > 0) {
-        if (hasMaskTextures) {
-            fragmentFilterCode += '    float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
-        }
-        fragmentFilterCode += '    vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
-    }
-    fragmentFilterCode += '\n' + blendingModesFragmentShaderMain + '\n';
-
-    let sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
-        + '    return texture2D(layerTexture, uv);\n'
-        + '}\n';
-    if (useAutomaticLayerTextureMipmaps) {
-        sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
-        + '    return texture2D(layerTexture, uv);\n'
-        + '}\n';
-    } else if (hasSampleBackbuffer) {
-        sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
-        + '    vec2 layerResolution = vec2(float(cLayerWidth), float(cLayerHeight));\n'
-        + '    vec2 uvDx = dFdx(vUv * layerResolution);\n'
-        + '    vec2 uvDy = dFdy(vUv * layerResolution);\n'
-        + '    float lod = floor(log2(max(max(length(uvDx), length(uvDy)), 1.0)) + 0.5);\n'
-        + '    return textureLod(layerTexture, uv, lod);\n'
-        + '}\n';
-    }
-
-    vertexShader = vertexShaderSetup + '\n' + vertexShader
-        + '\n' + vertexShaderMain.replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
-    fragmentShader = commonUtilityFragmentShader + '\n' + blendingModesFragmentShaderSetup + '\n'
-        + fragmentShaderSetup + '\n' + sampleLayerTextureSetup + '\n' + fragmentShader
-        + '\n' + fragmentShaderMain.replace('//[INJECT_FILTERS_HERE]', fragmentFilterCode);
-
-    return {
-        vertexShader,
-        fragmentShader,
-        uniforms,
-        defines,
-        textures,
-    };
+    return shaderPasses;
 }

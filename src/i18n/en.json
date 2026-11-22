@@ -585,6 +585,15 @@
                 "mix": "Mix"
             }
         },
+        "highlightBloom": {
+            "name": "Highlight Bloom",
+            "help": "Also known as halation; this is a soft glow where light bleeds from bright to dark areas of the image. In cameras, it can be caused by light scattering in the lens, diffusion filters, or light reflections on the emulsion of a film.\n* **Threshold** - A range of how bright a color has to be in order to bleed light.\n* **Radius** - How far light will bleed.\n* **Strength** - How bright the light bleed is.",
+            "param": {
+                "threshold": "Threshold",
+                "radius": "Radius",
+                "strength": "Strength"
+            }
+        },
         "hue": {
             "name": "Hue",
             "help": "Rotates the hue of colors in the image, effectively changing the perceived color.\n\nThe **Color Space** is used to determine the brightness and saturation of the new color. **Oklab** is generally the most accurate option.\n\nThe **Target Color** can be used to selectively modify only one specific color in the image. The **Range** determines what colors similar to the **Target Color** are affected.",

@@ -21,7 +21,7 @@ export interface TextMaterialUpdateParams {
 }
 
 export async function createTextMaterial(params: TextMaterialUpdateParams) {
-    const shader = await createLayerShader({
+    const shader = (await createLayerShader({
         vertexShaderSetup: textMaterialVertexShaderSetup,
         vertexShaderMain: textMaterialVertexShaderMain,
         fragmentShaderSetup: textMaterialFragmentShaderSetup,
@@ -29,7 +29,7 @@ export async function createTextMaterial(params: TextMaterialUpdateParams) {
         canvasFilters: params.canvasFilters ?? [],
         width: params?.width ?? 1,
         height: params?.height ?? 1,
-    });
+    }))[0];
 
     const material = new ShaderMaterial({
         transparent: true,

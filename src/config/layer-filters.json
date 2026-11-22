@@ -99,6 +99,10 @@
         "group": "distort"
     },
 
+    "highlightBloom": {
+        "name": "layerFilter.highlightBloom.name",
+        "group": "lightShadow"
+    },
     "mechanicalVignette": {
         "name": "layerFilter.mechanicalVignette.name",
         "group": "lightShadow"

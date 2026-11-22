@@ -96,6 +96,9 @@ export interface CanvasFilter<T extends Object = Record<string, unknown>> {
     name: string;
     params: T;
     overrideParams?: T;
+    passes?: number;
+    pass?: number;
+    maxPassTextureSize?: number;
     maskId?: number;
     disabled?: boolean;
     overrideDisabled?: boolean;
@@ -104,6 +107,7 @@ export interface CanvasFilter<T extends Object = Record<string, unknown>> {
 
 export interface Webgl2RendererCanvasFilter<T extends Object = Record<string, unknown>> extends Omit<CanvasFilter<T>, 'getEditConfig'> {
     fragmentShader: string;
+    fragmentShaders?: string[];
     getEditConfig?: () => CanvasFilterEditConfig;
     editConfig?: CanvasFilterEditConfig;
 }

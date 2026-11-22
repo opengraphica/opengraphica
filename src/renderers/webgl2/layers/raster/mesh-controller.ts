@@ -4,18 +4,21 @@
  */
 
 import { ImagePlaneGeometry } from '@/renderers/webgl2/geometries/image-plane-geometry';
+import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
+import { Scene } from 'three/src/scenes/Scene';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
+import { Vector4 } from 'three/src/math/Vector4';
 
 import { getWebgl2RendererBackend, markRenderDirty, requestFrontendTexture } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig, createLayerShaderUniformsAndDefines } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
-import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from './material';
+import { createRasterMaterials, disposeRasterMaterials, updateRasterMaterials } from './material';
 
-import type { Scene, ShaderMaterial } from 'three';
+import type { ShaderMaterial } from 'three';
 import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
     WorkingFileLayerBlendingMode, WorkingFileRasterLayer, WorkingFileLayerFilter
@@ -23,10 +26,15 @@ import type {
 
 export class RasterLayerMeshController implements Webgl2RendererMeshController {
     
+    /** @deprecated use materials */
     material: InstanceType<typeof ShaderMaterial> | undefined;
+    materials: InstanceType<typeof ShaderMaterial>[] = [];
     plane: InstanceType<typeof Mesh> | undefined;
+    prepassPlane: InstanceType<typeof Mesh> | undefined;
     planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
+    prepassScene: InstanceType<typeof Scene> | undefined;
+    prepassCamera: InstanceType<typeof OrthographicCamera> | undefined;
     sourceTexture: InstanceType<typeof Texture<any>> | undefined;
     draftTexture: InstanceType<typeof Texture<any>> | undefined;
 
@@ -42,6 +50,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     visibleOverride: boolean | undefined = undefined;
     width: number = 0;
 
+    isHalfFloat: boolean = false;
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
     isRequestingSourceTexture: boolean = false;
@@ -56,6 +65,14 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         this.plane = new Mesh(undefined, undefined);
         this.plane.matrixAutoUpdate = false;
         this.scene.add(this.plane);
+
+        const gl = backend.renderer.getContext();
+        this.isHalfFloat = !!(
+            (backend.renderer.capabilities.isWebGL2 || gl.getExtension('OES_texture_half_float'))
+        );
+
+        this.beforeRender = this.beforeRender.bind(this);
+        this.plane.onBeforeRender = this.beforeRender;
 
         this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
         messageBus.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
@@ -83,24 +100,28 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                 const updateType = this.materialUpdates[this.materialUpdates.length - 1];
                 if (!updateType) break;
                 if (updateType === 'destroyAndCreate') {
-                    if (this.material) {
-                        await disposeRasterMaterial(this.material);
+                    if (this.materials.length > 0) {
+                        await disposeRasterMaterials(this.materials);
                     }
                 }
-                if (!this.material || updateType === 'destroyAndCreate') {
-                    this.material = await createRasterMaterial({
+                if (this.materials.length === 0 || updateType === 'destroyAndCreate') {
+                    this.materials = await createRasterMaterials({
                         srcTexture: this.draftTexture ?? this.sourceTexture,
                         canvasFilters: this.filtersOverride ?? this.filters,
                         opacity: this.opacity,
+                        isHalfFloat: this.isHalfFloat,
                     });
-                    assignMaterialBlendingMode(this.material, this.blendingMode);
+                    if (this.materials.length > 1) {
+                        this.setupPrepass();
+                    }
+                    assignMaterialBlendingMode(this.materials[this.materials.length - 1], this.blendingMode);
                 } else {
-                    await updateRasterMaterial(this.material, {
+                    await updateRasterMaterials(this.materials, {
                         srcTexture: this.draftTexture ?? this.sourceTexture,
                         opacity: this.opacity,
                     })
                 }
-                this.plane && (this.plane.material = this.material);
+                this.plane && (this.plane.material = this.materials[this.materials.length - 1]);
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
                     markRenderDirty();
@@ -108,6 +129,57 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                 }
             }
         }
+    }
+
+    setupPrepass() {
+        if (
+            !this.plane
+            || !this.sourceTexture
+        ) return;
+        if (!this.prepassScene) {
+            this.prepassScene = new Scene();
+        }
+        if (!this.prepassPlane) {
+            this.prepassPlane = new Mesh(this.planeGeometry, undefined);
+            this.prepassScene.add(this.prepassPlane);
+        }
+        if (!this.prepassCamera) {
+            this.prepassCamera = new OrthographicCamera(0, this.sourceTexture.width, 0, this.sourceTexture.height, 0.1, 10000);
+        }
+        this.prepassCamera.right = this.sourceTexture.width;
+        this.prepassCamera.bottom = this.sourceTexture.height;
+        this.prepassCamera.position.z = 1;
+        this.prepassCamera.updateProjectionMatrix();
+    }
+
+    beforeRender() {
+        if (
+            !this.plane
+            || this.materials.length <= 1
+            || !this.sourceTexture
+            || !this.prepassScene
+            || !this.prepassPlane
+            || !this.prepassCamera
+            || !this.scene
+        ) return;
+        const backend = getWebgl2RendererBackend();
+        const originalRenderTarget = backend.renderer.getRenderTarget();
+        const originalViewport = new Vector4();
+        backend.renderer.getViewport(originalViewport);
+        backend.renderer.setViewport(0, 0, this.sourceTexture.width, this.sourceTexture.height);
+        for (let [materialIndex, currentMaterial] of this.materials.entries()) {
+            if (materialIndex > 0 && currentMaterial.uniforms.dstTexture) {
+                currentMaterial.uniforms.dstTexture.value = this.sourceTexture;
+            }
+            if (materialIndex < this.materials.length - 1) {
+                const nextMaterial = this.materials[materialIndex + 1];
+                backend.renderer.setRenderTarget(nextMaterial.userData.srcRenderTarget);
+                this.prepassPlane.material = currentMaterial;
+                backend.renderer.render(this.prepassScene, this.prepassCamera);
+            }
+        }
+        backend.renderer.setRenderTarget(originalRenderTarget);
+        backend.renderer.setViewport(originalViewport);
     }
 
     updateBlendingMode(blendingMode: WorkingFileLayerBlendingMode) {
@@ -160,6 +232,9 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                 this.sourceTexture = sourceTexture;
                 this.sourceTexture.needsUpdate = true;
                 this.isRequestingSourceTexture = false;
+                if (this.materials.length > 1) {
+                    this.setupPrepass();
+                }
                 for (const callback of this.sourceTextureFetchCallbacks) {
                     callback(this.sourceTexture);
                 }
@@ -218,11 +293,13 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     }
 
     renderHighQuality(isHighQuality: boolean) {
-        if (!this.material) return;
+        if (this.materials.length === 0) return;
         const highQualityFlag = isHighQuality ? 1 : 0;
-        if (this.material.defines.cHighQualityRender !== highQualityFlag) {
-            this.material.defines.cHighQualityRender = highQualityFlag;
-            this.material.needsUpdate = true;
+        for (const material of this.materials) {
+            if (material.defines.cHighQualityRender !== highQualityFlag) {
+                material.defines.cHighQualityRender = highQualityFlag;
+                material.needsUpdate = true;
+            }
         }
     }
 
@@ -305,7 +382,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
             }
         }
 
-        if (!this.material) return;
+        if (this.materials.length === 0) return;
 
         this.disposeOverrideFilterParamTextures();
 
@@ -316,16 +393,18 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         );
         this.overrideFilterParamTextures = textures;
 
-        for (const defineName in defines) {
-            if (this.material.defines[defineName] !== defines[defineName]) {
-                this.material.defines[defineName] = defines[defineName];
-                needsDestroyAndCreate = true;
+        for (const material of this.materials) {
+            for (const defineName in defines) {
+                if (material.defines[defineName] !== defines[defineName]) {
+                    material.defines[defineName] = defines[defineName];
+                    needsDestroyAndCreate = true;
+                }
             }
+            for (const uniformName in uniforms) {
+                material.uniforms[uniformName] = uniforms[uniformName];
+            }
+            material.uniformsNeedUpdate = true;
         }
-        for (const uniformName in uniforms) {
-            this.material.uniforms[uniformName] = uniforms[uniformName];
-        }
-        this.material.uniformsNeedUpdate = true;
 
         if (needsDestroyAndCreate) {
             this.scheduleMaterialUpdate('destroyAndCreate');
@@ -364,9 +443,11 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         this.plane && this.scene?.remove(this.plane);
         this.plane = undefined;
 
-        if (this.material) {
-            disposeRasterMaterial(this.material);
-            this.material = undefined;
+        this.prepassScene = undefined;
+
+        if (this.materials.length > 0) {
+            disposeRasterMaterials(this.materials);
+            this.materials = [];
         }
 
         this.disposeSourceTexture();
