@@ -40,7 +40,7 @@ export default class RadialSpeedLinesCanvasFilter implements CanvasFilter<Radial
             lineThickness: {
                 type: 'percentageRange',
                 default: [0.2, 0.2],
-                preview: [0.05, 0.2],
+                preview: [0.05, 0.4],
                 min: 0,
                 max: 1,
             },
