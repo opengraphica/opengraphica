@@ -182,6 +182,10 @@
                 <i class="bi bi-copy text-md"></i>
                 <span>{{ t('app.layerList.duplicate') }}</span>
             </el-menu-item>
+            <el-menu-item v-if="isLayerSettingsMergeDownEnabled" index="mergeDown">
+                <i class="bi bi-arrow-bar-down text-md"></i>
+                <span>{{ t('app.layerList.mergeDown') }}</span>
+            </el-menu-item>
             <el-menu-item index="delete">
                 <i class="bi bi-trash"></i>
                 <span>{{ t(isLayerSettingsMenuLayerSelected && (activeSelectionMask || appliedSelectionMask)
@@ -193,7 +197,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, reactive, computed, onMounted, onUnmounted, toRefs, nextTick, PropType } from 'vue';
+import { ref, watch, reactive, computed, toRefs, nextTick, PropType } from 'vue';
 import { useI18n } from '@/i18n';
 
 import OgPopover from '@/ui/element/popover.vue';
@@ -209,7 +213,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
-import workingFileStore, { getLayerById, isGroupLayer } from '@/store/working-file';
+import workingFileStore, { getLayerById, getParentGroupByLayerId, isGroupLayer } from '@/store/working-file';
 import { editingLayerIds as layerOpacityEditingLayerIds } from '@/tools/store/layer-opacity-state';
 import { effectEmitter, isToolbarVisible as isEffectToolbarVisible } from '@/tools/store/effect-state';
 import { activeSelectionMask, appliedSelectionMask } from '@/tools/store/selection-state';
@@ -220,6 +224,7 @@ import { BundleAction } from '@/actions/bundle';
 import { DeleteLayersAction } from '@/actions/delete-layers';
 import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { DuplicateLayerAction } from '@/actions/duplicate-layer';
+import { MergeLayerDownAction } from '@/actions/merge-layer-down';
 import { RasterizeLayerAction } from '@/actions/rasterize-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
 import { ReorderLayerFiltersAction } from '@/actions/reorder-layer-filters';
@@ -306,6 +311,14 @@ const isLayerSettingsEditEnabled = computed<boolean>(() => {
         return true;
     }
     return false;
+});
+
+const isLayerSettingsMergeDownEnabled = computed<boolean>(() => {
+    const layerId = showLayerSettingsMenuFor.value ?? -1;
+    const layer = getLayerById(layerId);
+    if (!layer) return false;
+    const layerList = getParentGroupByLayerId(layerId)?.layers ?? workingFileStore.get('layers');
+    return layerList.findIndex((otherLayer) => otherLayer.id === layerId) > 0;
 });
 
 const isLayerSettingsRasterizeEnabled = computed<boolean>(() => {
@@ -401,6 +414,10 @@ async function onLayerSettingsSelect(action: string) {
     } else if (action === 'duplicate') {
         historyStore.dispatch('runAction', {
             action: new DuplicateLayerAction(layer.id)
+        });
+    } else if (action === 'mergeDown') {
+        historyStore.dispatch('runAction', {
+            action: new MergeLayerDownAction(layer.id)
         });
     } else if (action === 'delete') {
         if (selectedLayerIds.value.includes(layer.id) && (activeSelectionMask.value || appliedSelectionMask.value)) {

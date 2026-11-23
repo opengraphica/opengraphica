@@ -165,7 +165,7 @@ async function dispatchRunAction(
 
     let actionRunStatus: { status: string, reason?: any } = { status: 'completed' };
     let resolveActiveAction = (value: void) => {};
-    let rejectActiveAction = () => {};
+    let rejectActiveAction = (error: any) => {};
 
     if (blockInteraction) {
         appEmitter.emit('editor.history.startBlocking', {
@@ -319,7 +319,7 @@ async function dispatchRunAction(
         resolveActiveAction();
     } catch (error) {
         actionRunStatus = { status: 'aborted', reason: error };
-        rejectActiveAction();
+        rejectActiveAction(error);
     }
 
     set('activeActionPromise', null);

@@ -47,7 +47,9 @@ export class UpdateVectorLayerAttributesAction extends BaseAction {
         }
 
         this.oldImageSourceUuid = layer.data.sourceUuid;
-        const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(this.oldImageSourceUuid);
+        const svgDocument = (layer.data.sourceDocument?.documentElement)
+            ? layer.data.sourceDocument
+            : await getStoredSvgDocument(this.oldImageSourceUuid);
         if (!svgDocument) {
             throw new Error('Aborted - Vector layer is missing a SVG document.');
         }

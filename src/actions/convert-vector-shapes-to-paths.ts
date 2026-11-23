@@ -50,7 +50,9 @@ export class ConvertVectorShapesToPathsAction extends BaseAction {
             throw new Error('Aborted - Layer is not a vector layer.');
         }
 
-        const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+        const svgDocument = (layer.data.sourceDocument?.documentElement)
+            ? layer.data.sourceDocument
+            : await getStoredSvgDocument(layer.data.sourceUuid);
         if (!svgDocument) {
             throw new Error('Aborted - Vector layer is missing a SVG document.');
         }

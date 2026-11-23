@@ -124,7 +124,9 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
             } else if (layer.type === 'vector') {
                 // For a vector layer, clip shapes with boolean subtract operation
 
-                let svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                let svgDocument = (layer.data.sourceDocument?.documentElement)
+                    ? layer.data.sourceDocument
+                    : await getStoredSvgDocument(layer.data.sourceUuid);
                 if (!svgDocument) {
                     continue;
                 }

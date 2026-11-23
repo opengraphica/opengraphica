@@ -536,7 +536,9 @@ async function transformLayersGeneral(
             }
             updateActions.push(new UpdateLayerAction(updateOptions));
         } else if (layer.type === 'vector') {
-            const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+            const svgDocument = (layer.data.sourceDocument?.documentElement)
+                ? layer.data.sourceDocument
+                : await getStoredSvgDocument(layer.data.sourceUuid);
             vectorModifier(svgDocument);
 
             const serializer = new XMLSerializer();

@@ -129,9 +129,24 @@ export function getLayerById<T extends WorkingFileAnyLayer<ColorModel>>(id: numb
         if (layer.id === id) {
             return layer as never;
         } else if (layer.type === 'group') {
-            let foundLayer = getLayerById(id, (layer as WorkingFileGroupLayer<ColorModel>).layers);
+            const foundLayer = getLayerById(id, (layer as WorkingFileGroupLayer<ColorModel>).layers);
             if (foundLayer) {
                 return foundLayer as never;
+            }
+        }
+    }
+    return null;
+}
+
+export function getParentGroupByLayerId(id: number, parent?: WorkingFileGroupLayer<ColorModel>): WorkingFileGroupLayer<ColorModel> | null {
+    const layerList = parent?.layers ?? store.get('layers');
+    for (let layer of layerList) {
+        if (layer.id === id) {
+            return parent ?? null;
+        } else if (layer.type === 'group') {
+            const foundLayer = getParentGroupByLayerId(id, layer as WorkingFileGroupLayer<ColorModel>);
+            if (foundLayer) {
+                return foundLayer;
             }
         }
     }

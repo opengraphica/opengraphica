@@ -32,14 +32,17 @@ async function isObjectUrlValid(url: string): Promise<boolean> {
  * @param canvas - HTML canvas that contains image data
  * @returns uuid that can be used to retrieve it later
  */
-export async function createStoredImage(imageOrCanvas: HTMLCanvasElement | HTMLImageElement): Promise<string> {
+interface CreateStoredImageOptions {
+    transfer?: boolean;
+}
+export async function createStoredImage(imageOrCanvas: HTMLCanvasElement | HTMLImageElement | ImageBitmap, options?: CreateStoredImageOptions): Promise<string> {
     let sourceCanvas: HTMLCanvasElement | null = null;
     let sourceBitmap: ImageBitmap | null = null;
     if (imageOrCanvas instanceof HTMLCanvasElement) {
         sourceCanvas = imageOrCanvas;
     } else {
         const rendererType = canvasStore.get('renderer');
-        sourceCanvas = createCanvasFromImage(imageOrCanvas);
+        sourceCanvas = createCanvasFromImage(imageOrCanvas, { transfer: options?.transfer });
         if (imageOrCanvas instanceof HTMLImageElement) {
             URL.revokeObjectURL(imageOrCanvas.src);
         }

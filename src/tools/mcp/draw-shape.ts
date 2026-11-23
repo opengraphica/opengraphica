@@ -55,7 +55,9 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
             actions.push(new TrimLayerEmptySpaceAction(-1));
         } else {
             for (const layer of vectorLayers) {
-                let svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                let svgDocument = (layer.data.sourceDocument?.documentElement)
+                    ? layer.data.sourceDocument
+                    : await getStoredSvgDocument(layer.data.sourceUuid);
                 const shape = createShapeCallback(svgDocument);
                 generateSvgElementIds(svgDocument);
                 createdShapeId = shape.getAttribute('data-ogr-id') ?? '';
@@ -341,7 +343,9 @@ registerTool({
         const layerDefinitions: Array<{ layerId: number, shapes: Array<{ shapeId: string, tagName: string, attributes: Record<string, string | number>, selected: boolean }> }> = [];
         const selectedVectorLayers = getSelectedLayers<WorkingFileVectorLayer>().filter((layer) => layer.type === 'vector');
         for (const layer of selectedVectorLayers) {
-            const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+            const svgDocument = (layer.data.sourceDocument?.documentElement)
+                ? layer.data.sourceDocument
+                : await getStoredSvgDocument(layer.data.sourceUuid);
             const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions({
                 defaultDPI: 90,
                 defaultUnit: 'px',
@@ -491,7 +495,9 @@ registerTool({
             const actions: BaseAction[] = [];
             const vectorLayers = getSelectedLayers<WorkingFileVectorLayer>().filter((layer) => layer.type === 'vector');
             for (const layer of vectorLayers) {
-                let svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                let svgDocument = (layer.data.sourceDocument?.documentElement)
+                    ? layer.data.sourceDocument
+                    : await getStoredSvgDocument(layer.data.sourceUuid);
                 svgDocument.querySelector(`[data-ogr-id="${id}"]`)?.remove();
                 generateSvgElementIds(svgDocument);
                 const svgString = serializer.serializeToString(svgDocument).replace(/xmlns=""/g, '');

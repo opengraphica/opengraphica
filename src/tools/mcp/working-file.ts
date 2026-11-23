@@ -126,7 +126,7 @@ registerTool({
         if (layer?.type !== 'vector') throw new Error(t('mcp.common.error.layerNotFound'));
         const serializer = new XMLSerializer();
         const svgString = serializer.serializeToString(
-            layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid)
+            (layer.data.sourceDocument?.documentElement) ? layer.data.sourceDocument : await getStoredSvgDocument(layer.data.sourceUuid)
         ).replace(/xmlns=""/g, '');
         return {
             content: [

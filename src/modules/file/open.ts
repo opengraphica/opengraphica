@@ -33,6 +33,7 @@ import { useWebdavClient } from '@/composables/webdav-client';
 
 import { knownFileExtensions } from '@/lib/regex';
 import appEmitter from '@/lib/emitter';
+import { getMimeTypeForExtension } from '@/lib/file';
 import { resizeImage } from '@/lib/image';
 import { limitMaxDimension } from '@/lib/math';
 
@@ -92,7 +93,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
                         description: 'Images / Videos',
                         accept: {
                             'text/plain': ['.json'],
-                            'image/*': [],
+                            'image/*': ['.ora'],
                             'video/*': []
                         }
                     }
@@ -288,15 +289,20 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
 
     for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
         const file = files[fileIndex];
+        let fileType = file.type;
+
+        if (fileType.length === 0) {
+            fileType = getMimeTypeForExtension(file.name.split('.').pop() ?? '') ?? '';
+        }
 
         readerPromises.push(
             new Promise(async (resolveReader, rejectReader) => {
                 try {
                     // Some images don't have the correct extension, which causes the browser to not recognize the type. Default to read as 'image';
                     let fileReadType: FileReadType = 'media';
-                    if (file.type === 'text/plain' || file.name.match(/\.json$/)) {
+                    if (fileType === 'text/plain' || file.name.match(/\.json$/)) {
                         fileReadType = 'json';
-                    } else if (file.type === 'image/openraster') {
+                    } else if (fileType === 'image/openraster') {
                         fileReadType = 'ora';
                     }
 
@@ -307,7 +313,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                     const fileReader = new FileReader();
 
                     if (fileReadType === 'media') {
-                        if (file.type === 'image/gif') {
+                        if (fileType === 'image/gif') {
                             const result: { image: HTMLImageElement, duration: number }[] = [];
                             const gifArrayBuffer = await new Promise<ArrayBuffer | null>((resolveArrayBuffer) => {
                                 fileReader.onload = async () => {
@@ -404,7 +410,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                             } else {
                                 rejectReader('No frames found in gif file "' + file.name + '".');
                             }
-                        } else if (file.type.startsWith('video/')) {
+                        } else if (fileType.startsWith('video/')) {
                             let videoObjectUrl = URL.createObjectURL(file);
                             let video = document.createElement('video');
                             await new Promise<void>((resolve, reject) => {
@@ -418,7 +424,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                                 video.src = videoObjectUrl;
                             });
                             resolveReader({ type: 'video', result: video, file: file });
-                        } else if (file.type === 'image/svg+xml') {
+                        } else if (fileType === 'image/svg+xml') {
                             const fileContents = await new Promise<string>((resolveFileContents, rejectFileContents) => {
                                 fileReader.onload = async () => {
                                     resolveFileContents(fileReader.result as string);

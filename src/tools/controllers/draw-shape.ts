@@ -2923,7 +2923,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 const layer = editingLayers.value[layerIndex];
                 if (!layer) continue;
 
-                const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                const svgDocument = (layer.data.sourceDocument?.documentElement)
+                    ? layer.data.sourceDocument
+                    : await getStoredSvgDocument(layer.data.sourceUuid);
                 const svgTransform = parseNodeTransform(svgDocument.documentElement);
 
                 for (const nodeIndex of Array.from(nodeIndices)) {
@@ -3091,7 +3093,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 const layer = getLayerById<WorkingFileVectorLayer>(layerId);
                 if (!layer) continue;
 
-                const sourceDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                const sourceDocument = (layer.data.sourceDocument?.documentElement)
+                    ? layer.data.sourceDocument
+                    : await getStoredSvgDocument(layer.data.sourceUuid);
                 
                 for (const nodeId of Array.from(nodeIds)) {
                     const shapeNode = sourceDocument.querySelector(`[data-ogr-id="${nodeId}"]`);
