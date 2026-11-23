@@ -123,6 +123,10 @@
     "spread": {
         "name": "layerFilter.spread.name",
         "group": "noise"
-    }
+    },
 
+    "radialSpeedLines": {
+        "name": "layerFilter.radialSpeedLines.name",
+        "group": "artistic"
+    }
 }

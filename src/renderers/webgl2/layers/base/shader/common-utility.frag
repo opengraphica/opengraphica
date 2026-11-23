@@ -1,4 +1,5 @@
 #define PI 3.1415926535
+#define TAU 6.28318530718
 #define CBRT_NEWTON_ITER 2
 #define CBRT_HALLEY_ITER 0
 
