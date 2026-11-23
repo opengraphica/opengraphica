@@ -2,19 +2,17 @@
  * This file constructs the necessary assets to render a vector layer.
  * It can run in the main thread or a worker.
  */
-import { BackSide, FrontSide } from 'three/src/constants';
-import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Color } from 'three/src/math/Color';
 import { Group } from 'three/src/objects/Group';
 import { ImagePlaneGeometry } from '@/renderers/webgl2/geometries/image-plane-geometry';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
-import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
+import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { Quaternion } from 'three/src/math/Quaternion';
 import { Raycaster } from 'three/src/core/Raycaster';
+import { Scene } from 'three/src/scenes/Scene';
 import { ShapeGeometry } from 'three/src/geometries/ShapeGeometry';
 import { Texture } from 'three/src/textures/Texture';
-import { Vector2 } from 'three/src/math/Vector2';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Vector4 } from 'three/src/math/Vector4';
 
@@ -29,11 +27,11 @@ import { getWebgl2RendererBackend, markRenderDirty, requestFrontendSvg } from '@
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig, createLayerShaderUniformsAndDefines } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
-import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from '../raster/material';
+import { createRasterMaterials, disposeRasterMaterials, updateRasterMaterials } from '../raster/material';
 import { createVectorMaterial, disposeVectorMaterial, updateVectorMaterial } from './material';
 import { SVGLoader } from './svg-loader';
 
-import type { Scene, ShaderMaterial, SvgShapePath } from 'three';
+import type { ShaderMaterial, SvgShapePath } from 'three';
 import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
     WorkingFileLayerBlendingMode, WorkingFileVectorLayer, WorkingFileLayerFilter,
@@ -49,10 +47,15 @@ interface QueuedAddVectorLayerElement {
 
 export class VectorLayerMeshController implements Webgl2RendererMeshController {
     
+    /** @deprecated use materials */
     material: InstanceType<typeof ShaderMaterial> | undefined;
+    materials: InstanceType<typeof ShaderMaterial>[] = [];
     plane: InstanceType<typeof Mesh> | undefined;
+    prepassPlane: InstanceType<typeof Mesh> | undefined;
     planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
+    prepassScene: InstanceType<typeof Scene> | undefined;
+    prepassCamera: InstanceType<typeof OrthographicCamera> | undefined;
     sourceSvg: Blob | undefined;
     sourceTexture: InstanceType<typeof Texture<any>> | undefined;
     sourceDocument: XMLDocument | undefined;
@@ -77,6 +80,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     lastResizeScaledWidth: number = 0;
     lastResizeScaledHeight: number = 0;
 
+    isHalfFloat: boolean = false;
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
     overrideFilterParamTextures: Texture<any>[] = [];
@@ -104,6 +108,14 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         this.plane.matrixAutoUpdate = false;
         this.scene.add(this.plane);
 
+        const gl = backend.renderer.getContext();
+        this.isHalfFloat = !!(
+            (backend.renderer.capabilities.isWebGL2 || gl.getExtension('OES_texture_half_float'))
+        );
+
+        this.beforeRender = this.beforeRender.bind(this);
+        this.plane.onBeforeRender = this.beforeRender;
+
         this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
         messageBus.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
     }
@@ -130,26 +142,32 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 const updateType = this.materialUpdates[this.materialUpdates.length - 1];
                 if (!updateType) break;
                 if (updateType === 'destroyAndCreate') {
-                    if (this.material) {
-                        await disposeRasterMaterial(this.material);
+                    if (this.materials.length > 0) {
+                        await disposeRasterMaterials(this.materials);
                     }
                 }
-                if (!this.material || updateType === 'destroyAndCreate') {
-                    this.material = await createRasterMaterial({
+                if (this.materials.length === 0 || updateType === 'destroyAndCreate') {
+                    this.materials = await createRasterMaterials({
                         srcTexture: this.sourceTexture,
                         canvasFilters: this.filtersOverride ?? this.filters,
                         opacity: this.opacity,
                         premultiplyAlphaFix: true,
+                        isHalfFloat: this.isHalfFloat,
                     });
-                    assignMaterialBlendingMode(this.material, this.blendingMode);
+                    if (this.materials.length > 1) {
+                        this.setupPrepass();
+                    }
+                    assignMaterialBlendingMode(this.materials[this.materials.length - 1], this.blendingMode);
                 } else {
-                    await updateRasterMaterial(this.material, {
+                    await updateRasterMaterials(this.materials, {
                         srcTexture: this.sourceTexture,
+                        canvasFilters: this.filtersOverride ?? this.filters,
                         opacity: this.opacity,
                         premultiplyAlphaFix: true,
+                        isHalfFloat: this.isHalfFloat,
                     })
                 }
-                this.plane && (this.plane.material = this.material);
+                this.plane && (this.plane.material = this.materials[this.materials.length - 1]);
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
                     markRenderDirty();
@@ -157,6 +175,60 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 }
             }
         }
+    }
+
+    setupPrepass() {
+        if (
+            !this.plane
+            || !this.sourceTexture
+        ) return;
+        if (!this.prepassScene) {
+            this.prepassScene = new Scene();
+        }
+        if (!this.prepassPlane) {
+            this.prepassPlane = new Mesh(this.planeGeometry, undefined);
+            this.prepassScene.add(this.prepassPlane);
+        }
+        if (!this.prepassCamera) {
+            this.prepassCamera = new OrthographicCamera(0, this.sourceTexture.width, 0, this.sourceTexture.height, 0.1, 10000);
+        }
+        this.prepassCamera.right = this.sourceTexture.width;
+        this.prepassCamera.bottom = this.sourceTexture.height;
+        this.prepassCamera.position.z = 1;
+        this.prepassCamera.updateProjectionMatrix();
+    }
+
+    beforeRender() {
+        if (
+            !this.plane
+            || this.materials.length <= 1
+            || !this.sourceTexture
+            || !this.prepassScene
+            || !this.prepassPlane
+            || !this.prepassCamera
+            || !this.scene
+        ) return;
+        const backend = getWebgl2RendererBackend();
+        const originalRenderTarget = backend.renderer.getRenderTarget();
+        const originalViewport = new Vector4();
+        const originalAutoClear = backend.renderer.autoClear;
+        backend.renderer.autoClear = true;
+        backend.renderer.getViewport(originalViewport);
+        backend.renderer.setViewport(0, 0, this.sourceTexture.width, this.sourceTexture.height);
+        for (let [materialIndex, currentMaterial] of this.materials.entries()) {
+            if (materialIndex > 0 && currentMaterial.uniforms.dstTexture) {
+                currentMaterial.uniforms.dstTexture.value = this.sourceTexture;
+            }
+            if (materialIndex < this.materials.length - 1) {
+                const nextMaterial = this.materials[materialIndex + 1];
+                backend.renderer.setRenderTarget(nextMaterial.userData.srcRenderTarget);
+                this.prepassPlane.material = currentMaterial;
+                backend.renderer.render(this.prepassScene, this.prepassCamera);
+            }
+        }
+        backend.renderer.autoClear = originalAutoClear;
+        backend.renderer.setRenderTarget(originalRenderTarget);
+        backend.renderer.setViewport(originalViewport);
     }
 
     updateBlendingMode(blendingMode: WorkingFileLayerBlendingMode) {
@@ -726,7 +798,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             }
         }
 
-        if (!this.material) return;
+        if (this.materials.length === 0) return;
 
         this.disposeOverrideFilterParamTextures();
 
@@ -737,16 +809,18 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         );
         this.overrideFilterParamTextures = textures;
 
-        for (const defineName in defines) {
-            if (this.material.defines[defineName] !== defines[defineName]) {
-                this.material.defines[defineName] = defines[defineName];
-                needsDestroyAndCreate = true;
+        for (const material of this.materials) {
+            for (const defineName in defines) {
+                if (material.defines[defineName] !== defines[defineName]) {
+                    material.defines[defineName] = defines[defineName];
+                    needsDestroyAndCreate = true;
+                }
             }
+            for (const uniformName in uniforms) {
+                material.uniforms[uniformName] = uniforms[uniformName];
+            }
+            material.uniformsNeedUpdate = true;
         }
-        for (const uniformName in uniforms) {
-            this.material.uniforms[uniformName] = uniforms[uniformName];
-        }
-        this.material.uniformsNeedUpdate = true;
 
         if (needsDestroyAndCreate) {
             this.scheduleMaterialUpdate('destroyAndCreate');
@@ -768,9 +842,9 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     }
 
     readBufferTextureUpdate(texture?: Texture) {
-        if (!this.material?.uniforms?.dstTexture) return;
-        this.material.uniforms.dstTexture.value = texture;
-        this.material.uniformsNeedUpdate = true;
+        if (!this.materials[0]?.uniforms?.dstTexture) return;
+        this.materials[0].uniforms.dstTexture.value = texture;
+        this.materials[0].uniformsNeedUpdate = true;
     }
     
     detach() {
@@ -789,9 +863,9 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
 
         this.disposeSvgMeshes();
 
-        if (this.material) {
-            disposeRasterMaterial(this.material);
-            this.material = undefined;
+        if (this.materials.length > 0) {
+            disposeRasterMaterials(this.materials);
+            this.materials = [];
         }
 
         this.disposeSourceTexture();

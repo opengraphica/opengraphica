@@ -121,7 +121,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                         canvasFilters: this.filtersOverride ?? this.filters,
                         opacity: this.opacity,
                         isHalfFloat: this.isHalfFloat,
-                    })
+                    });
                 }
                 this.plane && (this.plane.material = this.materials[this.materials.length - 1]);
                 this.materialUpdates.pop();
@@ -172,9 +172,9 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         backend.renderer.getViewport(originalViewport);
         backend.renderer.setViewport(0, 0, this.sourceTexture.width, this.sourceTexture.height);
         for (let [materialIndex, currentMaterial] of this.materials.entries()) {
-            if (materialIndex > 0 && currentMaterial.uniforms.dstTexture) {
-                currentMaterial.uniforms.dstTexture.value = this.sourceTexture;
-            }
+            // if (materialIndex > 0 && currentMaterial.uniforms.dstTexture) {
+            //     currentMaterial.uniforms.dstTexture.value = this.sourceTexture;
+            // }
             if (materialIndex < this.materials.length - 1) {
                 const nextMaterial = this.materials[materialIndex + 1];
                 backend.renderer.setRenderTarget(nextMaterial.userData.srcRenderTarget);
@@ -431,9 +431,9 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     }
 
     readBufferTextureUpdate(texture?: Texture) {
-        if (!this.material?.uniforms?.dstTexture) return;
-        this.material.uniforms.dstTexture.value = texture;
-        this.material.uniformsNeedUpdate = true;
+        if (!this.materials[this.materials.length - 1]?.uniforms?.dstTexture) return;
+        this.materials[this.materials.length - 1].uniforms.dstTexture.value = texture;
+        this.materials[this.materials.length - 1].uniformsNeedUpdate = true;
     }
     
     detach() {

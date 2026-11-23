@@ -24,7 +24,7 @@ vec4 processHighlightBloom(vec4 color, vec2 uv) {
         weightSum += 2.0 * weight;
     }
 
-    vec4 original = texture2D(dstTexture, uv);
+    vec4 original = texture2D(srcTexture, uv);
     vec3 bloom = sum / weightSum;
 
     return vec4(original.rgb + bloom, original.a);

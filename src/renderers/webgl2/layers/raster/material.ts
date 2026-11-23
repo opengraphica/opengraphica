@@ -33,50 +33,7 @@ export interface RasterMaterialUpdateParams {
  * @deprecated use createRasterMaterials
  */
 export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
-    const shader = (await createLayerShader({
-        vertexShaderSetup: rasterMaterialVertexShaderSetup,
-        vertexShaderMain: rasterMaterialVertexShaderMain,
-        fragmentShaderSetup: rasterMaterialFragmentShaderSetup,
-        fragmentShaderMain: rasterMaterialFragmentShaderMain,
-        canvasFilters: params.canvasFilters ?? [],
-        width: params?.srcTexture?.image.width ?? 1,
-        height: params?.srcTexture?.image.height ?? 1,
-        useAutomaticLayerTextureMipmaps: params?.useAutomaticLayerTextureMipmaps,
-    }))[0];
-
-    const material = new ShaderMaterial({
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-        vertexShader: shader.vertexShader,
-        fragmentShader: shader.fragmentShader,
-        side: FrontSide,
-        defines: {
-            ...shader.defines,
-        },
-        uniforms: {
-            ...shader.uniforms,
-        },
-        userData: {
-            disposableTextures: shader.textures,
-        },
-        premultipliedAlpha: params.premultiplyAlphaFix ?? false,
-    });
-
-    material.defines.cColorSpaceConversion = params.colorSpaceConversion ?? 0;
-    material.defines.cPremultiplyAlphaFix = params.premultiplyAlphaFix ? 1 : 0;
-    material.uniforms.srcTexture = {
-        value: params.srcTexture,
-    };
-    material.uniforms.dstTexture = {
-        value: undefined,
-    };
-    material.uniforms.opacity = {
-        value: params.opacity ?? 1,
-    };
-    material.needsUpdate = true;
-
-    return material;
+    return (await createRasterMaterials(params))[0];
 }
 
 export async function createRasterMaterials(params: RasterMaterialUpdateParams): Promise<ShaderMaterial[]> {
@@ -119,11 +76,10 @@ export async function createRasterMaterials(params: RasterMaterialUpdateParams):
 
         material.defines.cColorSpaceConversion = params.colorSpaceConversion ?? 0;
         material.defines.cPremultiplyAlphaFix = params.premultiplyAlphaFix ? 1 : 0;
-        if (shaderIndex === 0) {
-            material.uniforms.srcTexture = {
-                value: params.srcTexture,
-            };
-        } else {
+        material.uniforms.srcTexture = {
+            value: params.srcTexture,
+        };
+        if (shaderIndex > 0) {
             const renderTarget = new WebGLRenderTarget(renderTargetWidth, renderTargetHeight, {
                 format: RGBAFormat,
                 type: params.isHalfFloat ? HalfFloatType : UnsignedByteType,
@@ -132,7 +88,7 @@ export async function createRasterMaterials(params: RasterMaterialUpdateParams):
             });
             material.userData.srcRenderTarget = renderTarget;
             material.userData.disposableTextures.push(renderTarget);
-            material.uniforms.srcTexture = {
+            material.uniforms.passTexture = {
                 value: renderTarget.texture,
             };
         }
@@ -157,28 +113,7 @@ export async function updateRasterMaterial(
     material: ShaderMaterial,
     params: RasterMaterialUpdateParams
 ) {
-    const colorSpaceConversion = params.colorSpaceConversion ?? 0;
-    if (colorSpaceConversion !== material.defines.cColorSpaceConversion) {
-        material.defines.cColorSpaceConversion = colorSpaceConversion;
-    }
-    const premultiplyAlphaFix = params.premultiplyAlphaFix ? 1 : 0;
-    if (premultiplyAlphaFix !== material.defines.cPremultiplyAlphaFix) {
-        material.defines.cPremultiplyAlphaFix = premultiplyAlphaFix;
-    }
-    if (material.uniforms.srcTexture.value !== params.srcTexture) {
-        if (!params.srcTexture?.userData.isDraft) {
-            material.uniforms.srcTexture.value?.dispose(); // Prevent GPU memory leak. If it's still needed, THREE will re-upload.
-        }
-        material.uniforms.srcTexture.value = params.srcTexture;
-        if (params.srcTexture) {
-            material.defines.cLayerWidth = params.srcTexture?.width;
-            material.defines.cLayerHeight = params.srcTexture?.height;
-        }
-    }
-    if (params.opacity != null && material.uniforms.opacity.value !== params.opacity) {
-        material.uniforms.opacity.value = params.opacity;
-    }
-    material.needsUpdate = true;
+    return (await updateRasterMaterials([material], params))[0];
 }
 
 export async function updateRasterMaterials(
@@ -203,6 +138,7 @@ export async function updateRasterMaterials(
         } else {
             createRenderTarget:
             if (isSourceTextureUpdate && params.srcTexture) {
+                material.uniforms.srcTexture.value = params.srcTexture;
                 material.defines.cLayerWidth = params.srcTexture?.width;
                 material.defines.cLayerHeight = params.srcTexture?.height;
                 const { width: renderTargetWidth, height: renderTargetHeight } = limitMaxDimension(
@@ -228,7 +164,7 @@ export async function updateRasterMaterials(
                 });
                 material.userData.srcRenderTarget = renderTarget;
                 material.userData.disposableTextures.push(renderTarget);
-                material.uniforms.srcTexture = {
+                material.uniforms.passTexture = {
                     value: renderTarget.texture,
                 };
             }
@@ -253,11 +189,7 @@ export async function updateRasterMaterials(
  * @deprecated use disposeRasterMaterials
  */
 export async function disposeRasterMaterial(material: ShaderMaterial) {
-    for (const texture of material.userData.disposableTextures ?? []) {
-        texture.dispose();
-    }
-    material.uniforms = {};
-    material.dispose();
+    return (await disposeRasterMaterials([material]))[0];
 }
 
 export async function disposeRasterMaterials(materials: ShaderMaterial[]) {

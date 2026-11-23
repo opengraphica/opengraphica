@@ -1,5 +1,7 @@
+uniform sampler2D passTexture;
+
 vec4 materialMain(vec2 uv) {
-    return sampleLayerTexture(srcTexture, uv);
+    return sampleLayerTexture(passTexture, uv);
 }
 
 void main() {

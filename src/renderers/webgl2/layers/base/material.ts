@@ -425,7 +425,9 @@ export async function createLayerShader(
             }
             fragmentFilterCode += '    vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
         }
-        fragmentFilterCode += '\n' + blendingModesFragmentShaderMain + '\n';
+        if (passIndex === filtersByPass.length - 1) {
+            fragmentFilterCode += '\n' + blendingModesFragmentShaderMain + '\n';
+        }
 
         let sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
             + '    return texture2D(layerTexture, uv);\n'
@@ -448,7 +450,7 @@ export async function createLayerShader(
             + vertexShader
             + '\n' + vertexShaderMain.replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
         fragmentShader = commonUtilityFragmentShader + '\n'
-            + blendingModesFragmentShaderSetup + '\n'
+            + (passIndex === filtersByPass.length - 1 ? blendingModesFragmentShaderSetup + '\n' : '')
             + fragmentShaderSetup + '\n'
             + sampleLayerTextureSetup + '\n'
             + fragmentShader + '\n'
