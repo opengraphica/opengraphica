@@ -36,6 +36,7 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
+    blendingModeOverride: WorkingFileLayerBlendingMode | undefined = undefined;
     opacity: number = 1;
     data: WorkingFileGradientLayer<RGBAColor>['data'] | undefined = undefined;
     filters: Array<Webgl2RendererCanvasFilter | null> = [];
@@ -99,7 +100,7 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
                         transform: this.transform,
                         canvasFilters: this.filtersOverride ?? this.filters,
                     });
-                    assignMaterialBlendingMode(this.material, this.blendingMode);
+                    assignMaterialBlendingMode(this.material, this.blendingModeOverride ?? this.blendingMode);
                     backend.queueCreateLayerPasses();
                 } else if (this.data) {
                     await updateGradientMaterial(this.material, {
@@ -211,6 +212,16 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
         this.scene?.remove(this.plane);
         scene.add(this.plane);
         this.scene = scene;
+    }
+
+    overrideBlendingMode(blendingMode?: WorkingFileLayerBlendingMode) {
+        this.blendingModeOverride = blendingMode;
+        if (!this.material) return;
+        if (blendingMode != null) {
+            assignMaterialBlendingMode(this.material, blendingMode);
+        } else {
+            assignMaterialBlendingMode(this.material, this.blendingMode);
+        }
     }
 
     async overrideFilters(filters?: Array<Webgl2RendererCanvasFilter | null>) {

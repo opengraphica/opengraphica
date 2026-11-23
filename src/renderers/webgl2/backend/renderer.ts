@@ -564,6 +564,12 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             }
 
             if (options?.layerIds) {
+                if (options.layerIds.length === 1) {
+                    // TODO - this logic should be more complex. Basically any layer is on top of
+                    // another layer that isn't in the layerIds list should be 'normal'.
+                    const meshController = this.meshControllersById.get(options.layerIds[0]);
+                    meshController?.overrideBlendingMode('normal');
+                }
                 for (const layerId of options.layerIds) {
                     const meshController = this.meshControllersById.get(layerId);
                     meshController?.overrideVisibility(true);
@@ -605,6 +611,10 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             }
 
             if (options?.layerIds) {
+                if (options.layerIds.length === 1) {
+                    const meshController = this.meshControllersById.get(options.layerIds[0]);
+                    meshController?.overrideBlendingMode(undefined);
+                }
                 for (const layerId of options.layerIds) {
                     const meshController = this.meshControllersById.get(layerId);
                     meshController?.overrideVisibility(undefined);

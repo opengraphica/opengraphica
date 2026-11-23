@@ -45,6 +45,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
+    blendingModeOverride: WorkingFileLayerBlendingMode | undefined = undefined;
     opacity: number = 1;
     data: WorkingFileRasterSequenceLayer['data'] | undefined = undefined;
     filters: Array<Webgl2RendererCanvasFilter | null> = [];
@@ -131,7 +132,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
                     if (this.materials.length > 1) {
                         this.setupPrepass();
                     }
-                    assignMaterialBlendingMode(this.materials[this.materials.length - 1], this.blendingMode);
+                    assignMaterialBlendingMode(this.materials[this.materials.length - 1], this.blendingModeOverride ?? this.blendingMode);
                 } else {
                     await updateRasterMaterials(this.materials, {
                         srcTexture: this.sourceTexture,
@@ -293,9 +294,6 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         backend.renderer.getViewport(originalViewport);
         backend.renderer.setViewport(0, 0, this.sourceTexture.width, this.sourceTexture.height);
         for (let [materialIndex, currentMaterial] of this.materials.entries()) {
-            if (materialIndex > 0 && currentMaterial.uniforms.dstTexture) {
-                currentMaterial.uniforms.dstTexture.value = this.sourceTexture;
-            }
             if (materialIndex < this.materials.length - 1) {
                 const nextMaterial = this.materials[materialIndex + 1];
                 backend.renderer.setRenderTarget(nextMaterial.userData.srcRenderTarget);
@@ -339,6 +337,17 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         this.scene?.remove(this.plane);
         scene.add(this.plane);
         this.scene = scene;
+    }
+
+    overrideBlendingMode(blendingMode?: WorkingFileLayerBlendingMode) {
+        this.blendingModeOverride = blendingMode;
+        const material = this.materials[this.materials.length - 1];
+        if (!material) return;
+        if (blendingMode != null) {
+            assignMaterialBlendingMode(material, blendingMode);
+        } else {
+            assignMaterialBlendingMode(material, this.blendingMode);
+        }
     }
 
     async overrideFilters(filters?: Array<Webgl2RendererCanvasFilter | null>) {
@@ -417,9 +426,9 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
     }
 
     readBufferTextureUpdate(texture?: Texture) {
-        if (!this.materials[0]?.uniforms?.dstTexture) return;
-        this.materials[0].uniforms.dstTexture.value = texture;
-        this.materials[0].uniformsNeedUpdate = true;
+        if (!this.materials[this.materials.length - 1]?.uniforms?.dstTexture) return;
+        this.materials[this.materials.length - 1].uniforms.dstTexture.value = texture;
+        this.materials[this.materials.length - 1].uniformsNeedUpdate = true;
     }
     
     detach() {

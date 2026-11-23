@@ -1,6 +1,7 @@
 
 import { BaseAction } from './base';
 import { DeleteLayersAction } from './delete-layers';
+import { DeleteLayerFilterAction } from './delete-layer-filter';
 import { InsertLayerAction } from './insert-layer';
 import { UpdateLayerAction } from './update-layer';
 
@@ -8,7 +9,6 @@ import { createStoredImage } from '@/store/image';
 import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';
 import workingFileStore, { getLayerById, getParentGroupByLayerId } from '@/store/working-file';
 
-import { createCanvasFromImage } from '@/lib/image';
 import { findRectListBounds } from '@/lib/math';
 import { decomposeMatrix } from '@/lib/dom-matrix';
 import { calculateShapeAabb, generateSvgElementIds, getViewBox, parseCommonNodeAttributes } from '@/lib/svg';
@@ -171,6 +171,11 @@ export class MergeLayerDownAction extends BaseAction {
                         },
                     })
                 );
+                for (let i = destinationLayer.filters.length - 1; i >= 0; i--) {
+                    this.actions.push(
+                        new DeleteLayerFilterAction(destinationLayer.id, i)
+                    );
+                }
                 this.actions.push(
                     new DeleteLayersAction([mergeLayer.id])
                 );

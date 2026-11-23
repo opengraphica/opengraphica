@@ -37,6 +37,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
+    blendingModeOverride: WorkingFileLayerBlendingMode | undefined = undefined;
     opacity: number = 1;
     data: WorkingFileTextLayer['data'] | undefined = undefined;
     filters: Array<Webgl2RendererCanvasFilter | null> = [];
@@ -100,7 +101,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
                         canvasFilters: this.filtersOverride ?? this.filters,
                         opacity: this.opacity,
                     });
-                    assignMaterialBlendingMode(this.material, this.blendingMode);
+                    assignMaterialBlendingMode(this.material, this.blendingModeOverride ?? this.blendingMode);
                     this.letterMeshCache?.setMaterial(this.material);
                 } else {
                     await updateTextMaterial(this.material, {
@@ -284,6 +285,16 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         this.scene?.remove(this.textGroup);
         scene.add(this.textGroup);
         this.scene = scene;
+    }
+
+    overrideBlendingMode(blendingMode?: WorkingFileLayerBlendingMode) {
+        this.blendingModeOverride = blendingMode;
+        if (!this.material) return;
+        if (blendingMode != null) {
+            assignMaterialBlendingMode(this.material, blendingMode);
+        } else {
+            assignMaterialBlendingMode(this.material, this.blendingMode);
+        }
     }
 
     async overrideFilters(filters?: Array<Webgl2RendererCanvasFilter | null>) {

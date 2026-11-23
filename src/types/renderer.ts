@@ -127,6 +127,7 @@ export interface Webgl2RendererMeshController {
     getTransform(): Matrix4;
     setDraftTexture(texture?: Texture<any>);
     swapScene(scene: Scene): void;
+    overrideBlendingMode(blendingMode?: WorkingFileLayerBlendingMode);
     overrideFilters(filters?: Array<Webgl2RendererCanvasFilter | null>): Promise<void>;
     overrideFilterParams(filterIndex: number, params?: Record<string, any> | null);
     overrideVisibility(visible?: boolean): void;
