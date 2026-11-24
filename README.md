@@ -12,44 +12,53 @@ Visit the [Wiki page on github](https://github.com/opengraphica/opengraphica/wik
 
 OpenGraphica may be integrated into existing web applications which require a photo editor.
 
-To build OpenGraphica as a website:
-1. Install [Node.js](https://nodejs.org/en/)
-2. Install [Rust](https://rust-lang.org/)
-3. Clone this repository
+### Single-Page Apps
 
-Then run these Node Package Manager commands in the repository's folder:
-```
-npm install
-npm run build:wasm
-npm run build:website
-```
-Production-ready files will output in the `www` folder. You may view the index.html in this folder as an example of how to instantiate the app if you wish to tweak it.
+If you have an existing app in **Angular, React, Vue, Svelte**, etc. where you want to add OpenGraphica as a photo editor, it is easiest to install OpenGraphica as a NPM package and import it into your application.
 
-```
-<!-- OpenGraphica initialization example -->
-<!DOCTYPE html>
-<html>
-    <head>
-        <script src="js/vendors.js">
-        <script src="js/opengraphica.js">
-    </head>
-    <body class="og-full-page">
-        <div id="opengraphica"></div>
-        <script>
-            OpenGraphica.theme({
-                light: './css/main-light.css',
-                dark: './css/main-dark.css'
-            }).then(() => {
-                OpenGraphica.mount('#opengraphica');
-            });
-        </script>
-    </body>
-</html>
+This build packages OpenGraphica as ECMAScript Modules, so your bundler (Vite, Webpack) must be configured to import ESM modules.
+
+Install OpenGraphica in your project:
+
+```sh
+npm install opengraphica
 ```
 
-As shown in the example above, you must first configure OpenGraphica with the the list of themes that the user will be able to pick from. The theme URLs are relative to the index.html page.
+Import the app and mount it on your page:
 
-Afterwards, the "mount" method tells OpenGraphica where it should be placed in the DOM. OpenGraphica is a Vue 3 application, and you can [view the Vue 3 documentation](https://v3.vuejs.org/guide/migration/global-api.html#mounting-app-instance) for complete details on working with a Vue 3 app.
+```js
+import OpenGraphica from 'opengraphica';
+
+// Tell OpenGraphica where to load is assets from (editor images and other things).
+// This path depends on how your bundler is configured.
+OpenGraphica.emit('store.setPreference', { key: 'assetsBasePath', value: '/' });
+
+// Replace this with your logic. OpenGraphica will fill the width/height of whatever element you place it inside of.
+const container = document.createElement('div');
+container.style.display = 'flex';
+container.style.position = 'relative';
+container.style.width = '500px';
+container.style.height = '500px';
+document.body.append(container);
+OpenGraphica.mount(container);
+
+// Configure which CSS themes to use.
+OpenGraphica.theme({
+    light: '/css/main-light.css',
+    dark: '/css/main-dark.css',
+});
+```
+
+OpenGraphica is a Vue 3 application, and you can [see the Vue 3 documentation](https://v3.vuejs.org/guide/migration/global-api.html#mounting-app-instance) for complete details on working with a Vue 3 app.
+
+Note that OpenGraphica is only designed to have a  **single instance running** on a page.
+
+
+### Static Content Site
+
+Website builds are distributed on the [releases page on GitHub](https://github.com/opengraphica/opengraphica/releases).
+
+For simple deployment on a static web server like **Apache or Nginx**, you can extract the contents of the web build to any folder inside of your website's filesystem. It has a `index.html` file which will load the OpenGraphica image editor.
 
 ## Contributing
 
@@ -61,10 +70,18 @@ All commands assume you are operating in a Linux-like environment. If you're on 
 
 1. Install [Node.js](https://nodejs.org/en/)
 2. Install [Rust](https://rust-lang.org/)
-3. Clone this repository
-4. Open a terminal in the repository directory, and run:
+3. Clone this repository:
+
+```sh
+git clone https://github.com/opengraphica/opengraphica.git
+```
+
+4. Go into the repository directory, and install Node.js modules:
     
-    `npm install`
+```sh
+cd opengraphica
+npm install
+```
 
 ### Web Assembly Builds
 
@@ -74,7 +91,7 @@ Web assembly builds are not committed to the source repository, so before you do
 
 In the root folder of the project, run:
 
-```
+```sh
 npm run build:wasm
 ```
 
@@ -84,7 +101,7 @@ This command will build the rust code as web assembly modules, then set up some 
 
 Start the development server with this command:
 
-```
+```sh
 npm run dev
 ```
 

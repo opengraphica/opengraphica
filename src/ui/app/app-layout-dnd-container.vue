@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, toRefs, computed, inject, watch, onMounted, onUnmounted, nextTick, type Ref } from 'vue';
 import AppLayoutDock from '@/ui/app/app-layout-dock.vue';
 import AppLayoutMenuBar from '@/ui/app/app-layout-menu-bar.vue';
 import Toolbar from '@/ui/toolbar/toolbar.vue';
@@ -119,6 +119,7 @@ defineOptions({
 
 const emit = defineEmits(['dnd-ready', 'resize']);
 
+const rootElement = inject<Ref<HTMLDivElement>>('rootElement');
 const dndContainerElement = ref<Element>();
 const mainElement = ref<Element>();
 const floatingDocksContainer = editorStore.getWritableRef('floatingDocksContainer');
@@ -229,13 +230,16 @@ onUnmounted(() => {
 });
 
 function calculateDndArea() {
-    if (dndContainerElement.value && mainElement.value) {
+    if (rootElement?.value && dndContainerElement.value && mainElement.value) {
+        const rootElementRect = rootElement.value.getBoundingClientRect();
         const dndContainerRect = dndContainerElement.value.getBoundingClientRect();
         const mainRect = mainElement.value.getBoundingClientRect();
         const devicePixelRatio = window.devicePixelRatio || 1;
-        const top = mainRect.top - dndContainerRect.top;
+        const dndTop = mainRect.top - dndContainerRect.top;
+        canvasStore.set('dndAreaOffsetLeft', (dndContainerRect.left - rootElementRect.left) * devicePixelRatio);
+        canvasStore.set('dndAreaOffsetTop', (dndContainerRect.top - rootElementRect.top) * devicePixelRatio);
         canvasStore.set('dndAreaLeft', (mainRect.left - dndContainerRect.left) * devicePixelRatio);
-        canvasStore.set('dndAreaTop', top * devicePixelRatio);
+        canvasStore.set('dndAreaTop', dndTop * devicePixelRatio);
         canvasStore.set('dndAreaWidth', mainRect.width * devicePixelRatio);
         if (footerToolbarComponent.value?.$el) {
             const toolbarRect = footerToolbarComponent.value.$el.getBoundingClientRect();

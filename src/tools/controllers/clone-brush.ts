@@ -18,7 +18,7 @@ import workingFileStore, { getSelectedLayers, getLayerById } from '@/store/worki
 import {
     cursorHoverPosition, cursorHoverAngle,
     sourceX, sourceY, sourceDrawingOffsetX, sourceDrawingOffsetY, cursorIsHoveringSource,
-    brushDensity, brushPressureMinDensity, brushHardness, brushSize, isPreviewingSize,
+    brushHardness, brushSize, isPreviewingSize,
     brushPressureMinSize, brushPressureTaper, brushSmoothing, brushOpacity,
 } from '../store/clone-brush-state';
 import {  activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
@@ -389,8 +389,10 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
 
-            sourceDrawingOffsetX.value = transformedPoint.x - this.cloneStartX;
-            sourceDrawingOffsetY.value = transformedPoint.y - this.cloneStartY;
+            if (!this.isQueueingInput) {
+                sourceDrawingOffsetX.value = transformedPoint.x - this.cloneStartX;
+                sourceDrawingOffsetY.value = transformedPoint.y - this.cloneStartY;
+            }
             
             const pressure = this.cloneUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
             const size = brushSize.value * (

@@ -429,6 +429,7 @@ const store = new PerformantStore<EditorStore>({
                         store.get('toolCanvasController').onEnter();
                     } catch (error: unknown) {}
                 }
+                updateSystemBars();
                 break;
 
             case 'setThemes':
@@ -498,6 +499,21 @@ function updateRasterSequenceLayerWithTimeline(layer: WorkingFileRasterSequenceL
         if (frame.start <= timelineCursor && frame.end > timelineCursor) {
             layer.data.currentFrame = frame.image;
             break;
+        }
+    }
+}
+
+async function updateSystemBars() {
+    if (window.Capacitor?.isNativePlatform()) {
+        const { SystemBars, SystemBarsStyle } = await import('@capacitor/core');
+        if (store.get('isActiveToolbarExclusive')) {
+            if (store.get('activeTheme')?.name === 'dark') {
+                SystemBars.setStyle({ style: SystemBarsStyle.Dark });
+            } else {
+                SystemBars.setStyle({ style: SystemBarsStyle.Light });
+            }
+        } else {
+            SystemBars.setStyle({ style: SystemBarsStyle.Light });
         }
     }
 }

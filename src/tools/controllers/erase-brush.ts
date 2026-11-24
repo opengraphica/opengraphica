@@ -118,8 +118,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         this.isPreviewingSizeUnwatch = watch(() => isPreviewingSize.value, () => {
             if (isPreviewingSize.value) {
                 cursorHoverPosition.value = new DOMPoint(
-                    canvasStore.get('dndAreaLeft') + canvasStore.get('dndAreaWidth') / 2,
-                    canvasStore.get('dndAreaTop') + canvasStore.get('dndAreaHeight') / 2,
+                    canvasStore.get('dndAreaOffsetLeft') + canvasStore.get('dndAreaLeft') + canvasStore.get('dndAreaWidth') / 2,
+                    canvasStore.get('dndAreaOffsetTop') + canvasStore.get('dndAreaTop') + canvasStore.get('dndAreaHeight') / 2,
                 ).matrixTransform(canvasStore.state.transform.inverse());
                 applyPixelSnapping(cursorHoverPosition.value);
             } else {

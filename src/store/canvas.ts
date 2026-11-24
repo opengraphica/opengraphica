@@ -19,6 +19,8 @@ interface CanvasState {
     dndAreaTop: number; // devicePixelRatio IS applied.
     dndAreaWidth: number; // devicePixelRatio IS applied.
     dndAreaHeight: number; // devicePixelRatio IS applied.
+    dndAreaOffsetLeft: number; // devicePixelRatio IS applied.
+    dndAreaOffsetTop: number; // devicePixelRatio IS applied.
     drawing: boolean;
     isBufferInUse: boolean;
     isDisplayingNonRasterLayer: boolean;
@@ -70,6 +72,8 @@ const store = new PerformantStore<CanvasStore>({
         dndAreaTop: 0,  // devicePixelRatio IS applied.
         dndAreaWidth: 1,  // devicePixelRatio IS applied.
         dndAreaHeight: 1,  // devicePixelRatio IS applied.
+        dndAreaOffsetLeft: 0, // devicePixelRatio IS applied.
+        dndAreaOffsetTop: 0, // devicePixelRatio IS applied.
         drawing: false,
         isBufferInUse: false,
         isDisplayingNonRasterLayer: false,

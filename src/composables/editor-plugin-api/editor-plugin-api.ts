@@ -171,20 +171,18 @@ export function createEditorPluginApi(pluginId: string) {
 
     const pluginScopedImport = async (path: string) => {
         if (path.startsWith('#/')) {
+            const importUrl = path.replace(/^#\//g, 'plugins/' + pluginId + '/');
             if (/\.(?:json)$/.test(path)) {
-                return import(/*webpackIgnore: true*/ path.replace(/^#\//g, 'plugins/' + pluginId + '/'), {
-                    with: {
-                        type: 'json',
-                    },
-                });
+                const url = editorStore.state.pluginImportMap[importUrl];
+                return await (await fetch(url)).json();
             } else if (/\.(?:frag|vert)$/.test(path)) {
-                const url = editorStore.state.pluginImportMap[path.replace(/^#\//g, 'plugins/' + pluginId + '/')];
+                const url = editorStore.state.pluginImportMap[importUrl];
                 return await (await fetch(url)).text();
             } else if (/\.(?:bmp|gif|jpg|jpx|jpeg|png|tiff|webp)$/.test(path)) {
-                const url = editorStore.state.pluginImportMap[path.replace(/^#\//g, 'plugins/' + pluginId + '/')];
+                const url = editorStore.state.pluginImportMap[importUrl];
                 return await (await fetch(url)).blob();
             }
-            return import(/*webpackIgnore: true*/ path.replace(/^#\//g, 'plugins/' + pluginId + '/'));
+            return import(/*webpackIgnore: true*/ importUrl);
         } else if (path.startsWith('@/')) {
             if (moduleChunkMap == null) {
                 moduleChunkMap = await (await fetch(

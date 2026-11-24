@@ -89,8 +89,8 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
         this.isPreviewingSizeUnwatch = watch(() => isPreviewingSize.value, () => {
             if (isPreviewingSize.value) {
                 cursorHoverPosition.value = new DOMPoint(
-                    canvasStore.get('dndAreaLeft') + canvasStore.get('dndAreaWidth') / 2,
-                    canvasStore.get('dndAreaTop') + canvasStore.get('dndAreaHeight') / 2,
+                    canvasStore.get('dndAreaOffsetLeft') + canvasStore.get('dndAreaLeft') + canvasStore.get('dndAreaWidth') / 2,
+                    canvasStore.get('dndAreaOffsetTop') + canvasStore.get('dndAreaTop') + canvasStore.get('dndAreaHeight') / 2,
                 ).matrixTransform(canvasStore.state.transform.inverse());
             } else {
                 cursorHoverPosition.value = new DOMPoint(
