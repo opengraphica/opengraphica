@@ -179,162 +179,164 @@
                     </el-button>
                 </div>
             </div>
-            <el-form
-                v-if="editingFilter"
-                ref="form"
-                action="javascript:void(0)"
-                label-position="left"
-                :model="editingFilterParams"
-                :rules="editingFormValidationRules"
-                novalidate="novalidate"
-                hide-required-asterisk
-                class="mt-2 w-full max-w-128"
-                @submit="onConfirm"
-            >
-                <el-form-item-group class="el-form-item-group--resetable mb-0!">
-                    <template v-for="(editConfigField, paramName) in editingFilterConfig" :key="paramName">
-                        <el-form-item v-if="!editConfigField.hidden" :label="t(`layerFilter.${editingFilter.name}.param.${paramName}`)">
-                            <template v-if="editConfigField.type === 'percentage'">
-                                <el-row>
-                                    <el-col :span="19" :xs="18">
-                                        <el-slider
-                                            v-model="editingFilterParams[paramName] as number"
-                                            :min="getEditConfigMin(editConfigField)"
-                                            :max="getEditConfigMax(editConfigField)"
-                                            :step="0.01"
-                                            :show-tooltip="false"
-                                        />
-                                    </el-col>
-                                    <el-col :span="5" :xs="6">
-                                        <el-input-number
-                                            :modelValue="Math.floor((editingFilterParams[paramName] as number) * 100)"
-                                            :min="getEditConfigMin(editConfigField) * 100"
-                                            :max="getEditConfigMax(editConfigField) * 100"
-                                            :precision="0"
-                                            suffixText="%"
-                                            class="el-input--text-right"
-                                            @update:modelValue="editingFilterParams[paramName] = $event / 100"
-                                        >
-                                        </el-input-number>
-                                    </el-col>
-                                </el-row>
-                            </template>
-                            <template v-if="editConfigField.type === 'percentageRange'">
-                                <el-row>
-                                    <el-col :span="4" :xs="6">
-                                        <el-input-number
-                                            :modelValue="Math.floor((editingFilterParams[paramName] as number[])[0] * 100)"
-                                            :min="getEditConfigMin(editConfigField) * 100"
-                                            :max="getEditConfigMax(editConfigField) * 100"
-                                            :precision="0"
-                                            suffixText="%"
-                                            class="el-input--text-right"
-                                            @update:modelValue="(editingFilterParams[paramName] as number[])[0] = $event / 100"
-                                        >
-                                        </el-input-number>
-                                    </el-col>
-                                    <el-col :span="16" :xs="12">
-                                        <el-slider
-                                            v-model="editingFilterParams[paramName] as number"
-                                            range
-                                            :min="getEditConfigMin(editConfigField)"
-                                            :max="getEditConfigMax(editConfigField)"
-                                            :step="0.01"
-                                            :show-tooltip="false"
-                                        />
-                                    </el-col>
-                                    <el-col :span="4" :xs="6">
-                                        <el-input-number
-                                            :modelValue="Math.floor((editingFilterParams[paramName] as number[])[1] * 100)"
-                                            :min="getEditConfigMin(editConfigField) * 100"
-                                            :max="getEditConfigMax(editConfigField) * 100"
-                                            :precision="0"
-                                            suffixText="%"
-                                            class="el-input--text-right"
-                                            @update:modelValue="(editingFilterParams[paramName] as number[])[1] = $event / 100"
-                                        >
-                                        </el-input-number>
-                                    </el-col>
-                                </el-row>
-                            </template>
-                            <template v-else-if="editConfigField.type === 'float'">
-                                <el-row>
-                                    <el-col :span="4" :xs="6">
-                                        <og-button
-                                            type="button"
-                                            class="w-full"
-                                            @click="editingFilterParams[paramName] = Math.max(getEditConfigMin(editConfigField), editingFilterParams[paramName] - editConfigField.step)"
-                                        >-</og-button>
-                                    </el-col>
-                                    <el-col :span="16" :xs="12">
-                                        <el-input-number
-                                            :modelValue="editingFilterParams[paramName] as number"
-                                            :min="getEditConfigMin(editConfigField)"
-                                            :max="getEditConfigMax(editConfigField)"
-                                            :precision="0"
-                                            :suffixText="editConfigField.units"
-                                            class="el-input--text-right"
-                                            @update:modelValue="editingFilterParams[paramName] = $event"
-                                        />
-                                    </el-col>
-                                    <el-col :span="4" :xs="6">
-                                        <og-button
-                                            type="button"
-                                            class="w-full"
-                                            @click="editingFilterParams[paramName] = Math.min(getEditConfigMax(editConfigField), editingFilterParams[paramName] + editConfigField.step)"
-                                        >+</og-button>
-                                    </el-col>
-                                </el-row>
-                            </template>
-                            <template v-else-if="editConfigField.type === 'integer' && editConfigField.options">
-                                <el-select
-                                    v-model="editingFilterParams[paramName] as number"
-                                    popper-class="el-select-dropdown--unlocked-option-height"
-                                >
-                                    <el-option
-                                        v-for="option of editConfigField.options"
-                                        :key="option.key"
-                                        :label="t(`layerFilter.${editingFilter.name}.param.${paramName}Option.${option.key}`)"
-                                        :value="option.value"
+            <el-scrollbar class="og-toolbar--effect__param-scrollbar">
+                <el-form
+                    v-if="editingFilter"
+                    ref="form"
+                    action="javascript:void(0)"
+                    label-position="left"
+                    :model="editingFilterParams"
+                    :rules="editingFormValidationRules"
+                    novalidate="novalidate"
+                    hide-required-asterisk
+                    class="mt-2 w-full max-w-128"
+                    @submit="onConfirm"
+                >
+                    <el-form-item-group class="el-form-item-group--resetable mb-0!">
+                        <template v-for="(editConfigField, paramName) in editingFilterConfig" :key="paramName">
+                            <el-form-item v-if="!editConfigField.hidden" :label="t(`layerFilter.${editingFilter.name}.param.${paramName}`)">
+                                <template v-if="editConfigField.type === 'percentage'">
+                                    <el-row>
+                                        <el-col :span="19" :xs="18">
+                                            <el-slider
+                                                v-model="editingFilterParams[paramName] as number"
+                                                :min="getEditConfigMin(editConfigField)"
+                                                :max="getEditConfigMax(editConfigField)"
+                                                :step="0.01"
+                                                :show-tooltip="false"
+                                            />
+                                        </el-col>
+                                        <el-col :span="5" :xs="6">
+                                            <el-input-number
+                                                :modelValue="Math.floor((editingFilterParams[paramName] as number) * 100)"
+                                                :min="getEditConfigMin(editConfigField) * 100"
+                                                :max="getEditConfigMax(editConfigField) * 100"
+                                                :precision="0"
+                                                suffixText="%"
+                                                class="el-input--text-right"
+                                                @update:modelValue="editingFilterParams[paramName] = $event / 100"
+                                            >
+                                            </el-input-number>
+                                        </el-col>
+                                    </el-row>
+                                </template>
+                                <template v-if="editConfigField.type === 'percentageRange'">
+                                    <el-row>
+                                        <el-col :span="4" :xs="6">
+                                            <el-input-number
+                                                :modelValue="Math.floor((editingFilterParams[paramName] as number[])[0] * 100)"
+                                                :min="getEditConfigMin(editConfigField) * 100"
+                                                :max="getEditConfigMax(editConfigField) * 100"
+                                                :precision="0"
+                                                suffixText="%"
+                                                class="el-input--text-right"
+                                                @update:modelValue="(editingFilterParams[paramName] as number[])[0] = $event / 100"
+                                            >
+                                            </el-input-number>
+                                        </el-col>
+                                        <el-col :span="16" :xs="12">
+                                            <el-slider
+                                                v-model="editingFilterParams[paramName] as number"
+                                                range
+                                                :min="getEditConfigMin(editConfigField)"
+                                                :max="getEditConfigMax(editConfigField)"
+                                                :step="0.01"
+                                                :show-tooltip="false"
+                                            />
+                                        </el-col>
+                                        <el-col :span="4" :xs="6">
+                                            <el-input-number
+                                                :modelValue="Math.floor((editingFilterParams[paramName] as number[])[1] * 100)"
+                                                :min="getEditConfigMin(editConfigField) * 100"
+                                                :max="getEditConfigMax(editConfigField) * 100"
+                                                :precision="0"
+                                                suffixText="%"
+                                                class="el-input--text-right"
+                                                @update:modelValue="(editingFilterParams[paramName] as number[])[1] = $event / 100"
+                                            >
+                                            </el-input-number>
+                                        </el-col>
+                                    </el-row>
+                                </template>
+                                <template v-else-if="editConfigField.type === 'float'">
+                                    <el-row>
+                                        <el-col :span="4" :xs="6">
+                                            <og-button
+                                                type="button"
+                                                class="w-full"
+                                                @click="editingFilterParams[paramName] = Math.max(getEditConfigMin(editConfigField), editingFilterParams[paramName] - editConfigField.step)"
+                                            >-</og-button>
+                                        </el-col>
+                                        <el-col :span="16" :xs="12">
+                                            <el-input-number
+                                                :modelValue="editingFilterParams[paramName] as number"
+                                                :min="getEditConfigMin(editConfigField)"
+                                                :max="getEditConfigMax(editConfigField)"
+                                                :precision="0"
+                                                :suffixText="editConfigField.units"
+                                                class="el-input--text-right"
+                                                @update:modelValue="editingFilterParams[paramName] = $event"
+                                            />
+                                        </el-col>
+                                        <el-col :span="4" :xs="6">
+                                            <og-button
+                                                type="button"
+                                                class="w-full"
+                                                @click="editingFilterParams[paramName] = Math.min(getEditConfigMax(editConfigField), editingFilterParams[paramName] + editConfigField.step)"
+                                            >+</og-button>
+                                        </el-col>
+                                    </el-row>
+                                </template>
+                                <template v-else-if="editConfigField.type === 'integer' && editConfigField.options">
+                                    <el-select
+                                        v-model="editingFilterParams[paramName] as number"
+                                        popper-class="el-select-dropdown--unlocked-option-height"
                                     >
-                                        <div style="line-height: 1.4em" class="py-2">
-                                            <div>{{ t(`layerFilter.${editingFilter.name}.param.${paramName}Option.${option.key}`) }}</div>
-                                            <div v-if="editConfigField.optionsHaveDescriptions" class="has-text-color-placeholder">
-                                                {{ t(`layerFilter.${editingFilter.name}.param.${paramName}OptionDescription.${option.key}`) }}
+                                        <el-option
+                                            v-for="option of editConfigField.options"
+                                            :key="option.key"
+                                            :label="t(`layerFilter.${editingFilter.name}.param.${paramName}Option.${option.key}`)"
+                                            :value="option.value"
+                                        >
+                                            <div style="line-height: 1.4em" class="py-2">
+                                                <div>{{ t(`layerFilter.${editingFilter.name}.param.${paramName}Option.${option.key}`) }}</div>
+                                                <div v-if="editConfigField.optionsHaveDescriptions" class="has-text-color-placeholder">
+                                                    {{ t(`layerFilter.${editingFilter.name}.param.${paramName}OptionDescription.${option.key}`) }}
+                                                </div>
                                             </div>
-                                        </div>
-                                    </el-option>
-                                </el-select>
-                            </template>
-                            <template v-else-if="editConfigField.type === 'boolean'">
-                                <el-switch v-model="editingFilterParams[paramName]" />
-                            </template>
-                            <template v-else-if="editConfigField.type === 'color'">
-                                <el-input-color v-model="editingFilterParams[paramName]" />
-                            </template>
-                            <template v-else-if="editConfigField.type === 'gradient'">
-                                <div
-                                    role="button"
-                                    tabindex="0"
-                                    class="og-gradient-input"
-                                    :style="{ '--gradient': gradientBackgrounds[paramName] }"
-                                    aria-haspopup="dialog"
-                                    @click="onClickStopGradientSelect(paramName as string)"
-                                    @keydown="onKeydownStopGradientSelect($event, paramName as string)"
-                                >
-                                </div>
-                            </template>
-                            <el-button
-                                link type="primary" class="el-button--form-item-reset"
-                                :disabled="isFilterParamDefault(paramName as string, editConfigField)"
-                                :aria-label="t('module.layerEffectEdit.resetField')"
-                                @click="resetFilterParam(paramName as string, editConfigField)">
-                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
-                            </el-button>
-                        </el-form-item>
-                    </template>
-                </el-form-item-group>
-            </el-form>
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                                <template v-else-if="editConfigField.type === 'boolean'">
+                                    <el-switch v-model="editingFilterParams[paramName]" />
+                                </template>
+                                <template v-else-if="editConfigField.type === 'color'">
+                                    <el-input-color v-model="editingFilterParams[paramName]" />
+                                </template>
+                                <template v-else-if="editConfigField.type === 'gradient'">
+                                    <div
+                                        role="button"
+                                        tabindex="0"
+                                        class="og-gradient-input"
+                                        :style="{ '--gradient': gradientBackgrounds[paramName] }"
+                                        aria-haspopup="dialog"
+                                        @click="onClickStopGradientSelect(paramName as string)"
+                                        @keydown="onKeydownStopGradientSelect($event, paramName as string)"
+                                    >
+                                    </div>
+                                </template>
+                                <el-button
+                                    link type="primary" class="el-button--form-item-reset"
+                                    :disabled="isFilterParamDefault(paramName as string, editConfigField)"
+                                    :aria-label="t('module.layerEffectEdit.resetField')"
+                                    @click="resetFilterParam(paramName as string, editConfigField)">
+                                    <span class="bi bi-arrow-repeat" aria-hidden="true" />
+                                </el-button>
+                            </el-form-item>
+                        </template>
+                    </el-form-item-group>
+                </el-form>
+            </el-scrollbar>
         </floating-dock>
     </div>
 </template>
@@ -356,6 +358,7 @@ import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.
 import ElInputColor from '@/ui/el/el-input-color.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElPopover from '@/ui/el/el-popover.vue';
+import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
