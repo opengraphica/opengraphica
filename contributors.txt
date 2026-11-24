@@ -1,2 +1,3 @@
 Copyright (c) 2020-2021 Giwayume https://github.com/Giwayume/
 Copyright (c) 2026 hunchul choi https://github.com/hunchulchoi/
+Copyright (c) 2026 Viktor Dahl https://github.com/Viktor-Dahl
