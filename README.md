@@ -144,7 +144,7 @@ The resulting `.click` is stored in the `build/all/app` folder.
 
 ## AI Policy
 
-**AI is not used by the core OpenGraphica maintainers to generate code.**
+**AI is <u>not</u> used by the core OpenGraphica maintainers to generate code.**
 
 This project relies on [LibreTranslate](https://libretranslate.com/) to provide machine translation placeholders for languages other than English. If you have better translations, please contribute!
 
