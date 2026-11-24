@@ -78,7 +78,9 @@
         "updateSharpenLayer": "레이어 선명하게",
         "updateTextLayerProperties": "텍스트 레이어 속성 업데이트",
         "updateVectorLayerAttributes": "벡터 레이어 업데이트",
-        "waitingOnQueueFree": "작업 완료 대기 중"
+        "waitingOnQueueFree": "작업 완료 대기 중",
+        "freeTransform": "무료 Transform",
+        "mergeLayerDown": "Merge 층 아래로"
     },
     "app": {
         "colorPickerGradient": {
@@ -135,7 +137,8 @@
                 "text": "텍스트 레이어",
                 "vector": "벡터 레이어",
                 "video": "비디오 레이어"
-            }
+            },
+            "mergeDown": "맨 위로"
         },
         "renderer": {
             "initializeFailed": {
@@ -187,7 +190,9 @@
         "take": "촬영",
         "takePhoto": "사진 촬영",
         "updateApp": "앱 업데이트",
-        "yes": "예"
+        "yes": "예",
+        "deletePlugin": "플러그인",
+        "reload": "관련 상품"
     },
     "canvas": {
         "toolbar": {
@@ -337,6 +342,11 @@
                     "checkForUpdates": "업데이트 확인",
                     "updateAvailableTitle": "업데이트 있음",
                     "updateAvailableMessage": "OpenGraphica 업데이트가 있습니다. 설치할까요?"
+                },
+                "plugins": {
+                    "groupTitle": "플러그인",
+                    "selectFile": "플러그인 파일 추가 ...",
+                    "uninstall": "다운로드"
                 }
             }
         }
@@ -538,8 +548,11 @@
             "param": {
                 "size": "크기",
                 "xIntensity": "X 강도",
-                "yIntensity": "Y 강도"
-            }
+                "yIntensity": "Y 강도",
+                "xRadius": "X 반경",
+                "yRadius": "Y 반경"
+            },
+            "help": "Carl Friedrich Gauss가 발명 한 Gaussian 기능을 사용하여 이미지를 Blurs. 이 흐릿함은 심플한 화면을 통해 이미지를 볼 수 있으며, 이는 bokeh 효과와 차별화된 아웃 포인트 카메라 렌즈에 의해 만들어졌습니다."
         },
         "gradientMap": {
             "name": "그라데이션 맵",
@@ -741,6 +754,59 @@
                 "centerX": "가운데 X",
                 "centerY": "가운데 Y"
             }
+        },
+        "highlightBloom": {
+            "name": "높은 빛 블룸",
+            "help": "또한 halation로 알려져; 이것은 이미지의 어두운 지역에 밝은에서 빛이 표백하는 연약한 놀입니다. 카메라에서 렌즈, 확산 필터, 또는 필름의 유화에 빛의 흩어지기에 의해 발생할 수 있습니다.\n* **Threshold** - 밝은 색상의 범위는 빛을 표백하기 위해해야 합니다.\n* ** 레이디우스 ** - 얼마나 멀리 빛이 표백됩니다.\n* **Strength** - 빛이 얼마나 밝습니다.",
+            "param": {
+                "threshold": "뚱 베어",
+                "radius": "채용정보",
+                "strength": "제품정보"
+            }
+        },
+        "mechanicalVignette": {
+            "name": "기계 Vignette",
+            "help": "카메라 센서를 입력하여 빛을 차단하는 중앙 원형 배럴에 의한 이미지의 가장자리에 그림자를 시뮬레이션합니다.\n\n* **Pupil 거리 ** - 센서에서 렌즈의 외부 원형 오프닝의 거리.\n* **Pupil Radius** - 복부의 원형 오프닝의 반경.\n* **Barrel 거리 ** - 센서 옆에 렌즈 내부 원형 오프닝의 거리.\n* ** 배럴 반경 ** - 배럴의 원형 오프닝의 반경.",
+            "param": {
+                "mode": "주요 특징",
+                "modeOption": {
+                    "simulate": "관련 기사",
+                    "remove": "기타 제품"
+                },
+                "sensorWidth": "감지기 폭",
+                "sensorHeight": "감지기 고도",
+                "exitPupilDistance": "Pupil 거리",
+                "exitPupilRadius": "Pupil 반경",
+                "barrelOpeningDistance": "배럴 거리",
+                "barrelOpeningRadius": "배럴 반경"
+            }
+        },
+        "naturalVignette": {
+            "name": "자연 Vignette",
+            "help": "또한 자연 조명 낙하로 알려진이 카메라 센서의 가장자리에 그림자를 시뮬레이션은 오프 축 부분의 빛 광선으로 인해 각도의 센서에 도달 장면입니다.\n\n이 효과는 넓각 카메라 렌즈에 대한 더 많은 발음 그래서 빛은 센서를 수직으로 보였다.",
+            "param": {
+                "mode": "주요 특징",
+                "modeOption": {
+                    "simulate": "관련 기사",
+                    "remove": "기타 제품"
+                },
+                "sensorWidth": "감지기 폭",
+                "sensorHeight": "감지기 고도",
+                "focalLength": "초점 거리"
+            }
+        },
+        "radialSpeedLines": {
+            "name": "광선 속도 선",
+            "help": "광선 패턴의 모션 라인; 일반적으로 manga에서 사용. 대부분의 값은 무작위 범위입니다.\n* **Radius** - 멀리 선은 센터로 그려집니다.\n* **Spacing** - 라인의 걸림새 사이 공간.\n***Clumping** - 각 클램프에서 서로 다른 라인이 그려집니다.\n* ** 두께 ** - 최대 라인 두께.\n* **Seed** - 선을 무작위화합니다.",
+            "param": {
+                "centerRadius": "채용정보",
+                "lineSpacing": "관련 상품",
+                "lineClumping": "회사 소개",
+                "lineThickness": "제품 정보",
+                "horizontalOffset": "제품정보",
+                "verticalOffset": "수직",
+                "seed": "제품정보"
+            }
         }
     },
     "layerFilterGroup": {
@@ -764,6 +830,12 @@
         },
         "sharpen": {
             "name": "선명하게"
+        },
+        "artistic": {
+            "name": "예술적"
+        },
+        "lightShadow": {
+            "name": "빛 & 그림자"
         }
     },
     "lib": {
@@ -785,11 +857,26 @@
                 "notNumber": "{propertyName} 속성은 숫자여야 합니다.",
                 "notString": "{propertyName} 속성은 문자열이어야 합니다.",
                 "notInEnumList": "{propertyName} 속성은 허용된 값 중 하나가 아닙니다."
+            },
+            "response": {
+                "deleteSuccess": "성공 삭제.",
+                "updateSuccess": "업데이트 성공."
+            },
+            "error": {
+                "required": "{propertyName} 가 필요합니다.",
+                "notArray": "{propertyName}의 속성은 배열해야합니다.",
+                "notArrayNumber": "재산 {propertyName}는 수의 값이 있어야 합니다.",
+                "notArrayString": "{propertyName} 속성은 문자열입니다.",
+                "notNumber": "{propertyName} 의 속성은 숫자입니다.",
+                "notString": "{propertyName}은 문자열이어야합니다.",
+                "notInEnumList": "재산 {propertyName}는 받아들여진 enum 가치의 한개 아닙니다.",
+                "layerNotFound": "지정된 층은 발견되지 않았습니다.",
+                "2dTransformLength": "변환 배열은 정확히 6 숫자를해야합니다."
             }
         },
         "createCircleShape": {
             "description": "현재 선택된 레이어에 SVG <circle> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
-            "properties": {
+            "property": {
                 "cx": "원 중심의 x 위치(픽셀)입니다.",
                 "cy": "원 중심의 y 위치(픽셀)입니다.",
                 "r": "원의 반지름(픽셀)입니다."
@@ -797,7 +884,7 @@
         },
         "createEllipseShape": {
             "description": "현재 선택된 레이어에 SVG <ellipse> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
-            "properties": {
+            "property": {
                 "cx": "타원 중심의 x 위치(픽셀)입니다.",
                 "cy": "타원 중심의 y 위치(픽셀)입니다.",
                 "rx": "타원의 x축 반지름(픽셀)입니다.",
@@ -806,7 +893,7 @@
         },
         "createLineShape": {
             "description": "현재 선택된 레이어에 SVG <line> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
-            "properties": {
+            "property": {
                 "x1": "선 시작의 x 위치(픽셀)입니다.",
                 "y1": "선 시작의 y 위치(픽셀)입니다.",
                 "x2": "선 끝의 x 위치(픽셀)입니다.",
@@ -815,25 +902,25 @@
         },
         "createPathShape": {
             "description": "현재 선택된 레이어에 SVG <path> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
-            "properties": {
+            "property": {
                 "d": "SVG 경로 명령 목록입니다. SVG 명세를 따르세요. 예: \"M 10 80 Q 52.5 10, 95 80 T 180 80\""
             }
         },
         "createPolygonShape": {
             "description": "현재 선택된 레이어에 SVG <polygon> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
-            "properties": {
+            "property": {
                 "points": "도형 바깥 가장자리를 정의하는 점입니다. 예: \"0,0 20,0 10,5\""
             }
         },
         "createPolylineShape": {
             "description": "현재 선택된 레이어에 SVG <polyline> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
-            "properties": {
+            "property": {
                 "points": "연결된 선을 정의하는 점입니다. 예: \"0,0 20,0 10,5\""
             }
         },
         "createRectangleShape": {
             "description": "현재 선택된 레이어에 SVG <rect> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
-            "properties": {
+            "property": {
                 "x": "사각형 왼쪽 가장자리의 x 위치(픽셀)입니다.",
                 "y": "사각형 왼쪽 가장자리의 y 위치(픽셀)입니다.",
                 "rx": "사각형 모서리의 x 반지름(픽셀)입니다.",
@@ -843,7 +930,7 @@
             }
         },
         "createShapeCommon": {
-            "properties": {
+            "property": {
                 "fill": "채우기 색입니다. 채널당 8비트 RGB 16진수입니다. 채우기가 없으면 생략하세요. 예: \"#000000\"",
                 "fillOpacity": "채우기 색의 불투명도입니다. 0에서 1 사이의 소수입니다.",
                 "stroke": "획 색입니다. 채널당 8비트 RGB 16진수입니다. 획이 없으면 생략하세요. 예: \"#000000\"",
@@ -853,7 +940,7 @@
                 "strokeWidth": "획의 두께(픽셀)입니다.",
                 "transform": "도형의 transform 속성입니다. SVG 2D matrix 변환 함수여야 합니다. 예: \"matrix(1,0,0,1,0,0)\""
             },
-            "errors": {
+            "error": {
                 "fill": "채우기 구문이 올바르지 않습니다. 채널당 8비트 RGBA 16진수를 입력하세요. 예: \"#000000\"",
                 "stroke": "획 구문이 올바르지 않습니다. 채널당 8비트 RGBA 16진수를 입력하세요. 예: \"#000000\"",
                 "transform": "변환 구문이 올바르지 않습니다. SVG 2D matrix 변환 함수를 입력하세요. 예: \"matrix(1,0,0,1,0,0)\""
@@ -865,6 +952,135 @@
         },
         "getShapeList": {
             "description": "현재 선택된 벡터 레이어의 모든 도형을 아래부터 위 순서로 나열하는 JSON 정의를 반환합니다. 도형을 추가하거나 삭제하거나 순서를 바꾸면 도형 ID가 바뀔 수 있습니다."
+        },
+        "cropWorkingFile": {
+            "description": "작업 파일의 전체 이미지 캔버스를 자르기 (모든 층). 부정적인 작물은 화포 크기를 증가하기 위하여 사용될 수 있습니다.",
+            "property": {
+                "left": "픽셀의 작물 이미지의 왼쪽 경계. 이것은 부정적인 일 수 있습니다.",
+                "top": "픽셀의 작물 이미지의 최고 경계. 이것은 부정적인 일 수 있습니다.",
+                "width": "픽셀의 자르기 된 이미지의 새로운 폭. 이것은 본래 폭 보다는 더 큰 일 수 있습니다.",
+                "height": "픽셀의 새로운 높이. 이것은 본래 고도 보다는 더 큰 일 수 있습니다."
+            },
+            "response": {
+                "success": "Crop 성공."
+            }
+        },
+        "deleteLayers": {
+            "description": "지정된 ID로 레이어를 삭제합니다.",
+            "property": {
+                "layerIds": "층의 ID는 삭제합니다. 레이어 ID는 get-layer-list 도구에서 검색할 수 있습니다."
+            },
+            "error": {
+                "noIds": "최소 1층 ID를 제공합니다."
+            },
+            "response": {
+                "success": "삭제 된 층."
+            }
+        },
+        "deleteShape": {
+            "description": "선택된 벡터 레이어에서 SVG 모양을 삭제합니다.",
+            "property": {
+                "id": "삭제하는 모양의 ID. 이것은 get-shape-list 도구에서 검색 할 수 있습니다."
+            }
+        },
+        "getAvailableFontList": {
+            "description": "텍스트 레이어와 함께 사용할 수있는 모든 글꼴 가족을 나열합니다."
+        },
+        "getLayerList": {
+            "description": "작업 파일에서 모든 레이어의 JSON 요약 정의를 반환합니다. 레이어는 배열 순서 (최고에서 마지막)에 그려집니다."
+        },
+        "getRasterLayerImage": {
+            "description": "지정된 래스터 레이어의 이미지 데이터를 반환합니다.",
+            "property": {
+                "id": "래스터 레이어의 ID. 이것은 get-layer-list 도구에서 검색 할 수 있습니다."
+            }
+        },
+        "getVectorLayerSvg": {
+            "description": "지정된 벡터 레이어와 관련된 직렬 SVG 문서를 반환합니다.",
+            "property": {
+                "id": "벡터 층의 ID. 이것은 get-layer-list 도구에서 검색 할 수 있습니다."
+            }
+        },
+        "getWorkingFileDimensions": {
+            "description": "픽셀의 현재 작업 파일의 너비와 높이를 반환합니다. 모든 레이어가 앉아있는 전체 이미지 캔버스의 크기입니다."
+        },
+        "insertRasterLayer": {
+            "description": "8 비트 RGBA 이미지를 레이어 스택의 상단에 새로운 래스터 레이어로 삽입합니다.",
+            "property": {
+                "imageDataUri": "Base64 인코딩 이미지 데이터 URI. 미디어 유형 이미지/png 또는 이미지/jpeg는 수락가능합니다.",
+                "name": "새로운 층의 이름; 보통 이미지의 파일 이름.",
+                "transform": "2D 변환 매트릭스를 나타내는 6개의 숫자의 배열. 예제 ID 변환 : [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Raster 층 삽입."
+            }
+        },
+        "insertTextLayer": {
+            "description": "텍스트 레이어를 삽입합니다. 상단 / 왼쪽은 그리기 기원이며, 상단은 글꼴의 향기로운 선입니다.",
+            "property": {
+                "text": "텍스트 삽입",
+                "name": "새로운 텍스트 층의 이름.",
+                "transform": "2D 변환 매트릭스를 나타내는 6개의 숫자의 배열. 정체성 변형으로, 층은 작업 파일 캔버스의 왼쪽 상단으로 정렬 된 상단 왼쪽 코너로 그려집니다. 예제 ID 변환 : [1, 0, 0, 1, 0, 1]",
+                "fontFamily": "폰트 가족의 이름 사용. get-available-font-list 도구를 호출하여 이름 목록을 얻을 수 있습니다.",
+                "fontSize": "글꼴 크기.",
+                "fill": "수로 hex 당 RGB 또는 RGBA 8 비트로 채우기 색깔. 예: \"#000000\" 또는 \"#000000FF\""
+            }
+        },
+        "reorderLayers": {
+            "description": "층의 주문 변경",
+            "property": {
+                "insertLayerIds": "층의 ID는 층 더미에 지정된 insertPosition에 삽입합니다. 레이어 ID는 get-layer-list 도구에서 검색할 수 있습니다.",
+                "referenceLayerId": "삽입물 속성을 기반으로 층의 ID.",
+                "insertPosition": "ReferenceLayerId에 의해 참조되는 층의 주위에 삽입하는 위치. \"above\"또는 \"below\"."
+            },
+            "error": {
+                "noInsertIds": "InsertLayerIds 속성에서 최소 1개의 ID 제공"
+            },
+            "response": {
+                "success": "층 reordered."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "다른 해상도에서 작업 파일 (모든 층)의 전체 이미지 캔버스를 재 샘플. 이미지 크기를 스케일링으로도 알려져 있습니다.",
+            "property": {
+                "width": "픽셀의 resampled 이미지의 새로운 폭.",
+                "height": "픽셀의 재 샘플 이미지의 새로운 높이. 너비의 측면 비율은 원본 이미지를 일치해야합니다."
+            },
+            "response": {
+                "success": "Resample 성공."
+            }
+        },
+        "selectLayers": {
+            "description": "현재 에디터에서 선택된 레이어를 설정하여 ID를 제공",
+            "property": {
+                "ids": "레이어 ID (number 값)의 배열"
+            },
+            "error": {
+                "noIds": "Ids 속성에 적어도 하나의 레이어 ID를 제공해야합니다."
+            },
+            "response": {
+                "success": "선택된 층."
+            }
+        },
+        "setLayerTransform": {
+            "description": "현재 선택된 레이어 3x3 2D 변환 매트릭스를 설정하여 위치, 회전 및 스케일을 제어합니다.",
+            "property": {
+                "transform": "2D 변환 매트릭스를 나타내는 6개의 숫자의 배열. 예제 ID 변환 : [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "업데이트 된 Transform."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "현재 선택된 벡터 레이어의 모든 벡터 모양의 SVG 속성을 업데이트: <rect>, <circle>, <ellipse>, <line>, <polyline>, <polygon>, <path>.",
+            "property": {
+                "id": "업데이트 할 모양의 ID. 이것은 get-shape-list 도구에서 검색 할 수 있습니다.",
+                "cx": "원의 중심의 x 위치 또는 픽셀의 엘립스.",
+                "cy": "Y 위치의 중심의 원형 또는 ellipse 픽셀.",
+                "rx": "사각형의 코너의 x 반경 또는 픽셀의 ellipse의 반경.",
+                "ry": "Y 반경의 직사각형 코너 또는 ellipse의 반경 픽셀.",
+                "points": "Polyline 또는 polygon 모양의 외부 가장자리를 정의하는 점. 예: \"0,0 20,0 10,5\""
+            }
         }
     },
     "measurement": {
@@ -1321,6 +1537,21 @@
         "renameLayer": {
             "title": "레이어 이름 변경",
             "layerName": "새 이름"
+        },
+        "pluginInstallError": {
+            "title": "오류 설치 플러그인",
+            "message": "\"{pluginName}\" 플러그인을 설치할 때 오류가 발생했습니다. 편집기를 다시 시작하면 해결 될 수 있습니다."
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "플러그인 설치",
+            "message": "이 편집기는 플러그인이 효력을 발생하기 전에 다시로드해야합니다. 아직도 일하고 있는 경우에, 당신의 변화를 첫째로 저장하십시오."
+        },
+        "pluginInstallZip": {
+            "title": "플러그인 ZIP 설치",
+            "installError": {
+                "title": "오류 설치 플러그인",
+                "message": "선택한 파일은 OpenGraphica 편집기 플러그인이 아니며, 편집기의 현재 버전과 호환됩니다."
+            }
         }
     },
     "moduleGroup": {
@@ -1515,6 +1746,16 @@
                 "welcome": {
                     "name": "환영합니다",
                     "description": "이미지 작업을 시작합니다."
+                }
+            }
+        },
+        "plugin": {
+            "name": "다운로드",
+            "description": "플러그인 관리.",
+            "modules": {
+                "installZip": {
+                    "name": "플러그인 ZIP 설치",
+                    "description": "ZIP 파일에서 편집기 플러그인 설치."
                 }
             }
         }

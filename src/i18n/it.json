@@ -75,7 +75,9 @@
         "convertVectorShapesToPaths": "Convertire Forma a Percorso",
         "flipLayerX": "Livello orizzontale",
         "flipLayerY": "Flip Layer verticale",
-        "mergeEffects": "Effetti di fusione"
+        "mergeEffects": "Effetti di fusione",
+        "freeTransform": "Trasformazione libera",
+        "mergeLayerDown": "Merge Layer Down"
     },
     "app": {
         "colorPickerGradient": {
@@ -131,7 +133,9 @@
                 "vector": "Vector Layer",
                 "video": "Video Layer"
             },
-            "deleteSelection": "Elimina selezione"
+            "deleteSelection": "Elimina selezione",
+            "edit": "Modifica",
+            "mergeDown": "Unisciti a me"
         },
         "wait": {
             "applyLayerTransform": "Applicare la trasformazione del livello",
@@ -196,7 +200,9 @@
         "updateApp": "Aggiornamento App",
         "add": "Aggiungi",
         "mergeEffects": "Effetti di fusione",
-        "selectFiles": "Selezionare File..."
+        "selectFiles": "Selezionare File...",
+        "deletePlugin": "Eliminare Plugin",
+        "reload": "Reload"
     },
     "canvas": {
         "toolbar": {
@@ -333,6 +339,10 @@
                     "checkForUpdates": "Controllare gli aggiornamenti",
                     "updateAvailableTitle": "Aggiornamento disponibile",
                     "updateAvailableMessage": "È disponibile un aggiornamento per OpenGraphica. Vuoi installarlo?"
+                },
+                "plugins": {
+                    "selectFile": "Aggiungi Plugin File...",
+                    "uninstall": "Disinstallare"
                 }
             }
         }
@@ -440,8 +450,11 @@
             "param": {
                 "size": "Dimensione",
                 "xIntensity": "X Intensità",
-                "yIntensity": "Y Intensità"
-            }
+                "yIntensity": "Y Intensità",
+                "xRadius": "X Raggio",
+                "yRadius": "Y Raggio"
+            },
+            "help": "Sfoca l'immagine utilizzando le funzioni Gaussiane inventate da Carl Friedrich Gauss. Questa sfocatura assomiglia a vedere l'immagine attraverso uno schermo traslucido, che è distintamente diverso dall'effetto bokeh creato da un obiettivo fotocamera fuori fuoco."
         },
         "grayscale": {
             "name": "Scala di grigi",
@@ -473,7 +486,8 @@
                 "rotate": "Ruotare",
                 "targetColor": "Colore di destinazione",
                 "targetRange": "Ampiezza"
-            }
+            },
+            "help": "Ruota la tonalità dei colori nell'immagine, cambiando efficacemente il colore percepito.\n\nIl **Color Space** viene utilizzato per determinare la luminosità e la saturazione del nuovo colore. **Oklab** è generalmente l'opzione più accurata.\n\nIl colore **Target** può essere utilizzato per modificare selettivamente solo un colore specifico nell'immagine. Il **Range** determina quali colori simili al **Target Color** sono influenzati."
         },
         "negative": {
             "name": "Negativo",
@@ -679,6 +693,67 @@
                 "centerX": "Centro X",
                 "centerY": "Centro Y"
             }
+        },
+        "cylinderBend": {
+            "name": "Cilindro Bend",
+            "help": "Avvolge l'immagine intorno a un cilindro 3D. Utile per scenari come attaccare segni di carta a pali, ecc.\n\n* **Rotazione** - Ruota il cilindro intorno all'asse x. Questo può essere combinato con la rotazione z-asse dello strato per raggiungere qualsiasi angolo di visualizzazione.\n* ** Perspective** - 0% è visto da una distanza infinita e il 100% è molto vicino.\n* **Visualizza posizione** - Sposta il punto di vista su o giù, che cambia la prospettiva.",
+            "param": {
+                "rotation": "Rotazione",
+                "perspective": "Prospettive",
+                "viewPosition": "Posizione"
+            }
+        },
+        "highlightBloom": {
+            "help": "Conosciuto anche come halation; questo è un bagliore morbido dove sanguina leggera da aree luminose a scure dell'immagine. Nelle telecamere, può essere causata da luce spargimento nella lente, filtri di diffusione, o riflessi leggeri sull'emulsione di un film.\n***Threshold** - Una gamma di quanto sia luminoso un colore per sanguinare la luce.\nFino a che punto la luce sanguina.\nQuanto e' brillante l'emorragia luminosa.",
+            "param": {
+                "threshold": "Soglia",
+                "radius": "Raggio",
+                "strength": "Forza"
+            }
+        },
+        "mechanicalVignette": {
+            "name": "Vignette meccanico",
+            "help": "Simula l'ombra sul bordo di un'immagine causata da un barile circolare centrale che blocca la luce dall'ingresso del sensore della fotocamera.\n\n***Pupil Distance** - La distanza dell'apertura circolare esterna della lente dal sensore.\nIl raggio dell'apertura circolare dell'allievo.\n* **Barrel Distance** - La distanza di un'apertura circolare interna all'interno della lente accanto al sensore.\nIl raggio dell'apertura circolare della canna.",
+            "param": {
+                "mode": "Modalità",
+                "modeOption": {
+                    "simulate": "Simulazione",
+                    "remove": "Rimuovi"
+                },
+                "sensorWidth": "Larghezza del sensore",
+                "sensorHeight": "Altezza del sensore",
+                "exitPupilDistance": "Distanza di Pupil",
+                "exitPupilRadius": "Pupil Radius",
+                "barrelOpeningDistance": "Barrel Distanza",
+                "barrelOpeningRadius": "Raggio di barile"
+            }
+        },
+        "naturalVignette": {
+            "name": "Vignette naturale",
+            "help": "Conosciuto anche come caduta dell'illuminazione naturale, questo simula l'ombra sul bordo di un sensore della fotocamera a causa di raggi di luce da parti off-assis della scena raggiungendo il sensore ad un angolo.\n\nQuesto effetto è più pronunciato sulle lenti della fotocamera grandangolare che non sono progettate in modo che la luce colpisca il sensore perpendicolarmente.",
+            "param": {
+                "mode": "Modalità",
+                "modeOption": {
+                    "simulate": "Simulazione",
+                    "remove": "Rimuovi"
+                },
+                "sensorWidth": "Larghezza del sensore",
+                "sensorHeight": "Altezza del sensore",
+                "focalLength": "Lunghezza Focal"
+            }
+        },
+        "radialSpeedLines": {
+            "name": "Linee di velocità radiali",
+            "help": "Disegna linee di movimento in uno schema radiale; comunemente usato in manga. La maggior parte dei valori sono un intervallo casuale.\nFino a che punto le linee saranno disegnate verso il centro.\nLo spazio tra gocce di linee.\nQuante linee saranno disegnate l'una accanto all'altra in ogni clump.\n- Spessore massimo della linea.\nRandomina le battute.",
+            "param": {
+                "centerRadius": "Raggio",
+                "lineSpacing": "Spaziatura",
+                "lineClumping": "Increspatura",
+                "lineThickness": "Spessore",
+                "horizontalOffset": "Orizzonte",
+                "verticalOffset": "Verticale",
+                "seed": "Seme"
+            }
         }
     },
     "layerFilterGroup": {
@@ -702,6 +777,12 @@
         },
         "noise": {
             "name": "Rumore"
+        },
+        "artistic": {
+            "name": "Artisti"
+        },
+        "lightShadow": {
+            "name": "Luce e ombra"
         }
     },
     "layoutShortcutGroup": {
@@ -1214,6 +1295,21 @@
                 "title": "Nessun livello selezionato",
                 "message": "Selezionare almeno uno strato nel bacino strati per trasformare. Alcuni tipi di strato non possono essere trasformati."
             }
+        },
+        "pluginInstallError": {
+            "title": "Installazione di errore Plugin",
+            "message": "Si è verificato un errore durante l'installazione del plugin \"{pluginName}\". Questo potrebbe essere risolto se si riavvia l'editor."
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "Plugin installato",
+            "message": "L'editor deve essere ricaricato prima che il plugin abbia effetto. Se stai ancora lavorando, salva prima i tuoi cambiamenti."
+        },
+        "pluginInstallZip": {
+            "title": "Installare Plugin ZIP",
+            "installError": {
+                "title": "Installazione di errore Plugin",
+                "message": "Sia il file selezionato non è un plugin di editor OpenGraphica, o è incompatibile con la versione corrente dell'editor."
+            }
         }
     },
     "moduleGroup": {
@@ -1401,6 +1497,16 @@
                 "update": {
                     "name": "Aggiornamento App",
                     "description": "Aggiorna l'app per ricevere nuove funzionalità."
+                }
+            }
+        },
+        "plugin": {
+            "name": "Plugin",
+            "description": "Gestione del plugin.",
+            "modules": {
+                "installZip": {
+                    "name": "Installare Plugin ZIP",
+                    "description": "Installare un plugin di editor da un file ZIP."
                 }
             }
         }
@@ -1777,6 +1883,17 @@
         "layerOpacity": {
             "title": "Possibilità",
             "opacity": "Possibilità"
+        },
+        "cloneBrush": {
+            "brushOpacity": "Possibilità",
+            "brushSize": "Dimensione",
+            "brushHardness": "Durezza",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Nessun livello selezionato",
+                    "message": "Si prega di selezionare almeno uno strato di immagine nel bacino strati. Alcuni tipi di strato non possono essere utilizzati con il pennello clone."
+                }
+            }
         }
     },
     "toolGroup": {
@@ -2066,6 +2183,20 @@
                     "Toccare un'area per cancellare. Mentre si tiene premuto, si può trascinare a sinistra o a destra per regolare la quantità della zona è cancellata."
                 ]
             }
+        },
+        "cloneBrushToolIntroduction": {
+            "title": "Strumento di spazzola da sola",
+            "introduction": [
+                "Il pennello clone copia parte di un'immagine in modo da poter dipingere quella stessa area da qualche altra parte. tipicamente è usato per rimuovere le macchie, gli oggetti indesiderati, o riempire in un punto danneggiato."
+            ],
+            "body": {
+                "mouse": [
+                    "L'area clone mostra come un cerchio con l'icona del timbro clone. È possibile trascinarlo intorno o ctrl + fare clic per impostare la posizione del mouse corrente."
+                ],
+                "touch": [
+                    "L'area clone mostra come un cerchio con l'icona del timbro clone. Puoi trascinarlo in giro."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -2106,7 +2237,8 @@
         "chroma": "Cromatura",
         "color": "Colore",
         "lightness": "Luce",
-        "luminance": "Luminance"
+        "luminance": "Luminance",
+        "merge": "Merge"
     },
     "defaultBrush": {
         "default": "Predefinito",
@@ -2130,6 +2262,10 @@
                 "sharpen": {
                     "title": "Sharpen",
                     "description": "Affilare le aree dell'immagine"
+                },
+                "cloneBrush": {
+                    "title": "Spazzola da sola",
+                    "description": "Zone clone dell'immagine"
                 }
             },
             "name": "Deformità"
@@ -2222,6 +2358,233 @@
                 }
             },
             "name": "Vista su tela"
+        }
+    },
+    "mcp": {
+        "common": {
+            "response": {
+                "deleteSuccess": "Elimina il successo.",
+                "updateSuccess": "Aggiorna il successo."
+            },
+            "error": {
+                "required": "La proprietà {propertyName} è richiesta.",
+                "notArray": "La proprietà {propertyName} deve essere una matrice.",
+                "notArrayNumber": "La proprietà {propertyName} deve avere valori che sono numeri.",
+                "notArrayString": "La proprietà {propertyName} deve avere valori che sono stringhe.",
+                "notNumber": "La proprietà {propertyName} deve essere un numero.",
+                "notString": "La proprietà {propertyName} deve essere una stringa.",
+                "notInEnumList": "La proprietà {propertyName} non è uno dei valori enum accettati.",
+                "layerNotFound": "Lo strato specificato non è stato trovato.",
+                "2dTransformLength": "L'array di trasformazione deve avere esattamente 6 numeri."
+            }
+        },
+        "createCircleShape": {
+            "description": "Aggiunge una forma SVG <circle> al livello selezionato corrente, o a un nuovo strato se lo strato selezionato corrente non è uno strato vettoriale. La nuova forma è disegnata sopra tutte le altre forme nello strato.",
+            "property": {
+                "cx": "La posizione x del centro del cerchio in pixel.",
+                "cy": "La posizione y del centro del cerchio in pixel.",
+                "r": "Il raggio dei pixel del cerchio."
+            }
+        },
+        "createEllipseShape": {
+            "description": "Aggiunge una forma SVG <ellipse> al livello selezionato corrente, o a un nuovo strato se lo strato selezionato corrente non è uno strato vettoriale. La nuova forma è disegnata sopra tutte le altre forme nello strato.",
+            "property": {
+                "cx": "La posizione x del centro dell'ellisse in pixel.",
+                "cy": "La posizione y del centro dell'ellisse in pixel.",
+                "rx": "Il raggio dell'ellisse lungo l'asse x in pixel.",
+                "ry": "Il raggio dell'ellisse lungo l'asse y in pixel."
+            }
+        },
+        "createLineShape": {
+            "description": "Aggiunge una forma SVG <line> al livello selezionato corrente, o a un nuovo strato se lo strato selezionato corrente non è uno strato vettoriale. La nuova forma è disegnata sopra tutte le altre forme nello strato.",
+            "property": {
+                "x1": "La posizione x dell'inizio della linea in pixel.",
+                "y1": "La posizione y dell'inizio della linea in pixel.",
+                "x2": "La posizione x della fine della linea in pixel.",
+                "y2": "La posizione y della fine della linea in pixel."
+            }
+        },
+        "createPathShape": {
+            "description": "Aggiunge una forma SVG <path> al livello selezionato corrente, o a un nuovo strato se lo strato selezionato corrente non è uno strato vettoriale. La nuova forma è disegnata sopra tutte le altre forme nello strato.",
+            "property": {
+                "d": "L'elenco dei comandi del percorso SVG. Seguire la spec SVG. Esempio: \"M 10 80 Q 52.5 10, 95 80 T 180 80\""
+            }
+        },
+        "createPolygonShape": {
+            "description": "Aggiunge una forma SVG <polygon> al livello selezionato corrente, o a un nuovo strato se lo strato selezionato corrente non è uno strato vettoriale. La nuova forma è disegnata sopra tutte le altre forme nello strato.",
+            "property": {
+                "points": "I punti che definiscono il bordo esterno della forma. Esempio: \"0,0 20,0 10,5\""
+            }
+        },
+        "createPolylineShape": {
+            "description": "Aggiunge una forma SVG <polyline> al livello selezionato corrente, o a un nuovo strato se lo strato selezionato corrente non è uno strato vettoriale. La nuova forma è disegnata sopra tutte le altre forme nello strato.",
+            "property": {
+                "points": "I punti che definiscono le linee collegate. Esempio: \"0,0 20,0 10,5\""
+            }
+        },
+        "createRectangleShape": {
+            "description": "Aggiunge una forma SVG <rect> al livello selezionato corrente, o a un nuovo strato se lo strato selezionato corrente non è uno strato vettoriale. La nuova forma è disegnata sopra tutte le altre forme nello strato.",
+            "property": {
+                "x": "La posizione x del bordo sinistro del rettangolo in pixel.",
+                "y": "La posizione y del bordo sinistro del rettangolo in pixel.",
+                "rx": "Il raggio x degli angoli del rettangolo in pixel.",
+                "ry": "Il raggio y degli angoli del rettangolo in pixel.",
+                "width": "La larghezza del rettangolo in pixel.",
+                "height": "L'altezza del rettangolo in pixel."
+            }
+        },
+        "createShapeCommon": {
+            "property": {
+                "fill": "Il colore di riempimento come un RGB 8-bit per esagonale canale. Omettere senza riempire. Esempio: \"#000000\"",
+                "fillOpacity": "L'opacità del colore di riempimento come numero decimale da 0 a 1.",
+                "stroke": "Il colore del colpo come un RGB 8-bit per esagonale del canale. Omit per nessun colpo. Esempio: \"#000000\"",
+                "strokeLinecap": "Come vengono rese le estremità delle linee, come definito nella specifica SVG.",
+                "strokeLinejoin": "Come vengono resi gli angoli delle linee unite, come definito nella specifica SVG.",
+                "strokeOpacity": "L'opacità del colore del colpo come numero decimale da 0 a 1.",
+                "strokeWidth": "La larghezza del colpo in pixel.",
+                "transform": "L'attributo di trasformazione sulla forma. Deve essere una funzione di trasformazione della matrice SVG 2D. Esempio: \"matrix(1,0,0,1,0,0)\""
+            },
+            "error": {
+                "fill": "Sintassi di riempimento non valida. Fornire un RGBA 8 bit per esagonale canale. Esempio: \"#000000\"",
+                "stroke": "Sintassi ictus non valida. Fornire un RGBA 8 bit per esagonale canale. Esempio: \"#000000\"",
+                "transform": "Invalid trasformare la sintassi. Fornire una funzione di trasformazione della matrice SVG 2D. Esempio: \"matrix(1,0,0,1,0,0)\""
+            }
+        },
+        "cropWorkingFile": {
+            "description": "Ritaglia l'intera tela immagine nel file di lavoro (tutti gli strati). Un raccolto negativo può essere utilizzato per aumentare la dimensione della tela.",
+            "property": {
+                "left": "Il confine più a sinistra dell'immagine ritagliata in pixel. Questo può essere negativo.",
+                "top": "Il limite superiore dell'immagine ritagliata in pixel. Questo può essere negativo.",
+                "width": "La nuova larghezza dell'immagine ritagliata in pixel. Questo può essere più grande della larghezza originale.",
+                "height": "La nuova altezza dell'immagine ritagliata in pixel. Questo può essere più grande dell'altezza originale."
+            },
+            "response": {
+                "success": "Il successo del raccolto."
+            }
+        },
+        "deleteLayers": {
+            "description": "Elimina strati con gli ID specificati.",
+            "property": {
+                "layerIds": "Gli ID degli strati da eliminare. Gli ID di strato possono essere recuperati dallo strumento di get-layer-list."
+            },
+            "error": {
+                "noIds": "Fornire almeno 1 ID strato."
+            },
+            "response": {
+                "success": "Layers cancellato."
+            }
+        },
+        "deleteShape": {
+            "description": "Elimina una forma SVG da eventuali strati vettoriali selezionati.",
+            "property": {
+                "id": "L'ID della forma da eliminare. Questo può essere recuperato dallo strumento get-shape-list."
+            }
+        },
+        "getAvailableFontList": {
+            "description": "Elenca tutte le famiglie di caratteri che sono disponibili per l'uso con strati di testo."
+        },
+        "getEditorGuide": {
+            "description": "Fornisce un riassunto di lingua naturale di come l'editor di immagini OpenGraphica funziona.",
+            "summary": "OpenGraphica è un editor di immagini mista 2D. Al suo nucleo, può modificare sia immagini raster e forme vettoriali, ed esportare in formati di immagini raster e vettoriali.\n\nIl file di lavoro in OpenGraphica è un documento di immagine con uno o più strati. Ha una risoluzione rettangolare fissa, definita in pixel. Altre unità di misura come mm sono supportate nell'interfaccia utente per scopi di visualizzazione, ma sono convertite in pixel per la modifica utilizzando le impostazioni di risoluzioneX e risoluzioneY. Il documento di immagine del file di lavoro ha un sistema di coordinate dove +x è giusto, +y è giù, e -z va nello schermo, lontano dal visualizzatore.\n\nIl file di lavoro è composto da uno stack di strati individuali. Tutti gli strati hanno una larghezza/altezza definita in pixel, e una matrice di trasformazione 3x3 2D che determina la loro posizione / rotazione / scala. Con una matrice di trasformazione dell'identità, uno strato viene disegnato con il suo angolo superiore sinistro allineato con la parte superiore sinistra del file di lavoro.\n\nI livelli hanno diversi tipi, che descrivono il tipo di immagine che contengono:\nUn gradiente lineare o radiale che copre l'intero file di lavoro.\n**raster** - Un'immagine basata su pixel RGBA a 8 bit per canale.\n* **rasterSequence** - Una sequenza di animazione con 8 bit per canale immagini basate su pixel RGBA per ogni frame.\n* **text** - Uno o più paragrafi di testo ricco disegnati orizzontalmente o verticalmente.\nUn documento SVG 1.x.\nUn video che utilizza un codec web supportato.\n\nI livelli sono impilati dal basso all'alto, dove lo strato inferiore viene disegnato prima, e lo strato superiore è disegnato davanti a tutti gli altri strati. I livelli vengono memorizzati in modo che il primo strato nell'array sia lo strato più basso, ma vengono visualizzati all'utente finale dove l'elenco di strati più alti. I livelli sono compositi per impostazione predefinita con la sorgente oltre la miscelazione in RGB lineare, e convertiti in sRGB dopo che tutte le operazioni di compositing sono completate."
+        },
+        "getLayerList": {
+            "description": "Restituisce una definizione di sintesi di JSON di tutti gli strati del file di lavoro, dove gli strati sono disegnati in ordine di array (ultimo in alto)."
+        },
+        "getRasterLayerImage": {
+            "description": "Restituisce i dati dell'immagine per lo strato raster specificato.",
+            "property": {
+                "id": "L'ID dello strato raster. Questo può essere recuperato dallo strumento di get-layer-list."
+            }
+        },
+        "getShapeList": {
+            "description": "Restituisce una definizione JSON che elenca tutte le forme in qualsiasi livello vettoriale attualmente selezionato, in ordine dal basso all'alto. Gli ID di forma possono cambiare quando viene aggiunta una nuova forma, eliminata o riordinata."
+        },
+        "getVectorLayerSvg": {
+            "description": "Restituisce il documento SVG serializzato associato allo strato vettoriale specificato.",
+            "property": {
+                "id": "L'ID dello strato vettoriale. Questo può essere recuperato dallo strumento di get-layer-list."
+            }
+        },
+        "getWorkingFileDimensions": {
+            "description": "Restituisce la larghezza e l'altezza del file di lavoro corrente in pixel. Questa che è la dimensione della tela di immagine generale su cui tutti gli strati siedono."
+        },
+        "insertRasterLayer": {
+            "description": "Inserire un'immagine RGBA a 8 bit come un nuovo strato raster sulla parte superiore dello stack dello strato.",
+            "property": {
+                "imageDataUri": "Un URI dati di immagine codificato base64. I tipi di media immagine/png o immagine/jpeg sono accettabili.",
+                "name": "Il nome del nuovo strato; di solito il nome del file dell'immagine.",
+                "transform": "Una serie di 6 numeri che rappresenta la matrice di trasformazione 2D. Esempio di identità trasforma: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Strato raster inserito."
+            }
+        },
+        "insertTextLayer": {
+            "description": "Inserire uno strato di testo. La parte superiore/sinistra è l'origine dell'estrazione, dove la parte superiore è la linea di salita del carattere.",
+            "property": {
+                "text": "Il testo da inserire",
+                "name": "Il nome del nuovo strato di testo.",
+                "transform": "Una serie di 6 numeri che rappresenta la matrice di trasformazione 2D. Con una trasformazione di identità, lo strato viene disegnato con la sua parte superiore sinistra-corno allineato con la parte superiore sinistra della tela di file di lavoro. Esempio di identità trasforma: [1, 0, 0, 1, 0, 1]",
+                "fontFamily": "Il nome della famiglia font da usare. Chiamare lo strumento di ottenere-font-list per ottenere un elenco di nomi.",
+                "fontSize": "La dimensione del carattere.",
+                "fill": "Il colore di riempimento come RGB o RGBA 8-bit per esagonale canale. Esempio: \"#000000\" o \"#000000FF\""
+            }
+        },
+        "reorderLayers": {
+            "description": "Cambia l'ordine degli strati",
+            "property": {
+                "insertLayerIds": "Gli ID di strati da inserire all'inserto specificatoPosizione nello stack di strati. Gli ID di strato possono essere recuperati dallo strumento di get-layer-list.",
+                "referenceLayerId": "L'ID dello strato da inserire intorno, in base alla proprietà insertPosition.",
+                "insertPosition": "La posizione da inserire intorno allo strato di riferimentoLayerId. \"sopra\" o \"sotto\"."
+            },
+            "error": {
+                "noInsertIds": "Fornire almeno un ID nell'insertoLayerIds proprietà"
+            },
+            "response": {
+                "success": "Layers ha riordinato."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "Ripristina l'intera tela immagine nel file di lavoro (tutti gli strati) in una risoluzione diversa. Conosciuto anche come scalare la dimensione dell'immagine.",
+            "property": {
+                "width": "La nuova larghezza dell'immagine rivenduta in pixel.",
+                "height": "La nuova altezza dell'immagine rifinita in pixel. Il rapporto di aspetto tra larghezza e altezza deve corrispondere all'immagine originale."
+            },
+            "response": {
+                "success": "Ricampo il successo."
+            }
+        },
+        "selectLayers": {
+            "description": "Impostazioni che gli strati sono attualmente selezionati nell'editor fornendo i loro ID",
+            "property": {
+                "ids": "Una serie di ID di livello (valori numerici)"
+            },
+            "error": {
+                "noIds": "È necessario fornire almeno un ID strato nella proprietà ids."
+            },
+            "response": {
+                "success": "Livelli selezionati con successo."
+            }
+        },
+        "setLayerTransform": {
+            "description": "Imposta la matrice di trasformazione 3x3 2D attualmente selezionata che controlla la sua posizione, rotazione e scala.",
+            "property": {
+                "transform": "Una serie di 6 numeri che rappresenta la matrice di trasformazione 2D. Esempio di identità trasforma: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Trasformare aggiornato con successo."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "Aggiorna gli attributi SVG di qualsiasi forma vettoriale in qualsiasi livello di vettore attualmente selezionato: <rect>, <circle>, <ellipse>, <line>, <polyline>, <polygon> o <path>.",
+            "property": {
+                "id": "L'ID della forma da aggiornare. Questo può essere recuperato dallo strumento get-shape-list.",
+                "cx": "La posizione x del centro di un cerchio o ellisse in pixel.",
+                "cy": "La posizione y del centro di un cerchio o ellisse in pixel.",
+                "rx": "Il raggio x degli angoli di un rettangolo o un raggio di ellisse in pixel.",
+                "ry": "Il raggio y degli angoli di un rettangolo o un raggio di ellisse in pixel.",
+                "points": "I punti che definiscono il bordo esterno di una forma polilina o poligonale. Esempio: \"0,0 20,0 10,5\""
+            }
         }
     }
 }

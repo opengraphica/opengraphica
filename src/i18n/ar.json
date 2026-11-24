@@ -75,7 +75,9 @@
         "convertVectorShapesToPaths": "Convert Shape to Path",
         "flipLayerX": "Flip Layer Horizontal",
         "flipLayerY": "Flip Layer Vertical",
-        "mergeEffects": "الآثار الكبيرة"
+        "mergeEffects": "الآثار الكبيرة",
+        "freeTransform": "Free Transform",
+        "mergeLayerDown": "Merge Layer Down"
     },
     "app": {
         "colorPickerGradient": {
@@ -131,7 +133,9 @@
                 "vector": "Vector Layer",
                 "video": "Video Layer"
             },
-            "deleteSelection": "يحذف الاختيار"
+            "deleteSelection": "يحذف الاختيار",
+            "edit": "Edit",
+            "mergeDown": "Merge Down"
         },
         "wait": {
             "applyLayerTransform": "Applying Layer Transform",
@@ -196,7 +200,9 @@
         "updateApp": "Update App",
         "add": "مضافا إليها",
         "mergeEffects": "الآثار الكبيرة",
-        "selectFiles": "بيع الملفات..."
+        "selectFiles": "بيع الملفات...",
+        "deletePlugin": "تحذف البلوغين",
+        "reload": "Reload"
     },
     "canvas": {
         "toolbar": {
@@ -333,6 +339,10 @@
                     "checkForUpdates": "التحقق من المستجدات",
                     "updateAvailableTitle": "آخر المعلومات المتاحة",
                     "updateAvailableMessage": "ويمكن الاطلاع على آخر المستجدات المتعلقة بشركة \" OpenGraphica \" . هل تود تركيبه؟?"
+                },
+                "plugins": {
+                    "selectFile": "أضف بلوجين فيل.",
+                    "uninstall": "Uninstall"
                 }
             }
         }
@@ -440,8 +450,11 @@
             "param": {
                 "size": "الحجم",
                 "xIntensity": "X Intensity",
-                "yIntensity": "نعم"
-            }
+                "yIntensity": "نعم",
+                "xRadius": "X Radius",
+                "yRadius": "Y Radius"
+            },
+            "help": "تفسد الصورة باستخدام وظائف غاوسيان التي اخترعها كارل فريدريش غاوس هذا الضباب يشبه النظر للصورة من خلال شاشات مغايرة، التي تختلف اختلافاً واضحاً عن تأثير البوق الذي أحدثه عدسة كاميرا خارج التركيز."
         },
         "grayscale": {
             "name": "Grayscale",
@@ -473,7 +486,8 @@
                 "rotate": "المعدل",
                 "targetColor": "العقيدة المستهدفة",
                 "targetRange": "Range"
-            }
+            },
+            "help": "يُحوّلُ كوخ الألوانَ في الصورةِ، يُغيّرُ بشكل فعّال اللونَ المُتصوّرَ.\n\nThe **Color Space** is used to determine the brightness and saturation of the new color. ** Oklab** هو عموما الخيار الأكثر دقة.\n\nThe **Target Color** can be used to selectively modify only one specific color in the image. The **Range** determines what colors similar to the **Target Color** are affected."
         },
         "negative": {
             "name": "سلبي",
@@ -679,6 +693,67 @@
                 "centerX": "المركز العاشر",
                 "centerY": "المركز Y"
             }
+        },
+        "cylinderBend": {
+            "name": "Cylinder Bend",
+            "help": "تلف الصورة حول اسطوانة ثلاثية الأبعاد مفيدة للسيناريوهات مثل ربط العلامات الورقية بالأعمدة، الخ.\n\n* ** التناوب** - تناوب الأسطوانة حول الأكساكس. هذا يمكن أن يقترن مع تناوب طبقة الز-اكسس لتحقيق أي زاوية عرض.\n* ** المنظور** - يُنظر إلى ٠,٠ في المائة من مسافة لا نهاية لها و٠٠١ في المائة قريبة جدا.\n* ** موقف ضعيف** - يضيف وجهة النظر إلى أعلى أو أسفل، مما يغير المنظور.",
+            "param": {
+                "rotation": "التناوب",
+                "perspective": "المنظور",
+                "viewPosition": "موقع المراقبة"
+            }
+        },
+        "highlightBloom": {
+            "help": "ويُعرف أيضاً باسم الاستنشاق؛ وهذا توهّج ناعم حيث ينزف الضوء من المناطق المشرقة إلى المناطق المظلمة من الصورة. في الكاميرات، يمكن أن يكون سببه تحطيم الضوء في العدسة، أو مرشحات الانتشار، أو انعكاسات ضوئية على قذف فيلم.\n? ?\n-كم سينزف الضوء\nكم هو مشرق نزيف الضوء.",
+            "param": {
+                "threshold": "Threshold",
+                "radius": "Radius",
+                "strength": "القوة"
+            }
+        },
+        "mechanicalVignette": {
+            "name": "Mechanical Vignette",
+            "help": "يُقلّصُ الظلّ على حافةِ صورةِ سببها a برميل دائري مُركّز الذي يَحْلقُ الضوءَ مِنْ دُخُول مجسّسِ الكاميرا.\n\n* ** انقطاع عن العمل** - مسافة فتح التعميم الخارجي للمجس.\n(بوبيل راديوس)\n* ** انحراف الباليه** - بُعد التعميم الداخلي داخل العدسات بجانب جهاز الاستشعار.\n(باريل راديوس).",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "simulate": "محاكاة",
+                    "remove": "إزالة الألغام"
+                },
+                "sensorWidth": "سينور ويدث",
+                "sensorHeight": "جهاز الاستشعار",
+                "exitPupilDistance": "توقف التلاميذ",
+                "exitPupilRadius": "Pupil Radius",
+                "barrelOpeningDistance": "Barrel Distance",
+                "barrelOpeningRadius": "Barrel Radius"
+            }
+        },
+        "naturalVignette": {
+            "name": "Natural Vignette",
+            "help": "ويُعرف هذا المحاكاة أيضاً بـ \"سقوط النسيج الطبيعي\" الذي يُلقي على حافة مُجسّس الكاميرا بسبب الأشعة الضوئية من أجزاء من المشهد وصولاً إلى المجس في زاوية.\n\nهذا التأثير أكثر وضوحاً على عدسات كاميرا واسعة النطاق غير مصممة بحيث يضرب الضوء جهاز الإستشعار.",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "simulate": "محاكاة",
+                    "remove": "إزالة الألغام"
+                },
+                "sensorWidth": "سينور ويدث",
+                "sensorHeight": "جهاز الاستشعار",
+                "focalLength": "Focal Length"
+            }
+        },
+        "radialSpeedLines": {
+            "name": "خطوط السرعة",
+            "help": "رسم خطوط الحركة في نمط إشعاعي؛ تستخدم عادة في المانغا. معظم القيم هي نطاق عشوائي\n* ** راديوس** - إلى أي مدى ستوضع الخطوط نحو المركز.\n* المباعدة** - الحيز الذي يفصل بين أجزاء الخطوط.\n* ** الاختناق** - كم عدد الخطوط التي سيتم سحبها إلى جانب بعضها البعض في كل مجموعة.\n- سميك الحد الأقصى\n* ** Seed** - Randomize the lines.",
+            "param": {
+                "centerRadius": "Radius",
+                "lineSpacing": "Spacing",
+                "lineClumping": "القفز",
+                "lineThickness": "العصي",
+                "horizontalOffset": "Horizontal",
+                "verticalOffset": "كتابي",
+                "seed": "Seed"
+            }
         }
     },
     "layerFilterGroup": {
@@ -702,6 +777,12 @@
         },
         "noise": {
             "name": "Noise"
+        },
+        "artistic": {
+            "name": "الفنون"
+        },
+        "lightShadow": {
+            "name": "ضوء"
         }
     },
     "layoutShortcutGroup": {
@@ -1214,6 +1295,21 @@
                 "title": "No Layers Selected",
                 "message": "اختيار طبقة واحدة على الأقل في رصيف الطبقات لتحويل. بعض أنواع الطبقات لا يمكن تحويلها."
             }
+        },
+        "pluginInstallError": {
+            "title": "Error Installing Plugin",
+            "message": "حدث خطأ عندما تم تركيب \"{pluginName}\" هذا قد يُحلّ إذا أعدتَ المحرّر."
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "Plugin Install",
+            "message": "يجب أن يعاد تحميل المحرّر قبل أن يبدأ نفاذ البلوغ. إذا كنت لا تزال تعمل، حفظ التغييرات الخاصة بك أولا."
+        },
+        "pluginInstallZip": {
+            "title": "Install Plugin ZIP",
+            "installError": {
+                "title": "Error Installing Plugin",
+                "message": "فإما أن يكون الملف المختار ليس محررا مفتوحا لغرافيكا، أو أنه يتعارض مع الصيغة الحالية للمحرر."
+            }
         }
     },
     "moduleGroup": {
@@ -1401,6 +1497,16 @@
                 "update": {
                     "name": "Update App",
                     "description": "تحديث التطبيق للحصول على وظيفة جديدة."
+                }
+            }
+        },
+        "plugin": {
+            "name": "Plugin",
+            "description": "إدارة البلوجين.",
+            "modules": {
+                "installZip": {
+                    "name": "Install Plugin ZIP",
+                    "description": "ضع محرراً من ملف شركة \"زي بي\"."
                 }
             }
         }
@@ -1777,6 +1883,17 @@
         "layerOpacity": {
             "title": "Opacity",
             "opacity": "Opacity"
+        },
+        "cloneBrush": {
+            "brushOpacity": "Opacity",
+            "brushSize": "الحجم",
+            "brushHardness": "القوة",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "يرجى اختيار طبقة واحدة على الأقل من الصور في رصيف الطبقات. بعض أنواع الطبقات لا يمكن استخدامها مع فرشاة الاستنساخ."
+                }
+            }
         }
     },
     "toolGroup": {
@@ -2066,6 +2183,20 @@
                     "قفزة على منطقة لمحوها بينما تصمد، يمكنك أن تسحب إلى اليسار أو إلى اليمين لتعدل كم من المنطقة تم محوها."
                 ]
             }
+        },
+        "cloneBrushToolIntroduction": {
+            "title": "Clone Brush Tool",
+            "introduction": [
+                "الفرشاة المستنسخة تنسخ جزء من صورة لكي ترسم نفس المنطقة في مكان آخر وهي تستخدم عادة لإزالة الخلايا، أو الأشياء غير المرغوب فيها، أو ملء بقعة متضررة."
+            ],
+            "body": {
+                "mouse": [
+                    "المنطقة المستنسخة تُظهر كدائرة مع جهاز الإستنساخ يمكنك سحبه حول أو Ctrl + النقر لوضعه في موقع الفأر الحالي."
+                ],
+                "touch": [
+                    "المنطقة المستنسخة تُظهر كدائرة مع جهاز الإستنساخ يمكنك سحبها."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -2106,7 +2237,8 @@
         "chroma": "Chroma",
         "color": "Color",
         "lightness": "النور",
-        "luminance": "اللوم"
+        "luminance": "اللوم",
+        "merge": "رقيب"
     },
     "defaultBrush": {
         "default": "التقصير",
@@ -2130,6 +2262,10 @@
                 "sharpen": {
                     "title": "شاربن",
                     "description": "Sharpen areas of the image"
+                },
+                "cloneBrush": {
+                    "title": "Clone Brush",
+                    "description": "مناطق كلون من الصورة"
                 }
             },
             "name": "الشكل"
@@ -2222,6 +2358,233 @@
                 }
             },
             "name": "Canvas Viewport"
+        }
+    },
+    "mcp": {
+        "common": {
+            "response": {
+                "deleteSuccess": "يحذف النجاح.",
+                "updateSuccess": "تحديث النجاح."
+            },
+            "error": {
+                "required": "The property {propertyName} is required.",
+                "notArray": "The property {propertyName} must be an array.",
+                "notArrayNumber": "The property {propertyName} must have values that are numbers.",
+                "notArrayString": "The property {propertyName} must have values that are strings.",
+                "notNumber": "The property {propertyName} must be a number.",
+                "notString": "The property {propertyName} must be a string.",
+                "notInEnumList": "The property {propertyName} is not one of the accepted enum values.",
+                "layerNotFound": "The specified layer was not found.",
+                "2dTransformLength": "لا بد أن مجموعة التحول لديها 6 أرقام بالضبط."
+            }
+        },
+        "createCircleShape": {
+            "description": "يضيف شكلاً من نوع (سي في جي) إلى طبقة منتقاة حالياً، أو إلى طبقة جديدة إن لم تكن الطبقات المختارة الحالية طبقة ناقلات. والشكل الجديد مبني على جميع الأشكال الأخرى في الطبقة.",
+            "property": {
+                "cx": "موقع الدائرة في بيكسلز.",
+                "cy": "مركز الدائرة في بيكسل.",
+                "r": "نصف قطر الدائرة."
+            }
+        },
+        "createEllipseShape": {
+            "description": "يضيف شكل SVG LIpse. إلى طبقة منتقاة الحالية، أو إلى طبقة جديدة إذا الطبقات المختارة الحالية ليست طبقة ناقلات. والشكل الجديد مبني على جميع الأشكال الأخرى في الطبقة.",
+            "property": {
+                "cx": "موقع (إكس) في مركز (إلليبس) في (بيكسلز).",
+                "cy": "موقع مركز الشفاه في بيكسلز.",
+                "rx": "شعاع الشفاه على طول المحور X في البيكسلز.",
+                "ry": "شعاع النسيج على طول المحور."
+            }
+        },
+        "createLineShape": {
+            "description": "يُضيفُ a SVG sline. shape to the current selected layer, or to a new layer if the current selected layer is not a vector layer. والشكل الجديد مبني على جميع الأشكال الأخرى في الطبقة.",
+            "property": {
+                "x1": "\"الموقع الـ \"إكس\" لبداية الخط في \"بيكسل.",
+                "y1": "موقع بداية الخط في بيكسلز.",
+                "x2": "موقع (إكس) لنهاية الخط في (بيكسل).",
+                "y2": "موقع نهاية الخط في بيكسلز."
+            }
+        },
+        "createPathShape": {
+            "description": "يضيف شكل SVG لطبقة مختارة الحالية، أو إلى طبقة جديدة إذا الطبعة الحالية المختارة ليست طبقة ناقلات. والشكل الجديد مبني على جميع الأشكال الأخرى في الطبقة.",
+            "property": {
+                "d": "قائمة الأوامر إتبع المواصفات مثال: \"M 10 80 Q 52.5 10, 95 80 T 180 80\""
+            }
+        },
+        "createPolygonShape": {
+            "description": "يضيف شكل SVG polygon. إلى طبقة منتقاة الحالية، أو إلى طبقة جديدة إذا الطبقات المختارة الحالية ليست طبقة ناقلات. والشكل الجديد مبني على جميع الأشكال الأخرى في الطبقة.",
+            "property": {
+                "points": "النقاط التي تحدد الحافة الخارجية للشكل مثال: \"0 20,0 10,5\""
+            }
+        },
+        "createPolylineShape": {
+            "description": "يضيف شكل SVG POlyline. إلى طبقة منتقاة الحالية، أو إلى طبقة جديدة إذا الطبقات المختارة الحالية ليست طبقة ناقلات. والشكل الجديد مبني على جميع الأشكال الأخرى في الطبقة.",
+            "property": {
+                "points": "النقاط التي تحدد الخطوط المترابطة مثال: \"0 20,0 10,5\""
+            }
+        },
+        "createRectangleShape": {
+            "description": "يُضيفُ a SVG rect. شكل إلى طبقةِ مختارةِ الحاليةِ، أَو إلى طبقةِ جديدةِ إذا الطبعةِ الحاليةِ المختارة لَيستْ a طبقة ناقلاتِ. والشكل الجديد مبني على جميع الأشكال الأخرى في الطبقة.",
+            "property": {
+                "x": "موقع الـ (إكس) من الحافة اليسرى في (بيكسل).",
+                "y": "موقع التراجع الأيسر في بيكسلز.",
+                "rx": "أشعة (إكس) لزوايا (كاتلز).",
+                "ry": "شعاع زوايا التراجع في بيكسلز.",
+                "width": "\"استعراض التراجع في \"بيكسلز.",
+                "height": "ارتفاع التراجع في البيكسلز."
+            }
+        },
+        "createShapeCommon": {
+            "property": {
+                "fill": "لون الملاءة كـ \" آر جي بي \" 8 أطنان لكل قناة لا أملأ مثال: \"#000\"",
+                "fillOpacity": "عدم كفاية اللون الملئ كرقم عشري من صفر إلى 1.",
+                "stroke": "لون السكتة الدماغية كـ \" آر جي بي \" 8 أطنان لكل قناة \" هيكس \" لا سكتة دماغية مثال: \"#000\"",
+                "strokeLinecap": "How the ends of lines are rendered, as defined in the SVG spec.",
+                "strokeLinejoin": "How the corners of joined lines are rendered, as defined in the SVG spec.",
+                "strokeOpacity": "ظلم لون الجلطة كرقم عشري من صفر إلى 1.",
+                "strokeWidth": "عرض السكتة الدماغية في بيكسلز.",
+                "transform": "سمة التحول على الشكل لا بدّ أنّها مُصفوفة تحوّل من نوع (سي في جي 2 دي). مثال: \"الموسم (1,0,0,0)\""
+            },
+            "error": {
+                "fill": "غير قابل للاشتعال Provide a RGBA 8-bit per channel hex. مثال: \"#000\"",
+                "stroke": "سكتة دماغية غير سليمة Provide a RGBA 8-bit per channel hex. مثال: \"#000\"",
+                "transform": "غير قابل للتغيير Provide a SVG 2D fisheries transform function. مثال: \"الموسم (1,0,0,0)\""
+            }
+        },
+        "cropWorkingFile": {
+            "description": "تجمّع الصورة الكاملة في ملف العمل (جميع الطبقات). A negative crop can be used to increase the canvas size.",
+            "property": {
+                "left": "الحدود الأيسر للصورة المحصولة في بيكسلز هذا قد يكون سلبياً.",
+                "top": "الحدود القصوى للصورة المحصولة في بيكسلز هذا قد يكون سلبياً.",
+                "width": "البارود الجديد للصورة المحصولة في بيكسلز هذا يمكن أن يكون أكبر من البارود الأصلي.",
+                "height": "الطول الجديد للصورة المحصولة في بيكسلز هذا يمكن أن يكون أكبر من الطول الأصلي."
+            },
+            "response": {
+                "success": "نجاح المحاصيل."
+            }
+        },
+        "deleteLayers": {
+            "description": "تحذف طبقات مع هويات محددة.",
+            "property": {
+                "layerIds": "هويات الطبقات لحذفها يمكن استخلاص هويات الطبقات من أداة الرفع."
+            },
+            "error": {
+                "noIds": "على الأقل هويّة واحدة."
+            },
+            "response": {
+                "success": "(لاير) حذف."
+            }
+        },
+        "deleteShape": {
+            "description": "يحذف شكل SVG من أي طبقة مختارة من طبقة النواقل.",
+            "property": {
+                "id": "هويّة الشكل لحذفها هذا يمكن إسترجاعه من أداة الرفع من القائمة."
+            }
+        },
+        "getAvailableFontList": {
+            "description": "إدراج جميع الأسر العنيفة المتاحة لاستخدامها في طبقات النصوص."
+        },
+        "getEditorGuide": {
+            "description": "Provides a natural language summary of how the OpenGraphica image editor works.",
+            "summary": "(افتح (غرافيكا) هي محررة صور مختلطة الوسائط ويمكنها، في جوهرها، أن تحرر صوراً وشكلات ناقلات على حد سواء، وأن تُصدّر إلى كل من صيغ صور القاذورات والناقلات.\n\nThe working file in OpenGraphica is a image document with one or more layers. ولها قرار ثابت، محدد في بيكسلز. وتتلقى وحدات القياس الأخرى، مثل مليمتر، الدعم في وحدة التفتيش المشتركة لأغراض العرض، ولكنها تُحوَّل إلى أكياس للتحرير باستخدام نظامي القرار X والتسوية. وثيقة صورة ملف العمل لها نظام تنسيق حيث يكون (أوكس) محقاً و(+ي) في الأسفل و(ز) في الشاشة بعيداً عن المشاهد\n\nThe working file is composed of a stack of individual layers. All layers have a width/height defined in pixels, and a 3x3 2D transformationmel which determines their position / rotation / scale. مع مصفوفة تحوّل الهوية، تُرسم طبقة بزاوية من أعلى الدرجات متوافقة مع الجزء العلوي من ملف العمل.\n\nوللأصحاب أنواع مختلفة، مما يستدل على نوع الصورة التي تتضمنها:\n* ** التدرج** - التدرج الخطي أو الإشعاعي الذي يغطي كامل ملف العمل.\n**Sraster** - An 8-bit per channel RGBA pixel-based image.\n* ** التعاقب** - تسلسل قياسي باستخدام 8 لترات لكل قناة من الصور الثابتة لكل إطار.\n* ** النص** - صيغت فقرات أو أكثر من النص الغني أفقيا أو رأسيا.\n* **vector** - A SVG 1.x document.\n* ** فيديو** - شريط فيديو يستخدم رمزا مدعما بالشبكة.\n\nالملاير مقطوعة من أسفل إلى القمة، حيث تُرسم الطبقات السفلية أولاً، وتُرسم الطبعة العلوية أمام جميع الطبقات الأخرى. يُخزّن الملاوير بحيث تكون الطبقة الأولى في الصفوف هي الطبقة السفلية، لكنّهم يُعرضون على المستعمل النهائي حيث توجد أعلى الطبقات. ويتكون المصابون من تقصير مع وجود مصدر على الدمج في نظام RGB الخطي، ويحوَّلون إلى SRGB بعد الانتهاء من جميع العمليات التجميعية."
+        },
+        "getLayerList": {
+            "description": "(أ) يعيد تعريفاً موجزاً لجميع الطبقات في ملف العمل، حيث تُرسم طبقات في نظام الصفوف (على رأسها)."
+        },
+        "getRasterLayerImage": {
+            "description": "يُعيدُ بياناتَ الصورَ لطبقةِ الغرابةِ المحددةِ.",
+            "property": {
+                "id": "هويّة طبقة الغراب. ويمكن استخلاص هذا من أداة قائمة المطالِبين."
+            }
+        },
+        "getShapeList": {
+            "description": "(أ) يعيد تعريفاً للشركة المشتركة بين الوزارات يورد جميع الأشكال في أي طبقة مختارة حالياً من طبقات النواقل، من القاعدة إلى القمة. ويمكن أن تتغير الهويات الشكلية عندما يضاف شكل جديد أو يحذف أو يعاد ترتيبه."
+        },
+        "getVectorLayerSvg": {
+            "description": "ويعيد وثيقة SVG المسلسلة المرتبطة بطبقة ناقلات محددة.",
+            "property": {
+                "id": "هوية طبقة النواقل ويمكن استخلاص هذا من أداة قائمة المطالِبين."
+            }
+        },
+        "getWorkingFileDimensions": {
+            "description": "يُعيدُ إستعراضَ وطولَ ملفِ العملِ الحاليِ في بيكسلز. هذا هو حجم الصورة العامة التي تلف جميع الطبقات."
+        },
+        "insertRasterLayer": {
+            "description": "تُدرِجُ صورةً ذات 8 أرباعِ كطبقةِ جديدةِ على قمةِ طبقةِ الوجباتِ.",
+            "property": {
+                "imageDataUri": "A قاعدة 64 بيانات الصور المشفرة URI. والصورة/الصورة/الصورة/الصورة مقبولة لدى وسائط الإعلام.",
+                "name": "The name of the new layer; usually the filename of the image.",
+                "transform": "مجموعة من 6 أرقام تمثل مصفوفة التحول 2D. التحول في الهوية: [1، صفر، صفر، 1، صفر، 1]"
+            },
+            "response": {
+                "success": "الطبقة الراقية."
+            }
+        },
+        "insertTextLayer": {
+            "description": "ينشر طبقة نصية الرفع الأول هو أصل السحب، حيث القمة هي خط الرماد من الضباب.",
+            "property": {
+                "text": "يضاف النص التالي:",
+                "name": "اسم طبقة النص الجديدة.",
+                "transform": "مجموعة من 6 أرقام تمثل مصفوفة التحول 2D. مع تحول الهوية، يتم رسم الطبقة مع أعلى الذرة اليسرى لها متوافقة مع الجزء العلوي من ملف العمل. التحول في الهوية: [1، صفر، صفر، 1، صفر، 1]",
+                "fontFamily": "اسم العائلة الضبابية لتستخدمه اتصلي بأداة القائمة المتوفره للحصول على قائمة أسماء.",
+                "fontSize": "الحجم الضبابي.",
+                "fill": "لون الملئ كـ \" آر جي بي \" أو \" آر جي بي \" 8 أر بي \" مثال: \"#000\" أو \"#000FF\""
+            }
+        },
+        "reorderLayers": {
+            "description": "يغير ترتيب الطبقات",
+            "property": {
+                "insertLayerIds": "هويات الطبقات التي ستدرج في كومة الطبقة المحددة يمكن استخلاص هويات الطبقات من أداة الرفع.",
+                "referenceLayerId": "هوية الطبقة التي تُدرج حولها، استناداً إلى ممتلكات الإضافة.",
+                "insertPosition": "الموقع الذي يوضع حول الطبقة المشار إليها بالرجوع إلى \"لايرلد\" أو \"أعلى\" أو \"أنزل\"."
+            },
+            "error": {
+                "noInsertIds": "Provide at least one ID in the insertLayerIds property"
+            },
+            "response": {
+                "success": "(لاير) أعاد ترتيبها."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "Resamples the entire image canvas in the working file (all layers) at a different resolution. معروف أيضاً بحجم الصورة.",
+            "property": {
+                "width": "البارود الجديد للصورة المُعاد ثقبها في البيكسلز.",
+                "height": "الطول الجديد للصورة المُعاد ثقبها في البيكسلز النسبة الجانبية من البارود إلى الطول يجب أن تتطابق مع الصورة الأصلية."
+            },
+            "response": {
+                "success": "نجاح العينة."
+            }
+        },
+        "selectLayers": {
+            "description": "مجموعة من الطبقات التي يتم اختيارها حالياً في المحرِّر من خلال توفير هوياتها",
+            "property": {
+                "ids": "مجموعة من هويات الطبقات (عدد القيم)"
+            },
+            "error": {
+                "noIds": "يجب أن تُقدّم على الأقل بطاقة هوية واحدة في عقارات (ايدز)."
+            },
+            "response": {
+                "success": "تم اختيار (لاير) بنجاح."
+            }
+        },
+        "setLayerTransform": {
+            "description": "يُحدّدُ الطبقاتَ المُختارةَ حالياً 3x3 2D مصفوفة التحوّل التي تُسيطرُ على موقعِها، التناوب، وحجمها.",
+            "property": {
+                "transform": "مجموعة من 6 أرقام تمثل مصفوفة التحول 2D. التحول في الهوية: [1، صفر، صفر، 1، صفر، 1]"
+            },
+            "response": {
+                "success": "استكمل التحول بنجاح."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "Updates the SVG attributes of any vector shape in any currently selected vector layers: rect., crcle., circle., élépse., line., polyline., polygon., or path..",
+            "property": {
+                "id": "هويّة الشكل لتحديثه هذا يمكن إسترجاعه من أداة الرفع من القائمة.",
+                "cx": "موقع (إكس) وسط دائرة أو مهبط في (بيكسل).",
+                "cy": "موقع مركز الدائرة أو النسيج في بيكسلز.",
+                "rx": "أشعة \"إكس\" لزوايا التراجع أو نصف قطرة الشفاه.",
+                "ry": "شعاع زوايا التراجع أو شعاع النسيج في اليكسلز.",
+                "points": "النقاط التي تُعرّف الحافة الخارجية لشكل البوليلين أو البوليغون. مثال: \"0 20,0 10,5\""
+            }
         }
     }
 }

@@ -75,7 +75,9 @@
         "convertVectorShapesToPaths": "形状をパスに変換する",
         "flipLayerX": "フリップ層 横",
         "flipLayerY": "フリップ層縦",
-        "mergeEffects": "マージ効果"
+        "mergeEffects": "マージ効果",
+        "freeTransform": "フリートランスフォーム",
+        "mergeLayerDown": "マージレイヤーダウン"
     },
     "app": {
         "colorPickerGradient": {
@@ -131,7 +133,9 @@
                 "vector": "ベクトル層",
                 "video": "ビデオ層"
             },
-            "deleteSelection": "選択を削除"
+            "deleteSelection": "選択を削除",
+            "edit": "編集",
+            "mergeDown": "マージダウン"
         },
         "wait": {
             "applyLayerTransform": "レイヤー変換を適用",
@@ -196,7 +200,9 @@
         "updateApp": "更新アプリ",
         "add": "追加する",
         "mergeEffects": "マージ効果",
-        "selectFiles": "ファイルの選択..."
+        "selectFiles": "ファイルの選択...",
+        "deletePlugin": "プラグインの削除",
+        "reload": "リロード"
     },
     "canvas": {
         "toolbar": {
@@ -333,6 +339,10 @@
                     "checkForUpdates": "アップデートの確認",
                     "updateAvailableTitle": "利用できる更新",
                     "updateAvailableMessage": "OpenGraphica のアップデートが利用可能です。 インストールしたいですか?"
+                },
+                "plugins": {
+                    "selectFile": "プラグインファイルを追加する...",
+                    "uninstall": "アンインストール"
                 }
             }
         }
@@ -440,8 +450,11 @@
             "param": {
                 "size": "サイズ:",
                 "xIntensity": "X 強度",
-                "yIntensity": "Y 強度"
-            }
+                "yIntensity": "Y 強度",
+                "xRadius": "Xの半径",
+                "yRadius": "Yの半径"
+            },
+            "help": "カール・フリードリッヒ・ガウスが発明したガウス・ファンクションを使ってイメージをブラーズ。 このブールは、焦点外のカメラレンズによって生成されたボケ効果とは異なる透明スクリーンを介して画像を表示しているようです."
         },
         "grayscale": {
             "name": "グレースケール",
@@ -473,7 +486,8 @@
                 "rotate": "回転率",
                 "targetColor": "ターゲット色",
                 "targetRange": "レンジ"
-            }
+            },
+            "help": "色の色合いをイメージで回転させ、知覚した色を効果的に変えます。\n\n*Color Space**は、新しい色の明るさと飽和を決定するために使用されます。 **Oklab**は、一般的に最も正確なオプションです。\n\n*Target Color**は、画像の1つの特定の色のみを選択的に変更するために使用できます。 **Range** は、**Target Color** に似た色が影響されるかを決定します."
         },
         "negative": {
             "name": "ログイン",
@@ -679,6 +693,67 @@
                 "centerX": "センターX",
                 "centerY": "センター Y"
             }
+        },
+        "cylinderBend": {
+            "name": "シリンダー ベンド",
+            "help": "3Dシリンダーの周りのイメージを包みます。 棒に紙の印を付けることのようなシナリオのために有用、等。\n\n***Rotation** - x軸周りのシリンダーを回転させます。 あらゆる表示角度を達成するために層のz軸回転と結合することができます。\n***Perspective** - 0%は無限の距離から見られ、100%は非常に近いです。\n***View Position** - 視点を上下にシフトし、視点を変えます.",
+            "param": {
+                "rotation": "ローテーション",
+                "perspective": "パースペクティブ",
+                "viewPosition": "ポジションを見る"
+            }
+        },
+        "highlightBloom": {
+            "help": "また、ハレーションとして知られています。これは、画像の明るい部分から暗い領域に軽い傷がついた柔らかい輝きです。 カメラでは、レンズ、拡散フィルタ、フィルムのエマルジョンの光反射に光を散らすことによって引き起こすことができます。\n***Threshold** - 明るい色が光を浴びるために持っている方法の範囲。\n***Radius** - どの程度の光が傷つくか。\n***Strength** - 明るい光が点灯する方法.",
+            "param": {
+                "threshold": "パスワード",
+                "radius": "ラディウス",
+                "strength": "強み"
+            }
+        },
+        "mechanicalVignette": {
+            "name": "メカニカルビネット",
+            "help": "カメラセンサーの入るから光を遮断する中心の円筒によって引き起こされるイメージの端の揺れを模倣して下さい。\n\n***Pupil Distance** - センサーからレンズの外側の円形開口部の距離。\n***Pupil Radius** - 瞳孔の円形開口部の半径。\n***Barrel Distance** - センサーの横のレンズの内部の円の入り口の間隔。\n* **バレルの半径** - バレルの円形の入り口の半径.",
+            "param": {
+                "mode": "モード",
+                "modeOption": {
+                    "simulate": "シミュレート",
+                    "remove": "削除"
+                },
+                "sensorWidth": "センサーの幅",
+                "sensorHeight": "センサーの高さ",
+                "exitPupilDistance": "瞳孔距離",
+                "exitPupilRadius": "瞳孔半径",
+                "barrelOpeningDistance": "バレルの間隔",
+                "barrelOpeningRadius": "バレルの半径"
+            }
+        },
+        "naturalVignette": {
+            "name": "ナチュラルビネット",
+            "help": "また、自然のイルミネーションフォールオフとして知られるこのシミュレートは、角度でセンサーに到達するシーンのオフ軸部分から光線によるカメラセンサーのエッジの揺れをシミュレートします。\n\nこの効果は、光がセンサーを垂直に当たるように設計されていない広角カメラレンズでより顕著です.",
+            "param": {
+                "mode": "モード",
+                "modeOption": {
+                    "simulate": "シミュレート",
+                    "remove": "削除"
+                },
+                "sensorWidth": "センサーの幅",
+                "sensorHeight": "センサーの高さ",
+                "focalLength": "焦点距離"
+            }
+        },
+        "radialSpeedLines": {
+            "name": "放射速度ライン",
+            "help": "放射状パターンの爪の動き線;一般的にマンガで使用されます。 ほとんどの値はランダムな範囲です。\n***Radius** - 線が中心に向かって描画されるまで。\n***Spacing** - 線の塊の間の空間。\n***Clumping** - 各クラスムの横にいくつの線が描画されます。\n* **厚さ** - 最高のライン厚さ。\n***Seed** - 線をランダム化します.",
+            "param": {
+                "centerRadius": "ラディウス",
+                "lineSpacing": "スライディング",
+                "lineClumping": "リクルート",
+                "lineThickness": "厚さ:",
+                "horizontalOffset": "水平方向",
+                "verticalOffset": "プロフィール",
+                "seed": "シード"
+            }
         }
     },
     "layerFilterGroup": {
@@ -702,6 +777,12 @@
         },
         "noise": {
             "name": "ノイズ"
+        },
+        "artistic": {
+            "name": "アーティスト"
+        },
+        "lightShadow": {
+            "name": "光と影"
         }
     },
     "layoutShortcutGroup": {
@@ -1214,6 +1295,21 @@
                 "title": "選択された層無し",
                 "message": "レイヤードックで1層以上選択して変換します。 レイヤー型は変換できません."
             }
+        },
+        "pluginInstallError": {
+            "title": "プラグインのインストールエラー",
+            "message": "「{pluginName}」プラグインをインストールするとエラーが発生しました。 エディタを再起動すると解決できます."
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "プラグインのインストール",
+            "message": "プラグインが有効になる前にエディタを再ロードする必要があります。 それでも機能している場合は、まずは変更を保存してください."
+        },
+        "pluginInstallZip": {
+            "title": "プラグインZIPをインストールする",
+            "installError": {
+                "title": "プラグインのインストールエラー",
+                "message": "選択したファイルがOpenGraphicaエディタプラグインではなく、エディタの現在のバージョンと互換性がありません."
+            }
         }
     },
     "moduleGroup": {
@@ -1401,6 +1497,16 @@
                 "update": {
                     "name": "更新アプリ",
                     "description": "アプリを更新して、新しい機能を受信します."
+                }
+            }
+        },
+        "plugin": {
+            "name": "プラグイン",
+            "description": "プラグイン管理.",
+            "modules": {
+                "installZip": {
+                    "name": "プラグインZIPをインストールする",
+                    "description": "ZIPファイルからエディタプラグインをインストールします."
                 }
             }
         }
@@ -1777,6 +1883,17 @@
         "layerOpacity": {
             "title": "オパシティ",
             "opacity": "オパシティ"
+        },
+        "cloneBrush": {
+            "brushOpacity": "オパシティ",
+            "brushSize": "サイズ:",
+            "brushHardness": "フリガナ",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "選択された層無し",
+                    "message": "レイヤードックで少なくとも1つのイメージレイヤーを選択します。 クローンブラシでは特定のレイヤータイプを使用できません."
+                }
+            }
         }
     },
     "toolGroup": {
@@ -2066,6 +2183,20 @@
                     "エリアをタップして消去します。 ダウンしている間、領域の削除量を調整するために、左右にドラッグできます."
                 ]
             }
+        },
+        "cloneBrushToolIntroduction": {
+            "title": "クローンブラシツール",
+            "introduction": [
+                "クローンブラシはイメージの一部をコピーして、どこかで同じ領域をペイントすることができます。 傷、不要なオブジェクトを削除したり、破損したスポットを埋めるのに普通使われます."
+            ],
+            "body": {
+                "mouse": [
+                    "クローンエリアは、クローンスタンプアイコンで円として表示されます。 周りや ctrl + クリックして現在のマウスの位置に設定できます."
+                ],
+                "touch": [
+                    "クローンエリアは、クローンスタンプアイコンで円として表示されます。 ドラッグできます."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -2106,7 +2237,8 @@
         "chroma": "クロマ",
         "color": "カラー",
         "lightness": "ライトネス",
-        "luminance": "ルミナンス"
+        "luminance": "ルミナンス",
+        "merge": "マージ"
     },
     "defaultBrush": {
         "default": "デフォルト",
@@ -2130,6 +2262,10 @@
                 "sharpen": {
                     "title": "シャープン",
                     "description": "画像のシャープな領域"
+                },
+                "cloneBrush": {
+                    "title": "クローンブラシ",
+                    "description": "画像の領域をクローンする"
                 }
             },
             "name": "デフォーム"
@@ -2222,6 +2358,233 @@
                 }
             },
             "name": "キャンバスビューポート"
+        }
+    },
+    "mcp": {
+        "common": {
+            "response": {
+                "deleteSuccess": "成功を削除します.",
+                "updateSuccess": "成功をアップデートします."
+            },
+            "error": {
+                "required": "プロパティ {propertyName} が必要です.",
+                "notArray": "プロパティ {propertyName} 配列でなければなりません.",
+                "notArrayNumber": "プロパティ {propertyName} 数値である値を持つ必要があります.",
+                "notArrayString": "プロパティ {propertyName} 文字列の値を持つ必要があります.",
+                "notNumber": "プロパティ {propertyName} 数値でなければなりません.",
+                "notString": "プロパティ {propertyName} 文字列でなければなりません.",
+                "notInEnumList": "プロパティ {propertyName} 受け入れられた列の値の 1 つではありません.",
+                "layerNotFound": "指定したレイヤーが見つかりませんでした.",
+                "2dTransformLength": "変換配列は6つの数字を正確に持たなければなりません."
+            }
+        },
+        "createCircleShape": {
+            "description": "現在の選択レイヤーにSVG <circle> 形状を追加したり、選択したレイヤーがベクトルレイヤーでないと新しいレイヤーに追加します。 レイヤー内の他の全ての形状の上に新しい形状が描かれています.",
+            "property": {
+                "cx": "円の中心のxの位置はピクセルで.",
+                "cy": "ピクセルの円の中心のyの位置.",
+                "r": "円ピクセルの半径."
+            }
+        },
+        "createEllipseShape": {
+            "description": "現在の選択レイヤーにSVG <ellipse> 形状を追加したり、選択したレイヤーがベクトルレイヤーでないと新しいレイヤーに追加します。 レイヤー内の他の全ての形状の上に新しい形状が描かれています.",
+            "property": {
+                "cx": "ピクセルの楕円の中心のxの位置.",
+                "cy": "ピクセルの楕円の中心のyの位置.",
+                "rx": "ピクセルのx軸に沿って楕円の半径.",
+                "ry": "ピクセルのy軸に沿って楕円の半径."
+            }
+        },
+        "createLineShape": {
+            "description": "現在の選択レイヤーにSVG <line> 形状を追加したり、選択したレイヤーがベクトルレイヤーでないと新しいレイヤーに追加します。 レイヤー内の他の全ての形状の上に新しい形状が描かれています.",
+            "property": {
+                "x1": "ピクセルの行の先頭の x 位置.",
+                "y1": "ピクセルの行の先頭の y 位置.",
+                "x2": "ピクセルの行の末尾のxの位置.",
+                "y2": "ピクセルの行の終端の y 位置."
+            }
+        },
+        "createPathShape": {
+            "description": "現在の選択レイヤーにSVG <path> 形状を追加したり、選択したレイヤーがベクトルレイヤーでないと新しいレイヤーに追加します。 レイヤー内の他の全ての形状の上に新しい形状が描かれています.",
+            "property": {
+                "d": "SVGパスコマンドの一覧です。 SVGの仕様に従ってください。 例:「M 10 80 Q 52.5 10, 95 80 T 180 80」"
+            }
+        },
+        "createPolygonShape": {
+            "description": "現在の選択層にSVG <polygon> 形状を追加したり、選択したレイヤーがベクターレイヤーでないと新しいレイヤーに追加します。 レイヤー内の他の全ての形状の上に新しい形状が描かれています.",
+            "property": {
+                "points": "形状の外側のエッジを定義するポイント。 例:「0,0 20,0 10,5」"
+            }
+        },
+        "createPolylineShape": {
+            "description": "現在の選択レイヤーにSVG <polyline> シェイプを追加したり、選択したレイヤーがベクターレイヤーでないと新しいレイヤーに追加します。 レイヤー内の他の全ての形状の上に新しい形状が描かれています.",
+            "property": {
+                "points": "接続された行を定義するポイント。 例:「0,0 20,0 10,5」"
+            }
+        },
+        "createRectangleShape": {
+            "description": "現在の選択レイヤーにSVG <rect> 形状を追加したり、選択したレイヤーがベクトルレイヤーでないと新しいレイヤーに追加します。 レイヤー内の他の全ての形状の上に新しい形状が描かれています.",
+            "property": {
+                "x": "ピクセルの矩形の左端のx位置.",
+                "y": "ピクセルの矩形の左端のy位置.",
+                "rx": "ピクセルの長方形の角のX半径.",
+                "ry": "ピクセルの長方形の角のy半径.",
+                "width": "ピクセルの長方形の幅.",
+                "height": "ピクセルの長方形の高さ."
+            }
+        },
+        "createShapeCommon": {
+            "property": {
+                "fill": "チャネル六角ごとのRGB 8ビットとして色を満たして下さい。 記入しないで下さい。 例:「#000000」",
+                "fillOpacity": "塗りつぶしの色が0から1までの小数の不透明度.",
+                "stroke": "ストロークカラーは、チャンネルヘックスあたりRGB 8ビットです。 ストロークなしの省略 例:「#000000」",
+                "strokeLinecap": "SVG 仕様で定義されている行の端をレンダーする方法.",
+                "strokeLinejoin": "結合された行の角は、SVG 仕様で定義されているようにレンダリングされます.",
+                "strokeOpacity": "ストローク色の不透明度は0から1までです.",
+                "strokeWidth": "ピクセル内のストロークの幅.",
+                "transform": "形状のtransform属性。 SVG 2D のマトリックスの変形機能である必要があります。 例: \"matrix(1,0,0,1,0,0)\""
+            },
+            "error": {
+                "fill": "Invalid は構文を埋めます。 チャネル六角ごとのRGBA 8ビットを提供して下さい。 例:「#000000」",
+                "stroke": "無効なストロークの構文。 チャネル六角ごとのRGBA 8ビットを提供して下さい。 例:「#000000」",
+                "transform": "Invalid は構文を変換します。 SVG 2Dのマトリックスの変形機能を提供して下さい。 例: \"matrix(1,0,0,1,0,0)\""
+            }
+        },
+        "cropWorkingFile": {
+            "description": "作業ファイル(すべてのレイヤー)でイメージキャンバス全体をクロップします。 キャンバスサイズを増加させるために負の作物を使うことができます.",
+            "property": {
+                "left": "ピクセル内のクロップされた画像の左端の境界。 これはマイナスです.",
+                "top": "ピクセル内のクロップされた画像の最も境界線。 これはマイナスです.",
+                "width": "ピクセル内のクロップされた画像の新しい幅。 元の幅よりも大きくなります.",
+                "height": "ピクセル内のクロップされた画像の新しい高さ。 元の高さよりも大きくなります."
+            },
+            "response": {
+                "success": "作物の成功."
+            }
+        },
+        "deleteLayers": {
+            "description": "指定したIDでレイヤーを削除します.",
+            "property": {
+                "layerIds": "削除するレイヤーのID。 レイヤー ID は get-layer-list ツールから取得できます."
+            },
+            "error": {
+                "noIds": "少なくとも1層のIDを提供して下さい."
+            },
+            "response": {
+                "success": "削除された層."
+            }
+        },
+        "deleteShape": {
+            "description": "選択したベクターレイヤーからSVG形状を削除します.",
+            "property": {
+                "id": "削除する形状のID。 get-shape-list ツールから取得できます."
+            }
+        },
+        "getAvailableFontList": {
+            "description": "テキストレイヤーで使用できるすべてのフォントファミリーをリストします."
+        },
+        "getEditorGuide": {
+            "description": "OpenGraphicaイメージエディタの動作について、自然な言語の要約を提供します.",
+            "summary": "OpenGraphica は 2D の混合媒体のイメージ エディターです。 コアでは、ラスター画像とベクター形状を編集し、ラスターとベクター画像の両方の形式にエクスポートできます。\n\nOpenGraphica の作業ファイルは 1 つ以上のレイヤーを持つイメージ ドキュメントです。 それはピクセルで定義される固定長方形の決断を備えています。 ディスプレイの目的で、 mm などの他の測定単位は UI でサポートされていますが、解像度X や解像度Y の設定を使用して編集するためのピクセルに変換されます。 作業中のファイルイメージ文書は、+xが右にある座標系で、+yは下がり、-zはビューアから画面に入ります。\n\n作業ファイルは個々のレイヤーのスタックで構成されます。 すべてのレイヤーは、ピクセルで定義される幅/高さ、3x3 2D変換行列を持ち、その位置/回転/スケールを決定します。 アイデンティティトランスフォーメーションマトリクスでは、作業ファイルの左上隅にレイヤーが配置されます。\n\nレイヤーには異なるタイプがあり、これらに含まれている画像の種類を推論します。\n***勾配** - 作業ファイルの全体をカバーする線形または半径勾配。\n**raster** - チャネルRGBAピクセルベースのイメージごとの8ビット。\n***rasterSequence** - 各フレームのチャンネルRGBAピクセルベースの画像ごとに8ビットを使用してアニメーションシーケンス。\n***text** - 水平または垂直に描画されたリッチテキストの1つ以上段落。\n*** - SVG 1.x ドキュメント。\n***video** - ウェブ対応のコーデックを使用したビデオ。\n\n層は底から上まで積み重ねられ、底層が最初に描画され、上層は他のすべての層の前に描画されます。 レイヤは、配列の最初のレイヤーが最下層であるように保存されますが、最上位層リストのエンドユーザーに表示されます。 レイヤは、デフォルトで線形RGBでブレンドするソースで合成され、すべての堆肥化操作が完了した後、sRGBに変換されます."
+        },
+        "getLayerList": {
+            "description": "レイヤーが配列順に描画される全てのレイヤーの JSON 要約定義を返します."
+        },
+        "getRasterLayerImage": {
+            "description": "指定したレイスターレイヤーのイメージデータを返します.",
+            "property": {
+                "id": "ラスター層のID。 get-layer-list ツールから取得できます."
+            }
+        },
+        "getShapeList": {
+            "description": "現在選択したベクターレイヤーのすべての形状をリストする JSON の定義を返します。 形状 ID は、新しい形状を追加、削除、または再オーダーされるたびに変更できます."
+        },
+        "getVectorLayerSvg": {
+            "description": "指定したベクターレイヤーに関連付けられたシリアライズされたSVG文書を返します.",
+            "property": {
+                "id": "ベクトル層のID。 get-layer-list ツールから取得できます."
+            }
+        },
+        "getWorkingFileDimensions": {
+            "description": "ピクセル内の現在の作業ファイルの幅と高さを返します。 すべてのレイヤーが座っている全体のイメージキャンバスのサイズです."
+        },
+        "insertRasterLayer": {
+            "description": "8ビットRGBAイメージをレイヤースタックの上に新しいラスターレイヤーとしてインサートします.",
+            "property": {
+                "imageDataUri": "Base64 は画像データ URI をエンコードしました。 媒体のタイプイメージ/pngかimage/jpegは受諾可能です.",
+                "name": "新しいレイヤーの名前。通常はイメージのファイル名です.",
+                "transform": "2D変換行列を表す6つの数字の配列。 例: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "ラスター層インサート."
+            }
+        },
+        "insertTextLayer": {
+            "description": "テキストレイヤーをインサートします。 トップ/左は、トップがフォントの上昇線であるドローの起源です.",
+            "property": {
+                "text": "インサートするテキスト",
+                "name": "新しいテキストレイヤーの名前.",
+                "transform": "2D変換行列を表す6つの数字の配列。 アイデンティティ変換で、レイヤーは、作業ファイルのキャンバスの左上と整列するトップ左のコーナーで描画されます。 例: [1, 0, 0, 1, 0, 1]",
+                "fontFamily": "使用するフォントファミリーの名前。 get-available-font-list ツールを呼び出して、名前のリストを取得します.",
+                "fontSize": "フォントサイズ.",
+                "fill": "チャネルの六角ごとのRGBかRGBA 8ビットとして色を満たして下さい。 例:「#000000」または「#000000FF」"
+            }
+        },
+        "reorderLayers": {
+            "description": "レイヤーの注文を変更する",
+            "property": {
+                "insertLayerIds": "レイヤースタックで指定したインサートのレイヤー ID を差し込みます。 レイヤー ID は get-layer-list ツールから取得できます.",
+                "referenceLayerId": "レイヤーの ID は、insertPosition プロパティに基づいて、周りに差し込みます.",
+                "insertPosition": "参照先LayerId で参照されるレイヤーの周りにインサートする位置。 \"above\" または \"below\" ."
+            },
+            "error": {
+                "noInsertIds": "InsertLayerIds プロパティで少なくとも 1 つの ID を 1 つ提供"
+            },
+            "response": {
+                "success": "再注文された層."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "異なる解像度で、作業ファイル(すべてのレイヤー)で画像キャンバス全体をリサンプルします。 画像サイズをスケーリングするとしても知られています.",
+            "property": {
+                "width": "ピクセル内の再サンプル画像の新しい幅.",
+                "height": "ピクセル内の再サンプル画像の新たな高さ。 元のイメージにマッチする幅のアスペクト比."
+            },
+            "response": {
+                "success": "Resampleの成功."
+            }
+        },
+        "selectLayers": {
+            "description": "エディタで選択したレイヤーを ID を提供することで設定します",
+            "property": {
+                "ids": "レイヤーIDの配列(数値値)"
+            },
+            "error": {
+                "noIds": "Id プロパティで少なくとも 1 つのレイヤー ID を指定する必要があります."
+            },
+            "response": {
+                "success": "選択された層は首尾よく."
+            }
+        },
+        "setLayerTransform": {
+            "description": "現在選択されたレイヤーの3x3 2D変換行列を設定し、その位置、回転、スケールをコントロールします.",
+            "property": {
+                "transform": "2D変換行列を表す6つの数字の配列。 例: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "更新された成功を変換します."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "現在選択されているベクターレイヤーのSVG属性を更新します。<rect>、<circle>、<ellipse>、<line>、<polyline>、<polygon>、<path>.",
+            "property": {
+                "id": "形状のIDを更新します。 get-shape-list ツールから取得できます.",
+                "cx": "円または楕円の中心のxの位置.",
+                "cy": "画素の円または楕円の中心のyの位置.",
+                "rx": "長方形の角の角やピクセルの楕円の半径.",
+                "ry": "長方形の角の角やピクセルの楕円の半径.",
+                "points": "ポリラインまたはポリゴン形状の外側のエッジを定義するポイント。 例:「0,0 20,0 10,5」"
+            }
         }
     }
 }
