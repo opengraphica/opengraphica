@@ -6,12 +6,6 @@ import preferencesStore from '@/store/preferences';
 import { registerApp } from '@/composables/app-plugin';
 import { createWebdavClient } from '@/composables/webdav-client';
 
-declare global {
-    interface Window {
-        debugImage: (image: HTMLImageElement | HTMLCanvasElement | ImageBitmap | null) => void;
-    }
-}
-
 import('@/lib/keyboard');
 
 export interface OpenGraphica extends App<Element> {
@@ -88,22 +82,7 @@ appEmitter.on('app.component.register', (component) => {
 // Auto mount if dev server
 if ((window as any).webpackHotUpdateOpenGraphica) {
 
-    // Debugging
-    (window as any).debugImage = async function(image: HTMLImageElement | HTMLCanvasElement | ImageBitmap) {
-        import('file-saver').then(({ default: { saveAs } }) => {
-            import('@/lib/image').then(async ({ createImageBlobFromCanvas, createImageBlobFromImageBitmap, createImageBlobFromImage }) => {
-                let blob: Blob;
-                if (image instanceof ImageBitmap) {
-                    blob = await createImageBlobFromImageBitmap(image);
-                } else if (image instanceof HTMLCanvasElement) {
-                    blob = await createImageBlobFromCanvas(image);
-                } else if (image instanceof HTMLImageElement) {
-                    blob = await createImageBlobFromImage(image);
-                }
-                saveAs(blob!, 'debug-image.png');
-            });
-        });
-    }
+    import('@/lib/debugging');
 
     const mount = document.createElement('div');
     mount.id = 'opengraphica';

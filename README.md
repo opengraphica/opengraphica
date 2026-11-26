@@ -29,11 +29,12 @@ Import the app and mount it on your page:
 ```js
 import OpenGraphica from 'opengraphica';
 
-// Tell OpenGraphica where to load is assets from (editor images and other things).
+// Tell OpenGraphica where to load its assets from (editor images and other things).
 // This path depends on how your bundler is configured.
 OpenGraphica.emit('store.setPreference', { key: 'assetsBasePath', value: '/' });
 
-// Replace this with your logic. OpenGraphica will fill the width/height of whatever element you place it inside of.
+// Replace this with your logic. OpenGraphica will fill the width/height of whatever
+// element you place it inside of.
 const container = document.createElement('div');
 container.style.display = 'flex';
 container.style.position = 'relative';

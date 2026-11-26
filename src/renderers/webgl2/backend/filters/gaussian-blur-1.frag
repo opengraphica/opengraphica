@@ -7,13 +7,13 @@ vec4 processGaussianBlur(vec4 color, vec2 uv) {
     float sigma = (1.0 - cbrt(1.0 - pYRadius)) * maxDimension / 6.0;
     vec2 halfTexel = 0.5 / layerResolution;
 
-    float offset = random(vec3(12.9898, 78.233, 151.7182), 0.0);
+    float jitterOffset = random(vec3(12.9898, 78.233, 151.7182), 0.0);
 
     vec4 sum = sampleBackbuffer(uv);
     float weightSum = 1.0;
 
     for (int i = 1; i <= 64; ++i) {
-        float t = (float(i) + offset - 0.5) / 64.0;
+        float t = (float(i) + jitterOffset - 0.5) / 64.0;
         float weight = exp(-4.5 * t * t);
         float distancePixels = 3.0 * sigma * t;
         vec2 offset = vec2(0.0, distancePixels / layerResolution.y);

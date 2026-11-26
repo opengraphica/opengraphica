@@ -1,5 +1,5 @@
 
-vec4 materialMain(vec2 uv) {
+vec4 materialMain(vec2 uv, float lod) {
     vec2 fragCoord = vec2(uv.x * float(cCanvasWidth), (1.0 - uv.y) * float(cCanvasHeight));
 
 #if cFillType == GRADIENT_FILL_TYPE_LINEAR

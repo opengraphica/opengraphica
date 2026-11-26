@@ -160,18 +160,12 @@ vec3 rgbToHsl(in vec3 c){
 }
 
 vec3 rgbToOklab(in vec3 rgb) {
-    float L = pow(
-        0.41222147079999993 * rgb.r + 0.5363325363 * rgb.g + 0.0514459929 * rgb.b,
-        1.0 / 3.0
-    );
-    float M = pow(
-        0.2119034981999999 * rgb.r + 0.6806995450999999 * rgb.g + 0.1073969566 * rgb.b,
-        1.0 / 3.0
-    );
-    float S = pow(
-        0.08830246189999998 * rgb.r + 0.2817188376 * rgb.g + 0.6299787005000002 * rgb.b,
-        1.0 / 3.0
-    );
+    float lRaw = 0.41222147079999993 * rgb.r + 0.5363325363 * rgb.g + 0.0514459929 * rgb.b;
+    float L = sign(lRaw) * pow(abs(lRaw), 1.0 / 3.0);
+    float mRaw = 0.2119034981999999 * rgb.r + 0.6806995450999999 * rgb.g + 0.1073969566 * rgb.b;
+    float M = sign(mRaw) * pow(abs(mRaw), 1.0 / 3.0);
+    float sRaw = 0.08830246189999998 * rgb.r + 0.2817188376 * rgb.g + 0.6299787005000002 * rgb.b;
+    float S = sign(sRaw) * pow(abs(sRaw), 1.0 / 3.0);
     return vec3(
         0.2104542553 * L + 0.793617785 * M - 0.0040720468 * S,
         1.9779984951 * L - 2.428592205 * M + 0.4505937099 * S,

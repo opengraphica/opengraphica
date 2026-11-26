@@ -103,6 +103,10 @@
         "group": "distort"
     },
 
+    "dropShadow": {
+        "name": "layerFilter.dropShadow.name",
+        "group": "lightShadow"
+    },
     "highlightBloom": {
         "name": "layerFilter.highlightBloom.name",
         "group": "lightShadow"

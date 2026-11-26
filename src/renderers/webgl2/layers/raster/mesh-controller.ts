@@ -53,6 +53,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
 
     isHalfFloat: boolean = false;
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
+    extendedBounds: number[] = [0, 0, 0, 0];
     regenerateThumbnailTimeoutHandle: number | undefined;
     isRequestingSourceTexture: boolean = false;
     sourceTextureFetchCallbacks: Array<(texture: Texture | null) => void> = [];
@@ -124,6 +125,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                         isHalfFloat: this.isHalfFloat,
                     });
                 }
+                this.updateExtendedBounds();
                 this.plane && (this.plane.material = this.materials[this.materials.length - 1]);
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
@@ -171,7 +173,17 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         const originalAutoClear = backend.renderer.autoClear;
         backend.renderer.autoClear = true;
         backend.renderer.getViewport(originalViewport);
-        backend.renderer.setViewport(0, 0, this.sourceTexture.width, this.sourceTexture.height);
+        // backend.renderer.setViewport(
+        //     -this.extendedBounds[0],
+        //     -this.extendedBounds[1],
+        //     this.sourceTexture.width + this.extendedBounds[0] + this.extendedBounds[2],
+        //     this.sourceTexture.height + this.extendedBounds[1] + this.extendedBounds[3]
+        // );
+        this.prepassCamera.left = -this.extendedBounds[0];
+        this.prepassCamera.top = -this.extendedBounds[1];
+        this.prepassCamera.right = this.sourceTexture.width + this.extendedBounds[2];
+        this.prepassCamera.bottom = this.sourceTexture.height + this.extendedBounds[3];
+        this.prepassCamera.updateProjectionMatrix();
         for (let [materialIndex, currentMaterial] of this.materials.entries()) {
             if (materialIndex < this.materials.length - 1) {
                 const nextMaterial = this.materials[materialIndex + 1];
@@ -254,6 +266,26 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         this.tileUpdateId = data.tileUpdateId;
     }
 
+    updateExtendedBounds() {
+        const oldExtendedBounds = this.extendedBounds;
+        this.extendedBounds = [0, 0, 0, 0];
+        for (const material of this.materials) {
+            if (!material.userData.extendedBounds) continue;
+            this.extendedBounds[0] = Math.max(material.userData.extendedBounds[0], this.extendedBounds[0]);
+            this.extendedBounds[1] = Math.max(material.userData.extendedBounds[1], this.extendedBounds[1]);
+            this.extendedBounds[2] = Math.max(material.userData.extendedBounds[2], this.extendedBounds[2]);
+            this.extendedBounds[3] = Math.max(material.userData.extendedBounds[3], this.extendedBounds[3]);
+        }
+        if (
+            this.extendedBounds[0] !== oldExtendedBounds[0]
+            || this.extendedBounds[1] !== oldExtendedBounds[1]
+            || this.extendedBounds[2] !== oldExtendedBounds[2]
+            || this.extendedBounds[3] !== oldExtendedBounds[3]
+        ) {
+            this.updateSize(this.width, this.height);
+        }
+    }
+
     async updateFilters(filters: WorkingFileLayerFilter[]) {
         this.filters = await createCanvasFiltersFromLayerConfig(filters);
         await this.scheduleMaterialUpdate('destroyAndCreate');
@@ -268,10 +300,25 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     updateSize(width: number, height: number) {
         this.width = width;
         this.height = height;
+        let uvs = [
+            (-this.extendedBounds[0] / width),
+            (-this.extendedBounds[3] / height),
+            1 + (this.extendedBounds[2] / width),
+            1 + (this.extendedBounds[1] / height),
+        ];
         this.planeGeometry?.dispose();
-        this.planeGeometry = new ImagePlaneGeometry(width, height);
+        this.planeGeometry = new ImagePlaneGeometry(
+            width + this.extendedBounds[0] + this.extendedBounds[2],
+            height + this.extendedBounds[1] + this.extendedBounds[3],
+            -this.extendedBounds[0],
+            -this.extendedBounds[1],
+            uvs
+        );
         if (this.plane) {
             this.plane.geometry = this.planeGeometry;
+        }
+        if (this.prepassPlane) {
+            this.prepassPlane.geometry = this.planeGeometry;
         }
         markRenderDirty();
     }
@@ -417,11 +464,14 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
             for (const uniformName in uniforms) {
                 material.uniforms[uniformName] = uniforms[uniformName];
             }
+            material.userData.extendedBounds = material.userData.getExtendedBounds(this.filters)
             material.uniformsNeedUpdate = true;
         }
 
         if (needsDestroyAndCreate) {
             this.scheduleMaterialUpdate('destroyAndCreate');
+        } else {
+            this.updateExtendedBounds();
         }
 
         markRenderDirty();

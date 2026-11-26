@@ -54,8 +54,13 @@ export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLay
                     (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default
                 );
             }
+            let vertexShader: string | undefined;
+            if (canvasFilter.hasVertexShader) {
+                vertexShader = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.vert`)).default
+            }
             canvasFilter.fragmentShader = fragmentShaders[0];
             canvasFilter.fragmentShaders = fragmentShaders;
+            canvasFilter.vertexShader = vertexShader;
             canvasFilter.maskId = filterConfig.maskId;
             canvasFilter.params = filterConfig.params ?? {};
             canvasFilters.push(canvasFilter);

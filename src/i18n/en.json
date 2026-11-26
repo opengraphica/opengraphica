@@ -514,6 +514,17 @@
         "decreaseColorDepth": {
             "name": "Decrease Color Depth"
         },
+        "dropShadow": {
+            "name": "Drop Shadow",
+            "help": "Adds a shadow behind the current layer. The shadow is shaped around the transparent edges of the layer.\n\n**Note:** The shadow is cut off by the layer boundary. The image must have transparent areas for the shadow to appear.",
+            "param": {
+                "xOffset": "X Offset",
+                "yOffset": "Y Offset",
+                "blurRadius": "Blur",
+                "growRadius": "Grow",
+                "color": "Color"
+            }
+        },
         "emboss": {
             "name": "Emboss",
             "help": "Simulates the 3D appearance of physical embossing, such as pressing a design into paper or metal.\n\n* **Angle** - Controls the direction of the light and shadow.\n* **Elevation** - Rases the height of the embossed area, increasing the strength of lights and shadows.",
