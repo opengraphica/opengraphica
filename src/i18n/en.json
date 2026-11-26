@@ -770,6 +770,33 @@
         "sepia": {
             "name": "Sepia"
         },
+        "shapeMask": {
+            "name": "Shape Mask",
+            "help": "Creates an alpha/transparency mask using one of a few basic shapes.\n\n* **Square Aspect** - Centers the shape over the layer in a 1:1 aspect ratio.\n* **Rotation** - Rotates the shape while keeping its edges touching the layer boundaries.\n* **Adjustment** - Some shapes have an additional adjustment. What this does depends on the shape.",
+            "param": {
+                "type": "Shape",
+                "typeOption": {
+                    "circle": "Circle",
+                    "equilateralTriangle": "Equilateral Triangle",
+                    "rightAngleTriangle": "Right Angle Triangle",
+                    "parallelogram": "Parallelogram",
+                    "diamond": "Diamond",
+                    "trapezoid": "Trapezoid",
+                    "pentagon": "Pentagon",
+                    "hexagon": "Hexagon",
+                    "heptagon": "Heptagon",
+                    "octagon": "Octagon",
+                    "decagon": "Decagon",
+                    "dodecagon": "Dodecagon",
+                    "cross": "Cross",
+                    "heart": "Heart",
+                    "moon": "Moon"
+                },
+                "squareAspect": "Square Aspect",
+                "rotation": "Rotation",
+                "adjustment": "Adjustment"
+            }
+        },
         "spread": {
             "name": "Spread",
             "help": "Shifts the pixels horizontally or vertically in a random noise pattern.",
