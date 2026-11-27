@@ -31,29 +31,29 @@ export interface VectorPathCommandCommon {
 }
 
 export interface VectorPathCommandMove extends VectorPathCommandCommon {
-    type: VectorPathCommandType.MOVE,
+    type: VectorPathCommandType.MOVE;
     x: number;
     y: number;
 }
 
 export interface VectorPathCommandLine extends VectorPathCommandCommon {
-    type: VectorPathCommandType.LINE,
+    type: VectorPathCommandType.LINE;
     x: number;
     y: number;
 }
 
 export interface VectorPathCommandHorizontalLine extends VectorPathCommandCommon {
-    type: VectorPathCommandType.HORIZONTAL_LINE,
+    type: VectorPathCommandType.HORIZONTAL_LINE;
     x: number;
 }
 
 export interface VectorPathCommandVerticalLine extends VectorPathCommandCommon {
-    type: VectorPathCommandType.VERTICAL_LINE,
+    type: VectorPathCommandType.VERTICAL_LINE;
     y: number;
 }
 
 export interface VectorPathCommandCubicBezierCurve extends VectorPathCommandCommon {
-    type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
+    type: VectorPathCommandType.CUBIC_BEZIER_CURVE;
     x: number;
     y: number;
     x1: number;
@@ -63,7 +63,7 @@ export interface VectorPathCommandCubicBezierCurve extends VectorPathCommandComm
 }
 
 export interface VectorPathCommandSmoothCubicBezierCurve extends VectorPathCommandCommon {
-    type: VectorPathCommandType.SMOOTH_CUBIC_BEZIER_CURVE,
+    type: VectorPathCommandType.SMOOTH_CUBIC_BEZIER_CURVE;
     x: number;
     y: number;
     x2: number;
@@ -71,7 +71,7 @@ export interface VectorPathCommandSmoothCubicBezierCurve extends VectorPathComma
 }
 
 export interface VectorPathCommandQuadraticBezierCurve extends VectorPathCommandCommon {
-    type: VectorPathCommandType.QUADRATIC_BEZIER_CURVE,
+    type: VectorPathCommandType.QUADRATIC_BEZIER_CURVE;
     x: number;
     y: number;
     x1: number;
@@ -79,13 +79,13 @@ export interface VectorPathCommandQuadraticBezierCurve extends VectorPathCommand
 }
 
 export interface VectorPathCommandSmoothQuadraticBezierCurve extends VectorPathCommandCommon {
-    type: VectorPathCommandType.SMOOTH_QUADRATIC_BEZIER_CURVE,
+    type: VectorPathCommandType.SMOOTH_QUADRATIC_BEZIER_CURVE;
     x: number;
     y: number;
 }
 
 export interface VectorPathCommandArc extends VectorPathCommandCommon {
-    type: VectorPathCommandType.ELLIPTICAL_ARC,
+    type: VectorPathCommandType.ELLIPTICAL_ARC;
     rx: number;
     ry: number;
     xAxisRotation: number;
@@ -96,7 +96,7 @@ export interface VectorPathCommandArc extends VectorPathCommandCommon {
 }
 
 export interface VectorPathCommandClose extends VectorPathCommandCommon {
-    type: VectorPathCommandType.CLOSE,
+    type: VectorPathCommandType.CLOSE;
 }
 
 export type VectorPathCommand = VectorPathCommandMove | VectorPathCommandLine | VectorPathCommandHorizontalLine
@@ -105,7 +105,7 @@ export type VectorPathCommand = VectorPathCommandMove | VectorPathCommandLine | 
     | VectorPathCommandArc | VectorPathCommandClose;
 
 export interface AnyVectorPathCommand extends VectorPathCommandCommon {
-    type: VectorPathCommandType,
+    type: VectorPathCommandType;
     x?: number;
     y?: number;
     x1?: number;

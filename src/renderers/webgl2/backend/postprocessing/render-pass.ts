@@ -40,7 +40,7 @@ export class RenderPass extends Pass {
         this._previousPassMaterial = new ShaderMaterial({
             uniforms: CopyShader.uniforms,
             vertexShader: CopyShader.vertexShader,
-            fragmentShader: CopyShader.fragmentShader
+            fragmentShader: CopyShader.fragmentShader,
         });
         this._previousPassQuad = new FullScreenQuad(this._previousPassMaterial);
     }
@@ -81,7 +81,7 @@ export class RenderPass extends Pass {
             this._previousPassMaterial.needsUpdate = true;
             this._previousPassQuad.render(renderer);
         }
-        
+
         renderer.render(this.scene, this.camera);
 
         if (this.clearColor) {

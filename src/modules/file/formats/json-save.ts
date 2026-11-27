@@ -22,7 +22,7 @@ import type {
     SerializedFileTextLayer,
     WorkingFileLayer, WorkingFileGradientLayer, WorkingFileGroupLayer,
     WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
-    WorkingFileVideoLayer, WorkingFileTextLayer,
+    WorkingFileVideoLayer, WorkingFileTextLayer
 } from '@/types';
 
 export function serializeWorkingFile(): SerializedFile<ColorModel> {
@@ -34,7 +34,7 @@ export function serializeWorkingFile(): SerializedFile<ColorModel> {
             sourceImageSerialized: serializeStoredImage(mask.sourceUuid),
             hash: mask.hash,
             offset: mask.offset,
-        }
+        };
     }
 
     const serializedFile: SerializedFile<ColorModel> = {
@@ -55,14 +55,14 @@ export function serializeWorkingFile(): SerializedFile<ColorModel> {
         scaleFactor: workingFileStore.get('scaleFactor'),
         selectedLayerIds: workingFileStore.get('selectedLayerIds'),
         width: workingFileStore.get('width'),
-        layers: serializeWorkingFileLayers(workingFileStore.get('layers'))
+        layers: serializeWorkingFileLayers(workingFileStore.get('layers')),
     };
     return serializedFile;
 }
 
 function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): SerializedFileLayer<ColorModel>[] {
-    let serializedLayers: SerializedFileLayer<ColorModel>[] = [];
-    for (let layer of layers) {
+    const serializedLayers: SerializedFileLayer<ColorModel>[] = [];
+    for (const layer of layers) {
         let serializedLayer: SerializedFileLayer<ColorModel> = {
             blendingMode: layer.blendingMode,
             filters: layer.filters,
@@ -80,7 +80,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
             serializedLayer = {
                 ...serializedLayer,
                 type: 'gradient',
-                data: (layer as WorkingFileGradientLayer<ColorModel>).data
+                data: (layer as WorkingFileGradientLayer<ColorModel>).data,
             } as SerializedFileGradientLayer<ColorModel>;
         }
         else if (layer.type === 'group') {
@@ -88,7 +88,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                 ...serializedLayer,
                 type: 'group',
                 expanded: (layer as WorkingFileGroupLayer<ColorModel>).expanded,
-                layers: serializeWorkingFileLayers((layer as WorkingFileGroupLayer<ColorModel>).layers)
+                layers: serializeWorkingFileLayers((layer as WorkingFileGroupLayer<ColorModel>).layers),
             } as SerializedFileGroupLayer<ColorModel>;
         }
         else if (layer.type === 'raster') {
@@ -96,35 +96,35 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                 ...serializedLayer,
                 type: 'raster',
                 data: {
-                    sourceImageSerialized: serializeStoredImage((layer as WorkingFileRasterLayer<ColorModel>).data.sourceUuid)
-                }
+                    sourceImageSerialized: serializeStoredImage((layer as WorkingFileRasterLayer<ColorModel>).data.sourceUuid),
+                },
             } as SerializedFileRasterLayer<ColorModel>;
         }
         else if (layer.type === 'rasterSequence') {
             const memoryLayer = (layer as WorkingFileRasterSequenceLayer<ColorModel>);
             const serializedSequence: SerializedFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
-            for (let frame of memoryLayer.data.sequence) {
+            for (const frame of memoryLayer.data.sequence) {
                 serializedSequence.push({
                     start: frame.start,
                     end: frame.end,
                     image: {
-                        sourceImageSerialized: serializeStoredImage(frame.image.sourceUuid)
-                    }
+                        sourceImageSerialized: serializeStoredImage(frame.image.sourceUuid),
+                    },
                 });
             }
             serializedLayer = {
                 ...serializedLayer,
                 type: 'rasterSequence',
                 data: {
-                    sequence: serializedSequence
-                }
+                    sequence: serializedSequence,
+                },
             } as SerializedFileRasterSequenceLayer<ColorModel>;
         }
         else if (layer.type === 'text') {
             serializedLayer = {
                 ...serializedLayer,
                 type: 'text',
-                data: (layer as WorkingFileTextLayer<ColorModel>).data
+                data: (layer as WorkingFileTextLayer<ColorModel>).data,
             } as SerializedFileTextLayer<ColorModel>;
         }
         else if (layer.type === 'vector') {
@@ -133,9 +133,9 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                 type: 'vector',
                 data: {
                     sourceSvgSerialized: getStoredSvgDataUrl(
-                        (layer as WorkingFileVectorLayer<ColorModel>).data.sourceUuid
-                    )
-                }
+                        (layer as WorkingFileVectorLayer<ColorModel>).data.sourceUuid,
+                    ),
+                },
             } as SerializedFileVectorLayer<ColorModel>;
         }
         else if (layer.type === 'video') {
@@ -144,9 +144,9 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                 type: 'video',
                 data: {
                     sourceVideoSerialized: getStoredVideoDataUrl(
-                        (layer as WorkingFileVideoLayer<ColorModel>).data.sourceUuid
-                    )
-                }
+                        (layer as WorkingFileVideoLayer<ColorModel>).data.sourceUuid,
+                    ),
+                },
             } as SerializedFileVideoLayer<ColorModel>;
         }
         serializedLayers.push(serializedLayer);
@@ -167,7 +167,7 @@ function serializeStoredImage(imageUuid?: string): string {
             return '';
         }
         ctx.imageSmoothingEnabled = false;
-        
+
         if (canvasStore.state.renderer === 'webgl' && sourceImage instanceof ImageBitmap) {
             ctx.scale(1, -1);
             ctx.translate(0, -sourceImage.height);

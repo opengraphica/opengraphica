@@ -16,7 +16,7 @@ type DatabaseImageData = string | HTMLImageElement | ImageData | Blob;
 
 interface MemoryStore {
     isMemory: true;
-    images: { [key: string]: DatabaseImageData };
+    images: { [key: string]: DatabaseImageData; };
 }
 
 interface IDBDatabaseEnhanced extends IDBDatabase {
@@ -42,12 +42,12 @@ export default {
                         // Delete database from a previous page load, if no other tabs have notified that they're open in a while
                         let shouldDeleteDatabase = true;
                         try {
-                            let lastDatabaseTabPing = localStorage.getItem('openGraphica_historyUsagePing');
+                            const lastDatabaseTabPing = localStorage.getItem('openGraphica_historyUsagePing');
                             shouldDeleteDatabase = (!lastDatabaseTabPing || parseInt(lastDatabaseTabPing, 10) < new Date().getTime() - assumeTabIsClosedTimeout);
                         } catch (error) {}
                         if (shouldDeleteDatabase) {
                             await new Promise<void>((resolve, reject) => {
-                                let deleteRequest = window.indexedDB.deleteDatabase('openGraphicaUndoHistoryImageStore');
+                                const deleteRequest = window.indexedDB.deleteDatabase('openGraphicaUndoHistoryImageStore');
                                 deleteRequest.onerror = () => {
                                     reject(deleteRequest.error);
                                 };
@@ -58,7 +58,7 @@ export default {
                         }
                         // Initialize database
                         await new Promise<void>((resolve, reject) => {
-                            let openRequest = window.indexedDB.open('openGraphicaUndoHistoryImageStore', 1);
+                            const openRequest = window.indexedDB.open('openGraphicaUndoHistoryImageStore', 1);
                             openRequest.onupgradeneeded = function(event) {
                                 database = openRequest.result as IDBDatabaseEnhanced;
                                 switch (event.oldVersion) {
@@ -69,11 +69,11 @@ export default {
                             };
                             openRequest.onerror = () => {
                                 reject(openRequest.error);
-                            }
+                            };
                             openRequest.onsuccess = () => {
                                 resolve();
                                 database = openRequest.result as IDBDatabaseEnhanced;
-                            }
+                            };
                         });
                         if (!database) {
                             throw new Error('indexedDB not initialized');
@@ -98,7 +98,7 @@ export default {
                 databaseBackup = {
                     isMemory: true,
                     images: {},
-                }
+                };
                 resolveInit();
             });
             await databaseInitPromise;
@@ -109,13 +109,13 @@ export default {
 
     /**
      * Adds the specified image to the database. Returns a promise that is resolved with an id that can be used to retrieve it again.
-     * 
+     *
      * @param {string | Image | ImageData | Blob} imageData the image data to store
      * @returns {Promise<string>} resolves with retrieval id
      */
     async add(imageData: DatabaseImageData): Promise<string> {
         await this.init();
-        let imageId = tabUuid + '_' + uuidv4() + '_' + (imageIdCounter++);
+        const imageId = tabUuid + '_' + uuidv4() + '_' + (imageIdCounter++);
         if (database?.isMemory) {
             database.images[imageId] = imageData;
         } else {
@@ -126,8 +126,8 @@ export default {
                     const image = {
                         id: imageId,
                         tabUuid,
-                        data: imageData
-                    }
+                        data: imageData,
+                    };
                     const request = images.add(image);
                     request.onsuccess = function() {
                         resolve();
@@ -148,7 +148,7 @@ export default {
 
     /**
      * Gets the specified image from the database, by imageId retrieved from "add()" method.
-     * 
+     *
      * @param {string} imageId the id of the image to get
      * @returns {Promise<string | Image | ImageData | Blob>} resolves with the image
      */
@@ -185,9 +185,9 @@ export default {
 
     /**
      * Deletes the specified image from the database, by imageId retrieved from "add()" method.
-     * 
+     *
      * @param {string} imageId the id of the image to delete
-     * @returns {Promise<void>} 
+     * @returns {Promise<void>}
      */
     async delete(imageId: string): Promise<void> {
         await this.init();
@@ -211,8 +211,8 @@ export default {
 
     /**
      * Deletes all images associated with the current tab.
-     * 
-     * @returns {Promise<void>} 
+     *
+     * @returns {Promise<void>}
      */
     async deleteAll() {
         await this.init();
@@ -224,10 +224,10 @@ export default {
                 const transaction = (database as IDBDatabaseEnhanced).transaction('images', 'readwrite');
                 const images = transaction.objectStore('images');
                 const getAllImagesRequest = images.getAll();
-                getAllImagesRequest.onsuccess = async function () {
+                getAllImagesRequest.onsuccess = async function() {
                     const allImages = getAllImagesRequest.result;
                     let errorOccurred = false;
-                    for (let image of allImages) {
+                    for (const image of allImages) {
                         if (image.tabUuid === tabUuid) {
                             try {
                                 await new Promise<void>((deleteResolve, deleteReject) => {
@@ -252,9 +252,9 @@ export default {
                     resolve();
                 };
                 getAllImagesRequest.onerror = function() {
-                    reject(getAllImagesRequest.error)
+                    reject(getAllImagesRequest.error);
                 };
             });
         }
-    }
+    },
 };

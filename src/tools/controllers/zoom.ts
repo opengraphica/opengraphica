@@ -23,7 +23,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         // Tutorial message
         if (!editorStore.state.tutorialFlags.zoomToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.zoomToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.zoomToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -34,7 +34,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                             return `<p class="mb-3!">${rt(message, {
                                 zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.zooming')}</strong>`,
                                 panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.panning')}</strong>`,
-                            })}</p>`
+                            })}</p>`;
                         }).join(''),
                         mouse: message + (tm('tutorialTip.zoomToolIntroduction.body.mouse') as string[]).map((message) => {
                             return `<p class="mb-3!">${rt(message, {
@@ -43,9 +43,9 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                                 leftClick: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.leftClick')}</em>`,
                                 ctrlLeftClick: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.ctrlLeftClick')}</em>`,
                                 leftMouseButton: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.leftMouseButton')}</em>`,
-                            })}</p>`
+                            })}</p>`;
                         }).join(''),
-                    }
+                    },
                 });
             });
         }
@@ -84,7 +84,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 const lastCursorY = (pointer.movePrev || pointer.down).pageY;
                 const cursorX = e.pageX;
                 const cursorY = e.pageY;
-                let transform = canvasStore.get('transform');
+                const transform = canvasStore.get('transform');
                 const transformInverse = transform.inverse();
                 const moveTranslateStart = new DOMPoint(lastCursorX * devicePixelRatio, lastCursorY * devicePixelRatio).matrixTransform(transformInverse);
                 // Pan View

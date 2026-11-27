@@ -21,17 +21,17 @@ interface ConvertLayersToImageSequenceOptions {
 }
 
 export async function convertLayersToImageSequence(options: ConvertLayersToImageSequenceOptions = {}): Promise<void> {
-    let frameDelay = options.frameDelay || 1;
+    const frameDelay = options.frameDelay || 1;
 
     // TODO - base on selected layers
 
     const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
 
-    let { width: textureWidth, height: textureHeight } = limitMaxDimension(
+    const { width: textureWidth, height: textureHeight } = limitMaxDimension(
         workingFileStore.get('width'),
         workingFileStore.get('height'),
         maxTextureSize,
-    )
+    );
 
     const combineLayers = getLayersByType<WorkingFileRasterLayer<ColorModel>>('raster');
     const rasterSequenceLayer: InsertRasterSequenceLayerOptions<ColorModel> = {
@@ -44,30 +44,32 @@ export async function convertLayersToImageSequence(options: ConvertLayersToImage
             workingFileStore.get('height') / textureHeight,
         ),
         data: {
-            sequence: []
-        }
+            sequence: [],
+        },
     };
     let start: number = 0;
     if (combineLayers.length > 0) {
-        for (let layer of combineLayers) {
+        for (const layer of combineLayers) {
             rasterSequenceLayer.data?.sequence.push({
                 start: start,
                 end: Math.floor(start + frameDelay),
                 image: {
                     sourceUuid: layer.data.sourceUuid,
                 },
-                thumbnailImageSrc: null
+                thumbnailImageSrc: null,
             });
             start = Math.floor(start + frameDelay);
         }
-        rasterSequenceLayer.data && (rasterSequenceLayer.data.currentFrame = rasterSequenceLayer.data?.sequence[0].image);
+        if (rasterSequenceLayer.data) {
+            rasterSequenceLayer.data.currentFrame = rasterSequenceLayer.data?.sequence[0].image;
+        }
         editorStore.dispatch('setTimelineCursor', start);
         updateRasterSequenceLayerWithTimeline(rasterSequenceLayer as any);
         historyStore.dispatch('runAction', {
             action: new BundleAction('convertLayersToImageSequence', 'action.convertLayersToImageSequence', [
                 new DeleteLayersAction(combineLayers.map((layer) => layer.id)),
-                new InsertLayerAction(rasterSequenceLayer)
-            ])
+                new InsertLayerAction(rasterSequenceLayer),
+            ]),
         });
     }
 }
@@ -89,7 +91,7 @@ export interface CollageTypeCallbackParam {
     units?: 'px';
     min?: number;
     max?: number;
-    options?: Array<{ key: string, value: string | number | boolean }>;
+    options?: Array<{ key: string; value: string | number | boolean; }>;
     default?: string | number | boolean;
 }
 
@@ -112,7 +114,7 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                 type: 'number',
                 units: 'px',
                 min: 0,
-                default: 0
+                default: 0,
             },
         ],
         async callback(layers, params) {
@@ -121,11 +123,11 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                 trimLayerActions.push(new TrimLayerEmptySpaceAction(layer.id));
             }
             await historyStore.dispatch('runAction', {
-                action: new BundleAction('convertLayersToCollage', 'action.convertLayersToCollage', trimLayerActions)
+                action: new BundleAction('convertLayersToCollage', 'action.convertLayersToCollage', trimLayerActions),
             });
             let maxWidth = 0;
             let totalHeight = 0;
-            let layerTransformedBounds: Array<{
+            const layerTransformedBounds: Array<{
                 left: number;
                 right: number;
                 top: number;
@@ -141,8 +143,8 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                     new DOMPoint(0.0, layer.height).matrixTransform(layer.transform),
                     new DOMPoint(layer.width, layer.height).matrixTransform(layer.transform),
                 ]);
-                let transformedWidth = Math.ceil(transformedBounds.right - transformedBounds.left);
-                let transformedHeight = Math.ceil(transformedBounds.bottom - transformedBounds.top);
+                const transformedWidth = Math.ceil(transformedBounds.right - transformedBounds.left);
+                const transformedHeight = Math.ceil(transformedBounds.bottom - transformedBounds.top);
                 if (transformedWidth > maxWidth) {
                     maxWidth = transformedWidth;
                 }
@@ -150,7 +152,7 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                     ...transformedBounds,
                     width: transformedWidth,
                     height: transformedHeight,
-                    topOffset: totalHeight
+                    topOffset: totalHeight,
                 });
                 totalHeight += transformedHeight + (layerIndex < layers.length - 1 ? (params.verticalMargin ?? 0) : 0);
             }
@@ -170,20 +172,20 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                             -transformBounds.left + leftOffset,
                             -transformBounds.top + transformBounds.topOffset,
                         ).multiply(layer.transform),
-                    })
+                    }),
                 );
             }
             updateLayerActions.push(
                 new UpdateFileAction({
                     width: maxWidth,
                     height: totalHeight,
-                })
+                }),
             );
             await historyStore.dispatch('runAction', {
                 action: new BundleAction('convertLayersToCollage', 'action.convertLayersToCollage', updateLayerActions),
                 mergeWithHistory: 'convertLayersToCollage',
             });
-        }
+        },
     },
     {
         type: 'horizontalStack',
@@ -203,7 +205,7 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                 type: 'number',
                 units: 'px',
                 min: 0,
-                default: 0
+                default: 0,
             },
         ],
         async callback(layers, params) {
@@ -212,11 +214,11 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                 trimLayerActions.push(new TrimLayerEmptySpaceAction(layer.id));
             }
             await historyStore.dispatch('runAction', {
-                action: new BundleAction('convertLayersToCollage', 'action.convertLayersToCollage', trimLayerActions)
+                action: new BundleAction('convertLayersToCollage', 'action.convertLayersToCollage', trimLayerActions),
             });
             let maxHeight = 0;
             let totalWidth = 0;
-            let layerTransformedBounds: Array<{
+            const layerTransformedBounds: Array<{
                 left: number;
                 right: number;
                 top: number;
@@ -232,8 +234,8 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                     new DOMPoint(0.0, layer.height).matrixTransform(layer.transform),
                     new DOMPoint(layer.width, layer.height).matrixTransform(layer.transform),
                 ]);
-                let transformedWidth = Math.ceil(transformedBounds.right - transformedBounds.left);
-                let transformedHeight = Math.ceil(transformedBounds.bottom - transformedBounds.top);
+                const transformedWidth = Math.ceil(transformedBounds.right - transformedBounds.left);
+                const transformedHeight = Math.ceil(transformedBounds.bottom - transformedBounds.top);
                 if (transformedHeight > maxHeight) {
                     maxHeight = transformedHeight;
                 }
@@ -241,7 +243,7 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                     ...transformedBounds,
                     width: transformedWidth,
                     height: transformedHeight,
-                    leftOffset: totalWidth
+                    leftOffset: totalWidth,
                 });
                 totalWidth += transformedWidth + (layerIndex < layers.length - 1 ? (params.horizontalMargin ?? 0) : 0);
             }
@@ -261,20 +263,20 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
                             -transformBounds.left + transformBounds.leftOffset,
                             -transformBounds.top + topOffset,
                         ).multiply(layer.transform),
-                    })
+                    }),
                 );
             }
             updateLayerActions.push(
                 new UpdateFileAction({
                     width: totalWidth,
                     height: maxHeight,
-                })
+                }),
             );
             await historyStore.dispatch('runAction', {
                 action: new BundleAction('convertLayersToCollage', 'action.convertLayersToCollage', updateLayerActions),
                 mergeWithHistory: 'convertLayersToCollage',
             });
-        }
+        },
     },
     // {
     //     type: 'grid',
@@ -283,7 +285,7 @@ export const collageTypeCallbacks: CollageTypeCallback[] = [
 
     //     }
     // },
-]
+];
 
 export async function convertLayersToCollage(options: ConvertLayersToCollageOptions = {}): Promise<void> {
     if (!options.type) return;

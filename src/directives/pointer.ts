@@ -9,7 +9,7 @@ const { multiTouchDownTimeout, multiTouchTapTimeout, pointerPressHoldTimeout } =
 interface EventHandlerMap {
     [key: string]: { // Emulated event name
         [key: string]: [Window | Element, Function]; // Real event name
-    }
+    };
 }
 
 interface CallbackBindingMap {
@@ -27,7 +27,7 @@ const dragDataMap = new WeakMap<any, DragData>();
 
 function getEventName(binding: DirectiveBinding<any>): string {
     let eventName: string = '';
-    for (let modifier in binding.modifiers) {
+    for (const modifier in binding.modifiers) {
         if (!['primary', 'window'].includes(modifier) && binding.modifiers[modifier]) {
             eventName = modifier;
         }
@@ -118,9 +118,9 @@ function handleTapEvent(el: any, binding: DirectiveBinding<any>) {
         pointerdown: [el, onPointerDown],
         pointerup: [el, onPointerUp],
         touchstart: [el, onTouchStart],
-        touchend: [el, onTouchEnd]
+        touchend: [el, onTouchEnd],
     };
-    for (let realEventName in callbackHandles.tap) {
+    for (const realEventName in callbackHandles.tap) {
         const callbackConfig = callbackHandles.tap[realEventName];
         callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
@@ -234,9 +234,9 @@ function handlePressEvent(el: any, binding: DirectiveBinding<any>) {
         pointerup: [el, onPointerUp],
         touchstart: [el, onTouchStart],
         touchmove: [el, onTouchMoveWindow],
-        touchend: [el, onTouchEnd]
+        touchend: [el, onTouchEnd],
     };
-    for (let realEventName in callbackHandles.press) {
+    for (const realEventName in callbackHandles.press) {
         const callbackConfig = callbackHandles.press[realEventName];
         callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
@@ -265,17 +265,17 @@ function handleDownEvent(el: any, binding: DirectiveBinding<any>) {
         callbackHandles.down = {
             mousedown: [window, onMouseDown],
             pointerdown: [window, onPointerDown],
-            touchstart: [window, onTouchStart]
+            touchstart: [window, onTouchStart],
         };
     } else {
         callbackHandles.down = {
             mousedown: [el, onMouseDown],
             pointerdown: [el, onPointerDown],
-            touchstart: [el, onTouchStart]
+            touchstart: [el, onTouchStart],
         };
     }
 
-    for (let realEventName in callbackHandles.down) {
+    for (const realEventName in callbackHandles.down) {
         const callbackConfig = callbackHandles.down[realEventName];
         callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
@@ -302,9 +302,9 @@ function handleMoveEvent(el: any, binding: DirectiveBinding<any>) {
     callbackHandles.move = {
         mousemove: [binding.modifiers.window ? window : el, onMouseMove],
         pointermove: [binding.modifiers.window ? window : el, onPointerMove],
-        touchmove: [binding.modifiers.window ? window : el, onTouchMove]
+        touchmove: [binding.modifiers.window ? window : el, onTouchMove],
     };
-    for (let realEventName in callbackHandles.move) {
+    for (const realEventName in callbackHandles.move) {
         const callbackConfig = callbackHandles.move[realEventName];
         callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
@@ -434,9 +434,9 @@ function handleDragEvents(el: any, eventName: string, binding: DirectiveBinding<
         pointerup: [window, onPointerUpWindow],
         touchstart: [el, onTouchStart],
         touchmove: [window, onTouchMoveWindow],
-        touchend: [window, onTouchEndWindow]
+        touchend: [window, onTouchEndWindow],
     };
-    for (let realEventName in callbackHandles[eventName]) {
+    for (const realEventName in callbackHandles[eventName]) {
         const callbackConfig = callbackHandles[eventName][realEventName];
         callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
@@ -445,7 +445,7 @@ function handleDragEvents(el: any, eventName: string, binding: DirectiveBinding<
 
 /* Pointer Up */
 function handleUpEvent(el: any, binding: DirectiveBinding<any>) {
-    
+
     const callbackHandles = eventHandlerMap.get(el) || {};
 
     function onMouseUp(e: MouseEvent) {
@@ -466,16 +466,16 @@ function handleUpEvent(el: any, binding: DirectiveBinding<any>) {
         callbackHandles.up = {
             mouseup: [window, onMouseUp],
             pointerup: [window, onPointerUp],
-            touchend: [window, onTouchEnd]
+            touchend: [window, onTouchEnd],
         };
     } else {
         callbackHandles.up = {
             mouseup: [el, onMouseUp],
             pointerup: [el, onPointerUp],
-            touchend: [el, onTouchEnd]
+            touchend: [el, onTouchEnd],
         };
     }
-    for (let realEventName in callbackHandles.up) {
+    for (const realEventName in callbackHandles.up) {
         const callbackConfig = callbackHandles.up[realEventName];
         callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
@@ -485,7 +485,7 @@ function handleUpEvent(el: any, binding: DirectiveBinding<any>) {
 function removeCallbacks(el: any, binding: DirectiveBinding<any>) {
     const eventName = getEventName(binding);
     const callbackHandles = eventHandlerMap.get(el) || {};
-    for (let realEventName in callbackHandles[eventName]) {
+    for (const realEventName in callbackHandles[eventName]) {
         const eventDef = callbackHandles[eventName][realEventName];
         eventDef[0].removeEventListener(realEventName, eventDef[1] as any, true);
     }
@@ -538,7 +538,7 @@ const PointerDirective: ObjectDirective = {
     },
     async unmounted(el, binding) {
         removeCallbacks(el, binding);
-    }
+    },
 };
 
 export default PointerDirective;

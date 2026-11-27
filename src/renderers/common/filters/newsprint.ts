@@ -23,14 +23,14 @@ export default class NewsprintCanvasFilter implements CanvasFilter<NewsprintCanv
                 options: [
                     { key: 'cmyk', value: NewsprintColorModel.CMYK },
                     { key: 'blackOnWhite', value: NewsprintColorModel.BLACK_ON_WHITE },
-                ]
+                ],
             },
             density: {
                 type: 'percentage',
                 default: 0.25,
                 min: 0,
                 max: 1,
-            }
+            },
         } as CanvasFilterEditConfig;
     }
 }

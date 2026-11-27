@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { PerformantStore } from '@/store/performant-store';
 
 import type {
-    RGBAColor,
+    RGBAColor
 } from '@/types';
 
 export const cursorHoverPosition = ref<DOMPoint>(new DOMPoint());
@@ -12,7 +12,7 @@ interface PermanentStorageState {
     pickedColor: RGBAColor | null;
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'drawColorPickerStateStore',
     state: {
         pickedColor: null,

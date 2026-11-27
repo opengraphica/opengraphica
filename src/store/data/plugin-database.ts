@@ -12,7 +12,7 @@ export async function init() {
                 if (window.indexedDB) {
                     // Initialize database
                     await new Promise<void>((resolve, reject) => {
-                        let openRequest = window.indexedDB.open('openGraphicaPlugins', 1);
+                        const openRequest = window.indexedDB.open('openGraphicaPlugins', 1);
                         openRequest.onupgradeneeded = function(event) {
                             database = openRequest.result as IDBDatabase;
                             const oldVersion = event.oldVersion;
@@ -23,11 +23,11 @@ export async function init() {
                         };
                         openRequest.onerror = () => {
                             reject(openRequest.error);
-                        }
+                        };
                         openRequest.onsuccess = () => {
                             resolve();
                             database = openRequest.result as IDBDatabase;
-                        }
+                        };
                     });
                     if (!database) {
                         throw new Error('indexedDB not initialized');

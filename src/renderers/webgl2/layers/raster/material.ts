@@ -39,7 +39,6 @@ export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
 export async function createRasterMaterials(params: RasterMaterialUpdateParams): Promise<ShaderMaterial[]> {
     const width = params?.srcTexture?.image.width ?? 1;
     const height = params?.srcTexture?.image.height ?? 1;
-    const { width: renderTargetWidth, height: renderTargetHeight } = limitMaxDimension(width, height, params.canvasFilters?.[0]?.maxPassTextureSize ?? Infinity);
 
     const shaders = await createLayerShader({
         vertexShaderSetup: rasterMaterialVertexShaderSetup,
@@ -54,7 +53,15 @@ export async function createRasterMaterials(params: RasterMaterialUpdateParams):
 
     const materials: ShaderMaterial[] = [];
 
+    let srcTexture = params.srcTexture;
     for (const [shaderIndex, shader] of shaders.entries()) {
+        const extendedBounds = shader.getExtendedBounds(params.canvasFilters);
+        const { width: renderTargetWidth, height: renderTargetHeight } = limitMaxDimension(
+            width + extendedBounds[0] + extendedBounds[2],
+            height + extendedBounds[1] + extendedBounds[3],
+            params.canvasFilters?.[0]?.maxPassTextureSize ?? Infinity,
+        );
+
         const material = new ShaderMaterial({
             transparent: true,
             depthTest: false,
@@ -69,7 +76,10 @@ export async function createRasterMaterials(params: RasterMaterialUpdateParams):
                 ...shader.uniforms,
             },
             userData: {
+                getExtendedBounds: shader.getExtendedBounds,
+                extendedBounds,
                 disposableTextures: shader.textures,
+                shouldCaptureSource: shader.shouldCaptureSource,
             },
             premultipliedAlpha: params.premultiplyAlphaFix ?? false,
         });
@@ -77,7 +87,7 @@ export async function createRasterMaterials(params: RasterMaterialUpdateParams):
         material.defines.cColorSpaceConversion = params.colorSpaceConversion ?? 0;
         material.defines.cPremultiplyAlphaFix = params.premultiplyAlphaFix ? 1 : 0;
         material.uniforms.srcTexture = {
-            value: params.srcTexture,
+            value: srcTexture,
         };
         if (shaderIndex > 0) {
             const renderTarget = new WebGLRenderTarget(renderTargetWidth, renderTargetHeight, {
@@ -91,6 +101,9 @@ export async function createRasterMaterials(params: RasterMaterialUpdateParams):
             material.uniforms.passTexture = {
                 value: renderTarget.texture,
             };
+            if (shader.shouldCaptureSource) {
+                srcTexture = renderTarget.texture;
+            }
         }
         material.uniforms.dstTexture = {
             value: undefined,
@@ -111,21 +124,25 @@ export async function createRasterMaterials(params: RasterMaterialUpdateParams):
  */
 export async function updateRasterMaterial(
     material: ShaderMaterial,
-    params: RasterMaterialUpdateParams
+    params: RasterMaterialUpdateParams,
 ) {
     return (await updateRasterMaterials([material], params))[0];
 }
 
 export async function updateRasterMaterials(
     materials: ShaderMaterial[],
-    params: RasterMaterialUpdateParams
+    params: RasterMaterialUpdateParams,
 ) {
     let isSourceTextureUpdate = false;
+    let srcTexture: Texture | undefined = undefined;
 
     for (const [materialIndex, material] of materials.entries()) {
+        const extendedBounds = (material.userData.getExtendedBounds?.(params.canvasFilters)) ?? [0, 0, 0, 0];
+        material.userData.extendedBounds = extendedBounds;
         if (materialIndex === 0) {
             if (material.uniforms.srcTexture.value !== params.srcTexture) {
                 isSourceTextureUpdate = true;
+                srcTexture = params.srcTexture;
                 if (!params.srcTexture?.userData.isDraft) {
                     material.uniforms.srcTexture.value?.dispose(); // Prevent GPU memory leak. If it's still needed, THREE will re-upload.
                 }
@@ -138,19 +155,19 @@ export async function updateRasterMaterials(
         } else {
             createRenderTarget:
             if (isSourceTextureUpdate && params.srcTexture) {
-                material.uniforms.srcTexture.value = params.srcTexture;
+                material.uniforms.srcTexture.value = srcTexture;
                 material.defines.cLayerWidth = params.srcTexture?.width;
                 material.defines.cLayerHeight = params.srcTexture?.height;
                 const { width: renderTargetWidth, height: renderTargetHeight } = limitMaxDimension(
-                    params.srcTexture.width,
-                    params.srcTexture.height,
-                    params.canvasFilters?.[0]?.maxPassTextureSize ?? Infinity
+                    params.srcTexture.width + extendedBounds[0] + extendedBounds[2],
+                    params.srcTexture.height + extendedBounds[1] + extendedBounds[3],
+                    params.canvasFilters?.[0]?.maxPassTextureSize ?? Infinity,
                 );
                 if (material.userData.srcRenderTarget?.width === renderTargetWidth && material.userData.srcRenderTarget?.height === renderTargetHeight) {
                     break createRenderTarget;
                 }
                 const renderTargetIndex = material.userData.disposableTextures.findIndex(
-                    (otherRenderTarget) => otherRenderTarget === material.userData.srcRenderTarget
+                    (otherRenderTarget) => otherRenderTarget === material.userData.srcRenderTarget,
                 );
                 if (renderTargetIndex > -1) {
                     material.userData.disposableTextures.splice(renderTargetIndex, 1);
@@ -167,6 +184,9 @@ export async function updateRasterMaterials(
                 material.uniforms.passTexture = {
                     value: renderTarget.texture,
                 };
+                if (material.userData.shouldCaptureSource) {
+                    srcTexture = renderTarget.texture;
+                }
             }
         }
 

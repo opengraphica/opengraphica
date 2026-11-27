@@ -22,13 +22,13 @@ interface PermanentStorageState {
     selectionCombineMode: SelectionCombineMode;
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'selectionStateStore',
     state: {
         selectionAddShape: 'rectangle',
         selectionCombineMode: 'add',
     },
-    restore: ['selectionAddShape', 'selectionCombineMode']
+    restore: ['selectionAddShape', 'selectionCombineMode'],
 });
 
 export const selectionAddShape = permanentStorage.getWritableRef('selectionAddShape');
@@ -111,7 +111,7 @@ export function getActiveSelectionBounds(activeSelectionPathOverride: Array<AnyV
 }
 
 export async function previewActiveSelectionMask(activeSelectionPathOverride: Array<VectorPathCommand> = activeSelectionPath.value) {
-    let drawMargin: number = selectionMaskDrawMargin.value;
+    const drawMargin: number = selectionMaskDrawMargin.value;
     if (activeSelectionPathOverride.length > 0) {
         const activeSelectionBounds = getActiveSelectionBounds(activeSelectionPathOverride);
         const newActiveSelectionMaskCanvas = await createActiveSelectionMask(activeSelectionBounds, activeSelectionPathOverride);
@@ -154,12 +154,12 @@ export async function previewActiveSelectionMask(activeSelectionPathOverride: Ar
 }
 
 export async function previewSelectedLayersSelectionMask() {
-    let drawMargin: number = selectionMaskDrawMargin.value;
+    const drawMargin: number = selectionMaskDrawMargin.value;
 
-    let workingCanvas = document.createElement('canvas');
+    const workingCanvas = document.createElement('canvas');
     workingCanvas.width = workingFileStore.get('width');
     workingCanvas.height = workingFileStore.get('height');
-    let ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+    const ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) throw new Error('Couldn\'t draw to a new canvas when trying to apply selection mask.');
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = '#000000';
@@ -205,7 +205,7 @@ export function discardActiveSelectionMask() {
 }
 
 export async function createActiveSelectionMask(activeSelectionBounds: SelectionBounds, activeSelectionPathOverride: Array<VectorPathCommand> = activeSelectionPath.value): Promise<HTMLCanvasElement> {
-    let drawMargin: number = selectionMaskDrawMargin.value;
+    const drawMargin: number = selectionMaskDrawMargin.value;
 
     if (appliedSelectionMask.value != null) {
         if (appliedSelectionMaskCanvasOffset.value.x < activeSelectionBounds.left) {
@@ -261,7 +261,7 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
                 command.x2 - activeSelectionBounds.left + drawMargin,
                 command.y2 - activeSelectionBounds.top + drawMargin,
                 command.x - activeSelectionBounds.left + drawMargin,
-                command.y - activeSelectionBounds.top + drawMargin
+                command.y - activeSelectionBounds.top + drawMargin,
             );
         }
     }
@@ -277,7 +277,7 @@ export async function createAppliedSelectionPaths(
     selectionCombineModeOverride: SelectionCombineMode = selectionCombineMode.value,
 ): Promise<Array<Array<VectorPathCommandMove | VectorPathCommandLine>>> {
     let appliedSelectionPaths: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = JSON.parse(JSON.stringify(
-        appliedSelectionPathsOverride ?? []
+        appliedSelectionPathsOverride ?? [],
     ));
     if (activeSelectionPathOverride.length === 0) return appliedSelectionPaths;
     if (appliedSelectionPaths.length === 0 && selectionCombineModeOverride !== 'subtract') {
@@ -290,7 +290,7 @@ export async function createAppliedSelectionPaths(
             clipper.AddPath(
                 [{ x: 0, y: 0 }, { x: canvasWidth, y: 0 }, { x: canvasWidth, y: canvasHeight }, { x: 0, y: canvasHeight }],
                 PolyType.ptSubject,
-                true
+                true,
             );
         } else {
             for (const path of appliedSelectionPaths) {
@@ -336,7 +336,7 @@ export async function blitActiveSelectionMask(
     sourceImage: HTMLImageElement | HTMLCanvasElement | ImageBitmap,
     layerTransform: DOMMatrix,
     compositeOperation: CanvasRenderingContext2D['globalCompositeOperation'] = 'source-in',
-    sourceCropOptions?: SourceImageCropOptions
+    sourceCropOptions?: SourceImageCropOptions,
 ): Promise<HTMLCanvasElement> {
     return blitSpecifiedSelectionMask(
         activeSelectionMask.value ?? appliedSelectionMask.value,
@@ -344,7 +344,7 @@ export async function blitActiveSelectionMask(
         sourceImage,
         layerTransform,
         compositeOperation,
-        sourceCropOptions
+        sourceCropOptions,
     );
 }
 
@@ -357,7 +357,7 @@ export async function blitSpecifiedSelectionMask(
     sourceImage: HTMLImageElement | HTMLCanvasElement | ImageBitmap,
     layerTransform: DOMMatrix,
     compositeOperation: CanvasRenderingContext2D['globalCompositeOperation'] = 'source-in',
-    sourceCropOptions?: SourceImageCropOptions
+    sourceCropOptions?: SourceImageCropOptions,
 ): Promise<HTMLCanvasElement> {
     if (selectionMask == null) throw new Error('Active selection mask does not exist.');
     const workingCanvas = document.createElement('canvas');
@@ -386,7 +386,7 @@ export async function blitSpecifiedSelectionMask(
             isFlipY ? sourceImage.height - sourceCropOptions.sy - sourceCropOptions.sHeight : sourceCropOptions.sy,
             sourceCropOptions.sWidth,
             sourceCropOptions.sHeight,
-            0, 0, sourceCropOptions.sWidth, sourceCropOptions.sHeight
+            0, 0, sourceCropOptions.sWidth, sourceCropOptions.sHeight,
         );
         if (isFlipY) {
             ctx.restore();
@@ -412,7 +412,7 @@ export async function blitSpecifiedSelectionMask(
  * The selection mask image and offset is defined from the point of view of the canvas itself.
  * Layers can be transformed in many ways. This generates a new selection mask image that
  * can be drawn in the context of the layer's transform.
- * 
+ *
  * Example:
  * ```
  * resampleSelectionMaskInLayerBounds(

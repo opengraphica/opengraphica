@@ -16,14 +16,14 @@ export function installWebGLCommandLogger(canvas, options = {}) {
         }
 
         if (
-            typeof value === "string" ||
-            typeof value === "number" ||
-            typeof value === "boolean"
+            typeof value === 'string' ||
+            typeof value === 'number' ||
+            typeof value === 'boolean'
         ) {
             return value;
         }
 
-        if (typeof value === "bigint") {
+        if (typeof value === 'bigint') {
             return `${value}n`;
         }
 
@@ -35,7 +35,7 @@ export function installWebGLCommandLogger(canvas, options = {}) {
             return `ArrayBuffer(${value.byteLength})`;
         }
 
-        if (typeof value === "object") {
+        if (typeof value === 'object') {
             return Object.prototype.toString.call(value);
         }
 
@@ -45,7 +45,7 @@ export function installWebGLCommandLogger(canvas, options = {}) {
     function wrapExtension(extension, label) {
         if (
             extension === null ||
-            typeof extension !== "object"
+            typeof extension !== 'object'
         ) {
             return extension;
         }
@@ -58,15 +58,15 @@ export function installWebGLCommandLogger(canvas, options = {}) {
             get(target, property) {
                 const original = Reflect.get(target, property, target);
 
-                if (typeof property === "symbol") {
+                if (typeof property === 'symbol') {
                     return original;
                 }
 
-                if (typeof original !== "function") {
+                if (typeof original !== 'function') {
                     return original;
                 }
 
-                return function (...args) {
+                return function(...args) {
                     const id = ++commandNumber;
                     const command = `${label}.${String(property)}`;
 
@@ -84,7 +84,7 @@ export function installWebGLCommandLogger(canvas, options = {}) {
                     const result = Reflect.apply(
                         original,
                         target,
-                        args
+                        args,
                     );
 
                     if (includeReturns) {
@@ -107,13 +107,13 @@ export function installWebGLCommandLogger(canvas, options = {}) {
 
     const originalGetContext = canvas.getContext.bind(canvas);
 
-    canvas.getContext = function (type, attributes) {
+    canvas.getContext = function(type, attributes) {
         const context = originalGetContext(type, attributes);
 
         if (
-            type !== "webgl" &&
-            type !== "experimental-webgl" &&
-            type !== "webgl2"
+            type !== 'webgl' &&
+            type !== 'experimental-webgl' &&
+            type !== 'webgl2'
         ) {
             return context;
         }
@@ -122,15 +122,15 @@ export function installWebGLCommandLogger(canvas, options = {}) {
             get(target, property) {
                 const original = Reflect.get(target, property, target);
 
-                if (typeof property === "symbol") {
+                if (typeof property === 'symbol') {
                     return original;
                 }
 
-                if (typeof original !== "function") {
+                if (typeof original !== 'function') {
                     return original;
                 }
 
-                return function (...args) {
+                return function(...args) {
                     const id = ++commandNumber;
                     const command = `${type}.${String(property)}`;
 
@@ -149,7 +149,7 @@ export function installWebGLCommandLogger(canvas, options = {}) {
                     const result = Reflect.apply(
                         original,
                         target,
-                        args
+                        args,
                     );
 
                     if (includeReturns) {
@@ -162,12 +162,12 @@ export function installWebGLCommandLogger(canvas, options = {}) {
 
                     // getExtension is the one object-returning call we
                     // specially proxy so extension methods are traceable.
-                    if (property === "getExtension") {
-                        const extensionName = args[0] || "extension";
+                    if (property === 'getExtension') {
+                        const extensionName = args[0] || 'extension';
 
                         return wrapExtension(
                             result,
-                            `${type}.${extensionName}`
+                            `${type}.${extensionName}`,
                         );
                     }
 

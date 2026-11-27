@@ -2,7 +2,7 @@ import { nextTick, type ObjectDirective } from 'vue';
 
 function handleClick(el: HTMLElement) {
     nextTick(() => {
-        let intervalHandle = setInterval(() => {
+        const intervalHandle = setInterval(() => {
             if (!el.classList.contains('is-active')) {
                 clearInterval(intervalHandle);
                 return;
@@ -22,8 +22,8 @@ const ElCollapseItemSmartScrollDirective: ObjectDirective = {
         });
     },
     async unmounted(el, binding) {
-        
-    }
+
+    },
 };
 
 export default ElCollapseItemSmartScrollDirective;

@@ -168,7 +168,7 @@ export class BrushStroke {
     lastRetrievedPoint: BrushStrokePoint;
 
     constructor(
-        smoothing: number, spacing: number, pixelSnap: boolean, jitter: number, startingPoint: BrushStrokePoint
+        smoothing: number, spacing: number, pixelSnap: boolean, jitter: number, startingPoint: BrushStrokePoint,
     ) {
         this.pixelSnap = pixelSnap;
         this.spacing = spacing;
@@ -269,8 +269,8 @@ export class BrushStroke {
     }
 
     hasCollectedPoints() {
-        let isRetrievingCurve = !!(this.retrieveCatmullRomP0 && this.retrieveCatmullRomP1 && this.retrieveCatmullRomP2 && this.retrieveCatmullRomP3);
-        let isRetrievingLine = !isRetrievingCurve && !!(this.retrieveCatmullRomP1 && this.retrieveCatmullRomP2);
+        const isRetrievingCurve = !!(this.retrieveCatmullRomP0 && this.retrieveCatmullRomP1 && this.retrieveCatmullRomP2 && this.retrieveCatmullRomP3);
+        const isRetrievingLine = !isRetrievingCurve && !!(this.retrieveCatmullRomP1 && this.retrieveCatmullRomP2);
         return this.collectedPointsLength > 0 || isRetrievingCurve || isRetrievingLine;
     }
 
@@ -312,7 +312,7 @@ export class BrushStroke {
             ) {
                 isRetrievingLine = true;
             }
-            let centerPointDistance = this.catmullRomSegment.distance(
+            const centerPointDistance = this.catmullRomSegment.distance(
                 this.retrieveCatmullRomP1.x, this.retrieveCatmullRomP1.y,
                 this.retrieveCatmullRomP2.x, this.retrieveCatmullRomP2.y,
             );
@@ -351,7 +351,7 @@ export class BrushStroke {
                     tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
                     tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
                     twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
-                }
+                };
                 point.x += ((Math.random() * 2) - 1) * this.jitter * size;
                 point.y += ((Math.random() * 2) - 1) * this.jitter * size;
                 this.retrieveCatmullRomTravel += stepDistance;
@@ -391,7 +391,7 @@ export class BrushStroke {
                     tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
                     tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
                     twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
-                }
+                };
                 point.x += ((Math.random() * 2) - 1) * this.jitter * size;
                 point.y += ((Math.random() * 2) - 1) * this.jitter * size;
                 this.retrieveCatmullRomTravel += stepDistance;
@@ -414,10 +414,10 @@ export class BrushStroke {
 
     retrieveFinalPoints(): BrushStrokePoint | undefined {
         let point: BrushStrokePoint | undefined;
-        let isRetrievingLine = !!(this.retrieveCatmullRomP1 && this.retrieveCatmullRomP2);
+        const isRetrievingLine = !!(this.retrieveCatmullRomP1 && this.retrieveCatmullRomP2);
         let isRetrieveLastPoint = false;
         if (!isRetrievingLine && this.lastCollectedPoint2 !== this.lastCollectedPoint1) {
-            let centerPointDistance = this.catmullRomSegment.distance(
+            const centerPointDistance = this.catmullRomSegment.distance(
                 this.lastCollectedPoint2.x, this.lastCollectedPoint2.y,
                 this.lastCollectedPoint1.x, this.lastCollectedPoint1.y,
             );
@@ -453,7 +453,7 @@ export class BrushStroke {
                     tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
                     tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
                     twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
-                }
+                };
                 point.x += ((Math.random() * 2) - 1) * this.jitter * size;
                 point.y += ((Math.random() * 2) - 1) * this.jitter * size;
                 this.retrieveCatmullRomTravel += stepDistance;

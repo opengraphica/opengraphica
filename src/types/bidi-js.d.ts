@@ -18,7 +18,7 @@ declare module 'bidi-js' {
             embeddingLevels: EmbeddingLevels,
             start?: number,
             end?: number
-        ): Array<[ number, number ]>;
+        ): Array<[number, number]>;
         getMirroredCharactersMap(
             text: string,
             embeddingLevels: EmbeddingLevels,

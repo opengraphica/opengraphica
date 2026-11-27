@@ -16,7 +16,7 @@ const stylesheets = [
     }
 ];
 
-for (let { css, filename } of stylesheets) {
+for (const { css, filename } of stylesheets) {
     var processedCss = postcss()
         .use(pxtorem(options))
         .use(prefixer({

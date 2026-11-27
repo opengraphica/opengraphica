@@ -5,7 +5,7 @@ import {
     appliedSelectionPaths, activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
     selectionMaskDrawMargin, activeSelectionPath, createActiveSelectionMask, getActiveSelectionBounds,
     previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode,
-    createAppliedSelectionPaths,
+    createAppliedSelectionPaths
 } from '@/tools/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
@@ -30,7 +30,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
     private oldAppliedSelectionPaths: Array<VectorPathCommand[]> = [];
 
-    constructor(activeSelectionPathOverride: Array<VectorPathCommand> = activeSelectionPath.value, options: { doNotClearActiveSelection?: boolean } = {}) {
+    constructor(activeSelectionPathOverride: Array<VectorPathCommand> = activeSelectionPath.value, options: { doNotClearActiveSelection?: boolean; } = {}) {
         super('applyActiveSelection', 'action.applyActiveSelection');
         this.activeSelectionPath = activeSelectionPathOverride;
         this.drawMargin = selectionMaskDrawMargin.value;
@@ -117,7 +117,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
 
             // Merge selection paths
             this.oldAppliedSelectionPaths = JSON.parse(JSON.stringify(appliedSelectionPaths.value));
-            appliedSelectionPaths.value = await createAppliedSelectionPaths(this.activeSelectionPath, appliedSelectionPaths.value)
+            appliedSelectionPaths.value = await createAppliedSelectionPaths(this.activeSelectionPath, appliedSelectionPaths.value);
 
             if (!this.doNotClearActiveSelection) {
                 activeSelectionPath.value = [];

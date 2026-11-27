@@ -1,7 +1,7 @@
 import { colorToHex, linearSrgbaToOklab, srgbaToLinearSrgba, linearSrgbaToSrgba, oklabToLinearSrgba } from './color';
 import { lerp } from './math';
 
-import type { RGBAColor, WorkingFileGradientColorStop, WorkingFileGradientColorSpace } from "@/types";
+import type { RGBAColor, WorkingFileGradientColorStop, WorkingFileGradientColorSpace } from '@/types';
 
 /**
  * Gives the color at the specified offset in a gradient.
@@ -75,7 +75,7 @@ export function sampleGradient(
             b: lerp(leftColor.b, rightColor.b, interpolateOffset),
             alpha: lerp(leftColor.alpha, rightColor.alpha, interpolateOffset),
             style: leftColor.style,
-        }
+        };
         interpolatedColor.style = colorToHex(interpolatedColor, 'rgba');
     }
     return interpolatedColor;
@@ -91,7 +91,7 @@ export function sampleGradient(
 
 export function generateCssGradient(
     colorStops: WorkingFileGradientColorStop<RGBAColor>[],
-    blendColorSpace: WorkingFileGradientColorSpace | number
+    blendColorSpace: WorkingFileGradientColorSpace | number,
 ): string {
     if (blendColorSpace === 0) {
         blendColorSpace = 'oklab';
@@ -102,8 +102,8 @@ export function generateCssGradient(
     }
 
     let previewGradient = '';
-    let handledOffsets = new Set<number>();
-    let sampledColorStops: WorkingFileGradientColorStop<RGBAColor>[] = [];
+    const handledOffsets = new Set<number>();
+    const sampledColorStops: WorkingFileGradientColorStop<RGBAColor>[] = [];
     for (const stop of colorStops) {
         sampledColorStops.push(stop);
         handledOffsets.add(stop.offset);
@@ -121,16 +121,16 @@ export function generateCssGradient(
     if (blendColorSpace === 'oklab') {
         previewGradient = 'linear-gradient(in oklab 90deg, ' + sampledColorStops.map((colorStop) => {
             const { l, a, b, alpha } = linearSrgbaToOklab(srgbaToLinearSrgba(colorStop.color));
-            return `oklab(${l * 100}% ${a} ${b} / ${alpha}) ${colorStop.offset * 100}%`
+            return `oklab(${l * 100}% ${a} ${b} / ${alpha}) ${colorStop.offset * 100}%`;
         }).join(', ') + ')';
-    } else if (blendColorSpace === 'linearSrgb') { 
+    } else if (blendColorSpace === 'linearSrgb') {
         previewGradient = 'linear-gradient(in srgb-linear 90deg, ' + sampledColorStops.map((colorStop) => {
-            return `${colorStop.color.style} ${colorStop.offset * 100}%`
+            return `${colorStop.color.style} ${colorStop.offset * 100}%`;
         }).join(', ') + ')';
     }
     if (!window?.CSS?.supports || !window.CSS.supports('background-image', previewGradient)) {
         previewGradient = 'linear-gradient(90deg, ' + sampledColorStops.map((colorStop) => {
-            return `${colorStop.color.style} ${colorStop.offset * 100}%`
+            return `${colorStop.color.style} ${colorStop.offset * 100}%`;
         }).join(', ') + ')';
     }
     return previewGradient;
@@ -148,7 +148,7 @@ export function generateCssGradient(
 export function generateGradientImage(
     stops: WorkingFileGradientColorStop<RGBAColor>[],
     colorSpace: WorkingFileGradientColorSpace,
-    textureSize: number = 64
+    textureSize: number = 64,
 ): HTMLCanvasElement | OffscreenCanvas {
     const gradientImageData = new ImageData(textureSize, 1);
     stops.sort((a, b) => a.offset < b.offset ? -1 : 1);
@@ -197,7 +197,7 @@ export function generateGradientImage(
                 b: lerp(leftColor.b, rightColor.b, interpolateOffset),
                 alpha: lerp(leftColor.alpha, rightColor.alpha, interpolateOffset),
                 style: leftColor.style,
-            }
+            };
         }
         gradientImageData.data[(i * 4)] = Math.round(255 * interpolatedColor.r);
         gradientImageData.data[(i * 4) + 1] = Math.round(255 * interpolatedColor.g);

@@ -1,5 +1,5 @@
 /*
- * This was copied over from the old renderer, for reference. 
+ * This was copied over from the old renderer, for reference.
  */
 
 // import { toRefs, watch, type WatchStopHandle, toRaw } from 'vue';
@@ -41,7 +41,7 @@
 //     private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
 
 //     async onAttach(layer: WorkingFileGroupLayer<ColorModel>) {
-        
+
 //         this.camera = new OrthographicCamera(0, 0, workingFileStore.state.width, workingFileStore.state.height, 0.1, 1000);
 //         this.updateCameraDimensions(workingFileStore.state.width, workingFileStore.state.height);
 
@@ -180,7 +180,7 @@
 //         if (this.materialWrapper) {
 //             disposeMaterial(this.materialWrapper);
 //         }
-//         this.materialWrapper = await createMaterial('raster', { srcTexture: texture }, filters, 
+//         this.materialWrapper = await createMaterial('raster', { srcTexture: texture }, filters,
 //             { width: workingFileStore.state.width, height: workingFileStore.state.height },
 //             this.lastBlendingMode
 //         );

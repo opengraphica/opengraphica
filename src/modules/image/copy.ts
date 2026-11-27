@@ -9,7 +9,7 @@ import { cloneStoredSvg, getStoredSvgImage, deleteStoredSvg } from '@/store/svg'
 import workingFileStore, { getSelectedLayers } from '@/store/working-file';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
-    createAppliedSelectionPaths,
+    createAppliedSelectionPaths
 } from '@/tools/store/selection-state';
 
 import appEmitter from '@/lib/emitter';
@@ -29,7 +29,7 @@ import type { ExportAsImageOptions } from '../file/export';
 
 import type {
     ColorModel, UpdateAnyLayerOptions,
-    WorkingFileAnyLayer,
+    WorkingFileAnyLayer
 } from '@/types';
 
 export async function copySelectedLayers() {
@@ -43,7 +43,7 @@ export async function copySelectedLayers() {
 
     if (isDefaultPrevented) return;
 
-    let selectedLayers = getSelectedLayers();
+    const selectedLayers = getSelectedLayers();
     if (selectedLayers.length === 0) {
         appEmitter.emit('app.notify', {
             type: 'info',
@@ -134,31 +134,31 @@ export async function cutSelectedLayers() {
                         data: {
                             tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
                             alreadyRendererd: true,
-                        }
-                    })
+                        },
+                    }),
                 );
             } else if (layer.type === 'vector') {
                 updateLayerActions.push(
-                    new DeleteLayerSelectionAreaAction([layer.id])
+                    new DeleteLayerSelectionAreaAction([layer.id]),
                 );
             }
         }
         await historyStore.dispatch('runAction', {
             action: new BundleAction('cutLayers', 'action.cutLayers', [
                 ...updateLayerActions,
-                new ClearSelectionAction()
-            ])
+                new ClearSelectionAction(),
+            ]),
         });
     } else {
         await historyStore.dispatch('runAction', {
             action: new BundleAction('cutLayers', 'action.cutLayers', [
-                new DeleteLayersAction(workingFileStore.state.selectedLayerIds)
-            ])
+                new DeleteLayersAction(workingFileStore.state.selectedLayerIds),
+            ]),
         });
     }
 }
 
-// For firefox, experiment with 
+// For firefox, experiment with
 // dom.events.asyncClipboard.clipboardItem
 
 export async function copyAllLayers(options = {}) {
@@ -167,7 +167,7 @@ export async function copyAllLayers(options = {}) {
         const exportResults = await exportAsImage({
             fileType: 'png',
             toClipboard: true,
-            generateImageHash: true
+            generateImageHash: true,
         });
         editorStore.set('hasClipboardUpdateSupport', true);
         editorStore.set('clipboardBufferImageHash', exportResults.generatedImageHash);
@@ -179,7 +179,7 @@ export async function copyAllLayers(options = {}) {
         appEmitter.emit('app.notify', {
             type: 'error',
             dangerouslyUseHTMLString: true,
-            message: unexpectedErrorMessage
+            message: unexpectedErrorMessage,
         });
     }
 }

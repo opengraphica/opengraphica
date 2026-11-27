@@ -27,7 +27,7 @@ declare global {
     }
 
     var Electron: ElectronGlobal | undefined;
-    
+
     var showOpenFilePicker: ShowOpenFilePicker | undefined;
 }
 

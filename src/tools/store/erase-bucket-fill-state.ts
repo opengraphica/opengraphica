@@ -9,7 +9,7 @@ interface PermanentStorageState {
     strength: number;
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'eraseBucketFillStateStore',
     state: {
         antialias: true,

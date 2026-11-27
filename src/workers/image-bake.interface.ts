@@ -71,7 +71,7 @@ export function bakeCanvasFilters(imageData: ImageData, layerId: number, filterC
                 queueId,
                 layerId,
                 resolvePromise: resolve,
-                rejectPromise: reject
+                rejectPromise: reject,
             });
             const masks: Record<number, ImageData> = {};
             for (const filter of filterConfigurations) {

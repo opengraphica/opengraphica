@@ -45,7 +45,7 @@ export default class CanvasDrawColorPickerController extends BaseCanvasMovementC
     async onPointerUp(e: PointerEvent): Promise<void> {
         super.onPointerUp(e);
         if (e.isPrimary) {
-            this.colorPickEnd();    
+            this.colorPickEnd();
         }
     }
 
@@ -56,20 +56,20 @@ export default class CanvasDrawColorPickerController extends BaseCanvasMovementC
     private colorPickEnd() {
         if (!this.isPickingColor) return;
 
-        let { viewTransformPoint } = this.getTransformedCursorInfo();
+        const { viewTransformPoint } = this.getTransformedCursorInfo();
         this.pickColor(viewTransformPoint);
     }
 
-    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix } {
+    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint; viewDecomposedTransform: DecomposedMatrix; } {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewDecomposedTransform = canvasStore.get('decomposedTransform');
         const viewTransformPoint = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
             .matrixTransform(viewTransform.inverse());
-        
+
         return {
             viewTransformPoint,
-            viewDecomposedTransform
+            viewDecomposedTransform,
         };
     }
 

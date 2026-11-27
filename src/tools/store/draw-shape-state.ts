@@ -10,7 +10,7 @@ import {
     parseCircleNodeAttributes, parseEllipseNodeAttributes, parseLineNodeAttributes,
     parsePathNodeAttributes, parseCommonNodeAttributes,
     serializeVectorPathCommand,
-    getViewBox,
+    getViewBox
 } from '@/lib/svg';
 import { throttle } from '@/lib/timing';
 
@@ -56,7 +56,7 @@ interface PermanentStorageState {
     rotationSnappingDegrees: number;
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'drawShapeStateStore',
     state: {
         colorPalette: [
@@ -66,7 +66,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 g: 0,
                 b: 0,
                 alpha: 0,
-                style: '#00000000'
+                style: '#00000000',
             },
             {
                 is: 'color',
@@ -74,7 +74,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 g: 0,
                 b: 0,
                 alpha: 1,
-                style: '#000000'
+                style: '#000000',
             },
             {
                 is: 'color',
@@ -82,7 +82,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 g: 1,
                 b: 1,
                 alpha: 1,
-                style: '#ffffff'
+                style: '#ffffff',
             },
             {
                 is: 'color',
@@ -90,7 +90,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 g: 0,
                 b: 0,
                 alpha: 1,
-                style: '#ff0000'
+                style: '#ff0000',
             },
         ],
         fillColorPaletteIndex: 1,
@@ -129,15 +129,15 @@ export const fillColor = ref<RGBAColor>(colorPalette.value[fillColorPaletteIndex
     g: 0,
     b: 0,
     alpha: 1,
-    style: '#000000'
+    style: '#000000',
 });
-export const strokeColor = ref<RGBAColor>(colorPalette.value[strokeColorPaletteIndex.value]?? {
+export const strokeColor = ref<RGBAColor>(colorPalette.value[strokeColorPaletteIndex.value] ?? {
     is: 'color',
     r: 0,
     g: 0,
     b: 0,
     alpha: 0,
-    style: '#00000000'
+    style: '#00000000',
 });
 
 export const snapLineX = ref<number[]>([]);
@@ -157,12 +157,12 @@ export const transformRotateHandleHighlight = ref<boolean>(false);
 export const isTransformBoundsTransparent = ref<boolean>(false);
 
 export const transformOptions = computed(() => {
-    let canTranslate: boolean = true;
+    const canTranslate: boolean = true;
     let canScale: boolean = true;
-    let canRotate: boolean = true;
-    let shouldShowUnevenScalingHandles = new Set<boolean>(); // Enables the edge handles with apply uneven scaling
-    let shouldMaintainAspectRatio = new Set<boolean>(); // The scale must be applied evenly to layer's width/height
-    let shouldScaleDuringResize = new Set<boolean>(); // The scale will be applied to the layer's DOMMatrix, otherwise width/height are changed
+    const canRotate: boolean = true;
+    const shouldShowUnevenScalingHandles = new Set<boolean>(); // Enables the edge handles with apply uneven scaling
+    const shouldMaintainAspectRatio = new Set<boolean>(); // The scale must be applied evenly to layer's width/height
+    const shouldScaleDuringResize = new Set<boolean>(); // The scale will be applied to the layer's DOMMatrix, otherwise width/height are changed
     let shouldSnapRotationDegrees: boolean = useSnapping.value && useRotationSnapping.value;
     if (isShiftKeyPressed.value === true) {
         shouldMaintainAspectRatio.add(false);
@@ -196,7 +196,7 @@ export const transformOptions = computed(() => {
     };
 });
 
-drawShapeToolbarEmitter.on('setTransformDimensions', (event?: { top?: number, left?: number, width?: number, height?: number, rotation?: number, transformOriginX?: number, transformOriginY?: number }) => {
+drawShapeToolbarEmitter.on('setTransformDimensions', (event?: { top?: number; left?: number; width?: number; height?: number; rotation?: number; transformOriginX?: number; transformOriginY?: number; }) => {
     if (event) {
         if (event.transformOriginX != null) {
             transformOriginX.value = event.transformOriginX;
@@ -266,7 +266,7 @@ export const createEditControlPoints = throttle(() => {
     editControlPointNodes.value = [];
     editControlPointNodeParsedAttributes.value = [];
     let nodeIndex = 0;
-    
+
     for (const [layerIndex, layer] of editingLayers.value.entries()) {
         if (!layer.data.sourceDocument?.querySelectorAll) continue;
         const viewBox = getViewBox(layer.data.sourceDocument);
@@ -276,7 +276,7 @@ export const createEditControlPoints = throttle(() => {
             -viewBox.x, -viewBox.y, 0.0,
         );
         const nodes = Array.from(
-            layer.data.sourceDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path')
+            layer.data.sourceDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path'),
         );
         for (const node of nodes) {
             try {
@@ -468,7 +468,7 @@ export const createEditControlPoints = throttle(() => {
                         let previousCommand: VectorPathCommand | undefined;
                         let previousAttachToIndex: number = -1;
                         for (const [commandIndex, command] of d.entries()) {
-                            let attachToIndex: number = controlPoints.length;
+                            const attachToIndex: number = controlPoints.length;
                             switch (command.type) {
                                 case VectorPathCommandType.CUBIC_BEZIER_CURVE: {
                                     point.x = command.x;
@@ -654,7 +654,7 @@ watch(() => editingLayers.value, createEditControlPoints, { deep: true, flush: '
 interface ControlPointAttributeEditGroup {
     layerIndex: number;
     nodeIndex: number;
-    editControlPointIndices: number[]
+    editControlPointIndices: number[];
 }
 
 export interface ControlPointAttributeEdit {
@@ -671,10 +671,10 @@ export function renderControlPointAttributeEdits(
     const edits: ControlPointAttributeEdit[] = [];
     const scrapPoint = new DOMPoint();
 
-    for (let pointIndex of editControlPointIndices) {
+    for (const pointIndex of editControlPointIndices) {
         const editPoint = editControlPoints.value[pointIndex];
         let editGroup = editGroups.find(
-            (group) => group.layerIndex === editPoint.layerIndex && group.nodeIndex === editPoint.nodeIndex
+            (group) => group.layerIndex === editPoint.layerIndex && group.nodeIndex === editPoint.nodeIndex,
         );
         if (editGroup) {
             editGroup.editControlPointIndices.push(pointIndex);
@@ -705,10 +705,10 @@ export function renderControlPointAttributeEdits(
             layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
         ).translateSelf(
             -viewBox.x, -viewBox.y, 0.0,
-        )
+        );
         const inverseNodeXf = inverseViewXf.multiply(
-            originalAttributes.transform
-        )
+            originalAttributes.transform,
+        );
         const nodeXf = inverseNodeXf.inverse();
 
         switch (node.nodeName) {
@@ -757,15 +757,16 @@ export function renderControlPointAttributeEdits(
                 scrapPoint.x = originalPosition.x + width;
                 scrapPoint.y = originalPosition.y + height;
                 const bottomRightXfPoint = scrapPoint.matrixTransform(nodeXf);
-                
-                originalPosition.x + (x - originalPosition.x) +  width + (originalPosition.x - x);
+
+                // TODO - what was this?
+                // originalPosition.x + (x - originalPosition.x) +  width + (originalPosition.x - x);
                 scrapPoint.y = height + (originalPosition.y - y);
                 attributes.width = `${bottomRightXfPoint.x - topLeftXfPoint.x}`;
                 attributes.height = `${bottomRightXfPoint.y - topLeftXfPoint.y}`;
                 break;
             }
             case 'polygon': case 'polyline': {
-                let newPoints: DOMPoint[] = [...originalAttributes.points];
+                const newPoints: DOMPoint[] = [...originalAttributes.points];
                 for (const pointIndex of editGroup.editControlPointIndices) {
                     const point = editControlPoints.value[pointIndex];
                     scrapPoint.x = point.x;
@@ -779,7 +780,7 @@ export function renderControlPointAttributeEdits(
                 }
                 let points = '';
                 for (const point of newPoints) {
-                    points += ' ' + point.x + ','  + point.y;
+                    points += ' ' + point.x + ',' + point.y;
                 }
                 attributes.points = points.trim();
                 break;
@@ -846,7 +847,7 @@ export function renderControlPointAttributeEdits(
                 break;
             }
             case 'path': {
-                let newCommands: VectorPathCommand[] = [...originalAttributes.d];
+                const newCommands: VectorPathCommand[] = [...originalAttributes.d];
                 for (const pointIndex of editGroup.editControlPointIndices) {
                     const point = editControlPoints.value[pointIndex];
                     scrapPoint.x = point.x;

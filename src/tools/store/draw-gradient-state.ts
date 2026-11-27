@@ -5,7 +5,7 @@ import { t } from '@/i18n';
 
 import type {
     WorkingFileGradientLayer, WorkingFileGradientColorStop, WorkingFileGradientColorSpace,
-    WorkingFileGradientFillType, WorkingFileGradientSpreadMethod, RGBAColor,
+    WorkingFileGradientFillType, WorkingFileGradientSpreadMethod, RGBAColor
 } from '@/types';
 
 export const positionHandleRadius = 5;
@@ -33,7 +33,7 @@ interface PermanentStorageState {
     spreadMethod: WorkingFileGradientSpreadMethod;
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'drawGradientStateStore',
     state: {
         activeColorStops: [
@@ -42,16 +42,16 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 color: {
                     is: 'color',
                     r: 0, g: 0, b: 0, alpha: 1,
-                    style: '#000000'
-                }
+                    style: '#000000',
+                },
             },
             {
                 offset: 1,
                 color: {
                     is: 'color',
                     r: 0, g: 0, b: 0, alpha: 0,
-                    style: '#ffffff'
-                }
+                    style: '#ffffff',
+                },
             },
         ],
         blendColorSpace: 'oklab',

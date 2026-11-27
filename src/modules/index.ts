@@ -11,13 +11,13 @@ interface RunModuleOptions {
     hideWaitAnimation?: boolean;
 }
 
-const moduleGroups: { [key: string]: ModuleGroupDefinition } = moduleGroupConfig as { [key: string]: ModuleGroupDefinition };
+const moduleGroups: { [key: string]: ModuleGroupDefinition; } = moduleGroupConfig as { [key: string]: ModuleGroupDefinition; };
 
 export async function preloadModules() {
     const moduleLoadPromises: Promise<any>[] = [];
-    for (let groupName in moduleGroups) {
+    for (const groupName in moduleGroups) {
         const group = moduleGroups[groupName];
-        for (let moduleName in group.modules) {
+        for (const moduleName in group.modules) {
             const module = group.modules[moduleName];
             if (module.preload && module.action.type === 'function') {
                 const moduleIdentifierSplit = module.action.target.split('.');
@@ -27,7 +27,7 @@ export async function preloadModules() {
                 const moduleName = modulePathSplit[1];
                 if (moduleGroup && moduleName) {
                     moduleLoadPromises.push(
-                        import(/* webpackChunkName: 'module-preload-[request]' */ `./${moduleGroup}/${moduleName}`)
+                        import(/* webpackChunkName: 'module-preload-[request]' */ `./${moduleGroup}/${moduleName}`),
                     );
                 }
             }
@@ -47,7 +47,7 @@ export async function runModuleByDefinition(module: ModuleDefinition, moduleProp
     if (module.action.type === 'ui') {
         appEmitter.emit('app.dialogs.openFromModule', {
             name: module.action.target,
-            props: moduleProperties
+            props: moduleProperties,
         });
     } else if (module.action.type === 'function') {
         const moduleIdentifierSplit = module.action.target.split('.');
@@ -72,7 +72,7 @@ export async function runModuleByDefinition(module: ModuleDefinition, moduleProp
                 }
             };
             const moduleRunArgs: any = {
-                ...(moduleProperties ?? {})
+                ...(moduleProperties ?? {}),
             };
             if (cancelable) {
                 appEmitter.on('app.wait.cancelBlocking', cancelBlocking);
@@ -85,7 +85,7 @@ export async function runModuleByDefinition(module: ModuleDefinition, moduleProp
                     label: moduleIdentifiers
                         ? `moduleGroup.${ moduleIdentifiers.group }.modules.${ moduleIdentifiers.module }.name`
                         : 'app.wait.pleaseWait',
-                    cancelable: module.cancelable || false
+                    cancelable: module.cancelable || false,
                 });
             }
             let runModuleReturn: any;
@@ -100,7 +100,7 @@ export async function runModuleByDefinition(module: ModuleDefinition, moduleProp
             }
             if (!options.hideWaitAnimation) {
                 appEmitter.emit('app.wait.stopBlocking', {
-                    id: moduleRunId
+                    id: moduleRunId,
                 });
             }
             if (runModuleError) {
@@ -117,7 +117,7 @@ export async function runModule(moduleGroupName: string, moduleName: string, mod
     let module: ModuleDefinition = moduleGroups[moduleGroupName]?.modules[moduleName];
     if (!module) {
         const pluginModule = editorStore.get('pluginModules').find(
-            (definition) => definition.group === moduleGroupName && definition.name === moduleName
+            (definition) => definition.group === moduleGroupName && definition.name === moduleName,
         );
         if (pluginModule) {
             module = {
@@ -138,7 +138,7 @@ export async function runModule(moduleGroupName: string, moduleName: string, mod
     }
 }
 
-function findModuleIdentifiers(module: ModuleDefinition): { group: string, module: string } | null {
+function findModuleIdentifiers(module: ModuleDefinition): { group: string; module: string; } | null {
     for (const moduleGroupName in moduleGroups) {
         const moduleGroup = moduleGroups[moduleGroupName];
         for (const moduleName in moduleGroup.modules) {
@@ -146,7 +146,7 @@ function findModuleIdentifiers(module: ModuleDefinition): { group: string, modul
                 return {
                     group: moduleGroupName,
                     module: moduleName,
-                }
+                };
             }
         }
     }

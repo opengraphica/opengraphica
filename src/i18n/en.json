@@ -514,6 +514,17 @@
         "decreaseColorDepth": {
             "name": "Decrease Color Depth"
         },
+        "dropShadow": {
+            "name": "Drop Shadow",
+            "help": "Adds a shadow behind the current layer. The shadow is shaped around the transparent edges of the layer.\n\n**Note:** The shadow is cut off by the layer boundary. The image must have transparent areas for the shadow to appear.",
+            "param": {
+                "xOffset": "X Offset",
+                "yOffset": "Y Offset",
+                "blurRadius": "Blur",
+                "growRadius": "Grow",
+                "color": "Color"
+            }
+        },
         "emboss": {
             "name": "Emboss",
             "help": "Simulates the 3D appearance of physical embossing, such as pressing a design into paper or metal.\n\n* **Angle** - Controls the direction of the light and shadow.\n* **Elevation** - Rases the height of the embossed area, increasing the strength of lights and shadows.",
@@ -770,6 +781,33 @@
         },
         "sepia": {
             "name": "Sepia"
+        },
+        "shapeMask": {
+            "name": "Shape Mask",
+            "help": "Creates an alpha/transparency mask using one of a few basic shapes.\n\n* **Square Aspect** - Centers the shape over the layer in a 1:1 aspect ratio.\n* **Rotation** - Rotates the shape while keeping its edges touching the layer boundaries.\n* **Adjustment** - Some shapes have an additional adjustment. What this does depends on the shape.",
+            "param": {
+                "type": "Shape",
+                "typeOption": {
+                    "circle": "Circle",
+                    "equilateralTriangle": "Equilateral Triangle",
+                    "rightAngleTriangle": "Right Angle Triangle",
+                    "parallelogram": "Parallelogram",
+                    "diamond": "Diamond",
+                    "trapezoid": "Trapezoid",
+                    "pentagon": "Pentagon",
+                    "hexagon": "Hexagon",
+                    "heptagon": "Heptagon",
+                    "octagon": "Octagon",
+                    "decagon": "Decagon",
+                    "dodecagon": "Dodecagon",
+                    "cross": "Cross",
+                    "heart": "Heart",
+                    "moon": "Moon"
+                },
+                "squareAspect": "Square Aspect",
+                "rotation": "Rotation",
+                "adjustment": "Adjustment"
+            }
         },
         "spread": {
             "name": "Spread",

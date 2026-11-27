@@ -91,7 +91,7 @@ export default [
         subsets: ['coptic'],
         ranges: [[0x2c80, 0x2cff]],
     },
-    
+
     // Semitic languages
     // See https://en.wikipedia.org/wiki/List_of_Unicode_characters#Semitic_languages
     {
@@ -148,13 +148,13 @@ export default [
         subsets: ['mandaic'],
         ranges: [[0x0840, 0x085f]],
     },
-    
+
     {
         label: 'Thaana',
         subsets: ['thaana'],
         ranges: [[0x0780, 0x07bf]],
     },
-    
+
     // Brahmic scripts
     // See https://en.wikipedia.org/wiki/Brahmic_scripts#Unicode
     {
@@ -464,7 +464,7 @@ export default [
         subsets: ['tirhuta'],
         ranges: [[0x11480, 0x114df]],
     },
-    
+
     // Other south and central Asian writing systems
     {
         label: 'Masaram Gondi',
@@ -486,7 +486,7 @@ export default [
         subsets: ['warang-citi'],
         ranges: [[0x118a0, 0x118ff]],
     },
-    
+
     // African scripts
     {
         label: 'Ethiopic',
@@ -557,7 +557,7 @@ export default [
         subsets: ['vai'],
         ranges: [[0xa500, 0xa63f]],
     },
-    
+
     // American scripts
     {
         label: 'Cherokee',
@@ -594,7 +594,7 @@ export default [
         subsets: ['canadian-aboriginal'],
         ranges: [[0x18b0, 0x18ff]],
     },
-    
+
     {
         label: 'Mongolian',
         subsets: ['mongolian'],
@@ -605,7 +605,7 @@ export default [
             [0x11660, 0x1167f],
         ],
     },
-    
+
     // East Asian
     {
         label: 'Bopomofo',
@@ -753,7 +753,7 @@ export default [
         subsets: ['wancho'],
         ranges: [[0x1e2c0, 0x1e2ff]],
     },
-    
+
     // Southeast Asian
     {
         label: 'Hanifi Rohingya',
@@ -780,7 +780,7 @@ export default [
         subsets: ['meetei-mayek'],
         ranges: [[0xabc0, 0xabff]],
     },
-    
+
     // Ancient and historic scripts
     {
         label: 'Aegean Numbers',
@@ -1003,7 +1003,7 @@ export default [
         label: 'Zanabazar Square',
         ranges: [[0x11a00, 0x11a4f]],
     },
-    
+
     // Misc
     {
         label: 'Shavian',
@@ -3562,6 +3562,6 @@ export default [
             [0x1fafb, 0x1faff],
             // E0.0[1022] (🰀..🿽)    <reserved-1FC00>..<reserved-1FFFD>
             [0x1fc00, 0x1fffd],
-        ]
-    }
+        ],
+    },
 ];

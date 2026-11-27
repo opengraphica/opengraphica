@@ -29,7 +29,7 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
         if (vectorLayers.length === 0) {
             const { width, height } = workingFileStore.state;
             let newSvgString = `<svg width="${Math.round(width)}" height="${Math.round(height)}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>`;
-            let svgDocument = new DOMParser().parseFromString(newSvgString, 'image/svg+xml');
+            const svgDocument = new DOMParser().parseFromString(newSvgString, 'image/svg+xml');
             const shape = createShapeCallback(svgDocument);
             generateSvgElementIds(svgDocument);
             createdShapeId = shape.getAttribute('data-ogr-id') ?? '';
@@ -38,7 +38,7 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
                 new InsertLayerAction({
                     type: 'vector',
                     name: ensureUniqueLayerSiblingName(
-                        workingFileStore.state.layers[0]?.id, t('toolbar.drawShape.newVectorLayerName')
+                        workingFileStore.state.layers[0]?.id, t('toolbar.drawShape.newVectorLayerName'),
                     ),
                     width,
                     height,
@@ -49,13 +49,13 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
                             return image;
                         })()),
                         sourceDocument: editorStore.state.activeTool === 'shape' ? svgDocument : undefined,
-                    }
-                })
+                    },
+                }),
             );
             actions.push(new TrimLayerEmptySpaceAction(-1));
         } else {
             for (const layer of vectorLayers) {
-                let svgDocument = (layer.data.sourceDocument?.documentElement)
+                const svgDocument = (layer.data.sourceDocument?.documentElement)
                     ? layer.data.sourceDocument
                     : await getStoredSvgDocument(layer.data.sourceUuid);
                 const shape = createShapeCallback(svgDocument);
@@ -72,8 +72,8 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
                                 return image;
                             })()),
                             sourceDocument: editorStore.state.activeTool === 'shape' ? svgDocument : undefined,
-                        }
-                    })
+                        },
+                    }),
                 );
                 actions.push(new TrimLayerEmptySpaceAction(layer.id));
             }
@@ -121,7 +121,7 @@ function setShapeCommonAttributes(
     { fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform }: {
         fill?: string; fillOpacity?: number; stroke?: string; strokeLinecap?: string;
         strokeLinejoin?: string; strokeOpacity?: number; strokeWidth?: number; transform?: string;
-    }
+    },
 ) {
     if (fill != null) {
         shape.setAttribute('fill', fill);
@@ -167,7 +167,7 @@ registerTool({
             svgDocument.documentElement.appendChild(rect);
             return rect;
         });
-    }
+    },
 });
 
 registerTool({
@@ -194,7 +194,7 @@ registerTool({
             svgDocument.documentElement.appendChild(circle);
             return circle;
         });
-    }
+    },
 });
 
 registerTool({
@@ -223,7 +223,7 @@ registerTool({
             svgDocument.documentElement.appendChild(ellipse);
             return ellipse;
         });
-    }
+    },
 });
 
 registerTool({
@@ -252,7 +252,7 @@ registerTool({
             svgDocument.documentElement.appendChild(line);
             return line;
         });
-    }
+    },
 });
 
 registerTool({
@@ -275,7 +275,7 @@ registerTool({
             svgDocument.documentElement.appendChild(polyline);
             return polyline;
         });
-    }
+    },
 });
 
 registerTool({
@@ -298,7 +298,7 @@ registerTool({
             svgDocument.documentElement.appendChild(polygon);
             return polygon;
         });
-    }
+    },
 });
 
 registerTool({
@@ -321,7 +321,7 @@ registerTool({
             svgDocument.documentElement.appendChild(path);
             return path;
         });
-    }
+    },
 });
 
 registerTool({
@@ -340,7 +340,7 @@ registerTool({
         const stringAttributes = ['fill', 'stroke', 'strokeLinecap', 'strokeLinejoin', 'transform'];
         const numberAttributes = ['x', 'y', 'cx', 'cy', 'rx', 'ry', 'r', 'width', 'height', 'fillOpacity', 'strokeOpacity', 'strokeWidth'];
 
-        const layerDefinitions: Array<{ layerId: number, shapes: Array<{ shapeId: string, tagName: string, attributes: Record<string, string | number>, selected: boolean }> }> = [];
+        const layerDefinitions: Array<{ layerId: number; shapes: Array<{ shapeId: string; tagName: string; attributes: Record<string, string | number>; selected: boolean; }>; }> = [];
         const selectedVectorLayers = getSelectedLayers<WorkingFileVectorLayer>().filter((layer) => layer.type === 'vector');
         for (const layer of selectedVectorLayers) {
             const svgDocument = (layer.data.sourceDocument?.documentElement)
@@ -353,7 +353,7 @@ registerTool({
             layerDefinitions.push({
                 layerId: layer.id,
                 shapes: Array.from(
-                    svgDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path')
+                    svgDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path'),
                 ).map((element) => {
                     const shapeId = element.getAttribute('data-ogr-id') ?? '';
                     return {
@@ -377,15 +377,15 @@ registerTool({
                         },
                         selected: !!selectedShapes.value.find(([layerId, otherShapeId]) => layerId === layer.id && shapeId === otherShapeId),
                     };
-                })
-            })
+                }),
+            });
         }
         return {
             structuredContent: {
                 shapesByLayer: layerDefinitions,
             },
         };
-    }
+    },
 });
 
 registerTool({
@@ -440,7 +440,7 @@ registerTool({
                     return accumulator;
                 }, {} as Record<string, string>);
                 actions.push(
-                    new UpdateVectorLayerAttributesAction(layer.id, properties.id, attributes)
+                    new UpdateVectorLayerAttributesAction(layer.id, properties.id, attributes),
                 );
                 actions.push(new TrimLayerEmptySpaceAction(layer.id));
             }
@@ -460,10 +460,10 @@ registerTool({
                 {
                     type: 'text',
                     text: t('mcp.common.response.updateSuccess'),
-                }
+                },
             ],
         };
-    }
+    },
 });
 
 registerTool({
@@ -495,7 +495,7 @@ registerTool({
             const actions: BaseAction[] = [];
             const vectorLayers = getSelectedLayers<WorkingFileVectorLayer>().filter((layer) => layer.type === 'vector');
             for (const layer of vectorLayers) {
-                let svgDocument = (layer.data.sourceDocument?.documentElement)
+                const svgDocument = (layer.data.sourceDocument?.documentElement)
                     ? layer.data.sourceDocument
                     : await getStoredSvgDocument(layer.data.sourceUuid);
                 svgDocument.querySelector(`[data-ogr-id="${id}"]`)?.remove();
@@ -511,8 +511,8 @@ registerTool({
                                 return image;
                             })()),
                             sourceDocument: editorStore.state.activeTool === 'shape' ? svgDocument : undefined,
-                        }
-                    })
+                        },
+                    }),
                 );
                 actions.push(new TrimLayerEmptySpaceAction(layer.id));
             }
@@ -532,8 +532,8 @@ registerTool({
                 {
                     type: 'text',
                     text: t('mcp.common.response.deleteSuccess'),
-                }
+                },
             ],
         };
-    }
+    },
 });

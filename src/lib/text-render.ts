@@ -9,7 +9,7 @@ import { textMetaDefaults } from './text-common';
 import type {
     FontFamilyFetchDefinition,
     TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanBidiRun,
-    RenderTextLineInfo, RenderTextGlyphInfo, CalculatedTextPlacement,
+    RenderTextLineInfo, RenderTextGlyphInfo, CalculatedTextPlacement
 } from '@/types';
 import type { Font, Glyph } from '@/lib/opentype.js';
 
@@ -35,7 +35,7 @@ export function getUnloadedFontFamilies(document: TextDocument): string[] {
     }
     for (const subset of subsets) {
         for (const defaultFontFamily of defaultFontFamilies) {
-            if (defaultFontFamily.family.startsWith("Noto Sans") && defaultFontFamily.subsets.includes(subset)) {
+            if (defaultFontFamily.family.startsWith('Noto Sans') && defaultFontFamily.subsets.includes(subset)) {
                 fontFamilies.add(defaultFontFamily.family);
                 break;
             }
@@ -51,14 +51,14 @@ export function getUnloadedFontFamilies(document: TextDocument): string[] {
 
 export async function loadFontFamilies(unloadedFontFamilies: string[]): Promise<boolean> {
     let hadUnloadedFont = false;
-    let loadFontPromises: Promise<unknown>[] = [];
+    const loadFontPromises: Promise<unknown>[] = [];
     for (const family of unloadedFontFamilies) {
         if (!fontCache.isFontFamilyLoaded(family)) {
             hadUnloadedFont = true;
         }
         if (!(await fontCache.waitForFontFamilyLoaded(family))) {
             loadFontPromises.push(
-                fontCache.loadFontFamily(family)
+                fontCache.loadFontFamily(family),
             );
         }
     }
@@ -142,7 +142,7 @@ export function getSpanBidiRuns(characterStartIndex: number, span: TextDocumentS
             isFlipped: false,
             text: span.text,
             meta: span.meta,
-        }]
+        }];
     }
 
     const characterEndIndex = characterStartIndex + span.text.length;
@@ -158,7 +158,7 @@ export function getSpanBidiRuns(characterStartIndex: number, span: TextDocumentS
             isFlipped: false,
             text: span.text,
             meta: span.meta,
-        })
+        });
         return bidiRuns;
     }
 
@@ -232,11 +232,11 @@ export interface CalculateTextPlacementOptions {
 export function calculateTextWraps(document: TextDocument, options: CalculateTextPlacementOptions = {}) {
     let { wrapSize } = options;
     wrapSize = wrapSize ?? 0;
-    let isHorizontal = ['ltr', 'rtl'].includes(document.lineDirection);
-    let documentLines = document.lines;
+    const isHorizontal = ['ltr', 'rtl'].includes(document.lineDirection);
+    const documentLines = document.lines;
 
     let wrappedLines = documentLines;
-    let originalLineIndices: number[] = [];
+    const originalLineIndices: number[] = [];
     if (document.boundary === 'box') {
         wrappedLines = [];
         let currentLineSpans: TextDocumentSpan[] = [];
@@ -282,11 +282,11 @@ export function calculateTextWraps(document: TextDocument, options: CalculateTex
                         let maxWordIterations = 0;
                         while (words.length > 0 && maxWordIterations < 1000) {
                             maxWordIterations++;
-                            let fittedWords: string[] = [];
+                            const fittedWords: string[] = [];
                             let fittedWordAdvanceWidth = 0;
                             let currentWordAdvanceWidth = 0;
                             for (const [wordIndex, word] of words.entries()) {
-                                currentWordAdvanceWidth = getAdvanceWidth((wordIndex > 0 ? ' ': '') + word, font, size, glyphScale, isHorizontal);
+                                currentWordAdvanceWidth = getAdvanceWidth((wordIndex > 0 ? ' ' : '') + word, font, size, glyphScale, isHorizontal);
                                 if (currentLineSize + fittedWordAdvanceWidth + currentWordAdvanceWidth <= wrapSize) {
                                     fittedWords.push(word);
                                     fittedWordAdvanceWidth += currentWordAdvanceWidth;
@@ -363,8 +363,8 @@ export function calculateTextWraps(document: TextDocument, options: CalculateTex
                                             characters = characters.slice(fittedCharacters.length);
                                         } else {
                                             // All characters fit in the current line. Add them.
-                                            let endingSpace = (fittedWords.length !== words.length ? ' ' : '');
-                                            let endingSpaceAdvanceWidth = getAdvanceWidth(endingSpace, font, size, glyphScale, isHorizontal);
+                                            const endingSpace = (fittedWords.length !== words.length ? ' ' : '');
+                                            const endingSpaceAdvanceWidth = getAdvanceWidth(endingSpace, font, size, glyphScale, isHorizontal);
                                             if (fittedCharacters.length > 0) {
                                                 currentLineSpans.push({
                                                     text: fittedCharacters + endingSpace,
@@ -409,13 +409,13 @@ export function calculateTextWraps(document: TextDocument, options: CalculateTex
     return {
         wrappedLines,
         originalLineIndices,
-    }
+    };
 }
 
 export function calculateTextPlacement(document: TextDocument, options: CalculateTextPlacementOptions = {}): CalculatedTextPlacement {
     let { wrapSize } = options;
     wrapSize = wrapSize ?? 0;
-    let isHorizontal = ['ltr', 'rtl'].includes(document.lineDirection);
+    const isHorizontal = ['ltr', 'rtl'].includes(document.lineDirection);
 
     // Determine line wrapping based on boundary box.
     let documentLines = document.lines;
@@ -472,10 +472,10 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
         let runningAdvanceOffset = 0;
         let isDrawCompensatingForAdvanceHeight = false;
         let wasDrawCompensatingForAdvanceHeight = false;
-        let lineDrawXOffset = 0;
+        const lineDrawXOffset = 0;
         let lineDrawYOffset = 0;
-        let previousGlyphInfo: RenderTextGlyphInfo | null = null;
-        
+        const previousGlyphInfo: RenderTextGlyphInfo | null = null;
+
         // let workingFlippedRun: RenderTextGlyphInfo[] = [];
         for (const fullSpan of line.spans) {
             const spanFontSplits = splitSpanByAvailableFonts(fullSpan, isEmptyLine ? (isHorizontal ? '​' : ' ') : null);
@@ -491,7 +491,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                 const size = span.meta.size ?? textMetaDefaults.size;
                 const glyphScale = size / unitsPerEm;
                 const hGlyph = font.charToGlyph('H');
-                const capHeight = font.tables?.os2?.sCapHeight 
+                const capHeight = font.tables?.os2?.sCapHeight
                     ? font.tables.os2.sCapHeight + (unitsPerEm / size) * 2
                     : hGlyph.yMax
                         ? hGlyph.yMax + (unitsPerEm / size) * 2
@@ -531,14 +531,14 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                             : bidiRunText.split('').map((char, index) => {
                                 return {
                                     glyph: font.charToGlyph(char),
-                                    replaced: [index]
+                                    replaced: [index],
                                 };
                             });
                     } catch (error) {
                         glyphs = bidiRunText.split('').map((char, index) => {
                             return {
                                 glyph: font.charToGlyph(char),
-                                replaced: [index]
+                                replaced: [index],
                             };
                         });
                     }
@@ -546,7 +546,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                     let originalTextCharacterIndex = bidiRun.isFlipped ? bidiRunText.length - 1 : 0;
                     for (const { glyph, replaced } of glyphs) {
                         const documentCharacterCount = replaced.length;
-                        
+
                         const glyphMetrics = glyph.getMetrics();
 
                         if (!isHorizontal) {
@@ -640,11 +640,11 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
     }
 
     // Calculate draw bounds.
-    let left = 0;
+    const left = 0;
     let right = 0;
-    let top = 0;
+    const top = 0;
     let bottom = 0;
-    let lineDirectionSize = longestLineSize;
+    const lineDirectionSize = longestLineSize;
     let wrapDirectionSize = 0;
     if (isHorizontal) {
         wrapDirectionSize = linesToDraw.reduce((previous, current) => {

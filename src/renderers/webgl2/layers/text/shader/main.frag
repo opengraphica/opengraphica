@@ -1,6 +1,6 @@
 uniform vec4 fill;
 
-vec4 materialMain(vec2 uv) {
+vec4 materialMain(vec2 uv, float lod) {
     return fill * vec4(1.0, 1.0, 1.0, opacity);
 }
 

@@ -4,7 +4,7 @@ import BaseCanvasMovementController from './base-movement';
 import {
     cursorHoverPosition, positionHandleRadius, editingLayers,
     activeColorStops, blendColorSpace, fillType, spreadMethod,
-    hasVisibleToolbarOverlay, showStopDrawer, radiusMultiplierTouch,
+    hasVisibleToolbarOverlay, showStopDrawer, radiusMultiplierTouch
 } from '@/tools/store/draw-gradient-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
@@ -27,8 +27,8 @@ import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import type {
-    InsertGradientLayerOptions, UpdateGradientLayerOptions, WorkingFileAnyLayer, WorkingFileGradientFillType, WorkingFileGradientLayer, 
-    WorkingFileGradientColorSpace, WorkingFileGradientSpreadMethod,
+    InsertGradientLayerOptions, UpdateGradientLayerOptions, WorkingFileAnyLayer, WorkingFileGradientFillType, WorkingFileGradientLayer,
+    WorkingFileGradientColorSpace, WorkingFileGradientSpreadMethod
 } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -51,15 +51,15 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
-            -100000000000
-        )
+            -100000000000,
+        );
 
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
             this.selectedLayers = getSelectedLayers<WorkingFileGradientLayer>(newIds).filter(
-                layer => layer.type === 'gradient'
+                layer => layer.type === 'gradient',
             );
             editingLayers.value = getSelectedLayers<WorkingFileGradientLayer>(newIds).filter(
-                layer => layer.type === 'gradient'
+                layer => layer.type === 'gradient',
             );
             this.updateToolbarFromEditingLayers();
         }, { immediate: true });
@@ -74,7 +74,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         // Tutorial message
         if (!editorStore.state.tutorialFlags.drawGradientToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.drawGradientToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.drawGradientToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -82,12 +82,12 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
                     title: t('tutorialTip.drawGradientToolIntroduction.title'),
                     message: {
                         touch: message + (tm('tutorialTip.drawGradientToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`;
                         }).join(''),
                         mouse: message + (tm('tutorialTip.drawGradientToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`;
                         }).join(''),
-                    }
+                    },
                 });
             });
         }
@@ -126,7 +126,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
@@ -160,7 +160,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
@@ -195,11 +195,11 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
         // See if the user clicked on any points in a selected layer.
         this.editingControlPoint = this.getControlPointAtPosition(start, selectedLayers, true);
-        
+
         if (this.editingControlPoint == null) {
             editingLayers.value = [];
             const { width, height } = workingFileStore.state;
-            let layerActions: BaseAction[] = [];
+            const layerActions: BaseAction[] = [];
             selectedLayers = selectedLayers.filter(layer => layer.type === 'empty');
 
             const newGradientData: InsertGradientLayerOptions['data'] = {
@@ -210,7 +210,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
                 blendColorSpace: blendColorSpace.value,
                 fillType: fillType.value,
                 spreadMethod: spreadMethod.value,
-            }
+            };
 
             // Insert gradient layer if none selected
             if (selectedLayers.length === 0) {
@@ -233,7 +233,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
                             width,
                             height,
                             data: JSON.parse(JSON.stringify(newGradientData)),
-                        })
+                        }),
                     );
                 } else if (selectedLayer.type !== 'gradient') {
                     selectedLayers.splice(i, 1);
@@ -245,7 +245,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
                 await historyStore.dispatch('runAction', {
                     action: new BundleAction('createDrawGradientLayer', 'action.createDrawGradientLayer', layerActions),
                 });
-            }   
+            }
             this.editingControlPoint = 'end';
         }
 
@@ -269,7 +269,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
             this.editingLayersStartData = [];
             for (const layer of editingLayers.value) {
                 this.editingLayersStartData.push(
-                    JSON.parse(JSON.stringify(layer.data))
+                    JSON.parse(JSON.stringify(layer.data)),
                 );
                 layer.data = JSON.parse(JSON.stringify(layer.data));
             }
@@ -297,21 +297,21 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         const pointer = this.pointers.filter((pointer) => pointer.id === this.drawingPointerId)[0];
 
         if (pointer?.isDragging && this.editingControlPoint != null && editingLayers.value.length >= 0) {
-            let layerActions: BaseAction[] = [];
+            const layerActions: BaseAction[] = [];
             for (const [layerIndex, layer] of editingLayers.value.entries()) {
                 layerActions.push(
                     new UpdateLayerAction<UpdateGradientLayerOptions>({
                         id: layer.id,
                         data: JSON.parse(JSON.stringify(layer.data)),
                     }, {
-                        data: this.editingLayersStartData?.[layerIndex]
-                    })
-                )
+                        data: this.editingLayersStartData?.[layerIndex],
+                    }),
+                );
             }
             historyStore.dispatch('runAction', {
                 action: new BundleAction('updateDrawGradientLayerPosition', 'action.updateDrawGradientLayerPosition', layerActions),
                 mergeWithHistory: this.hasCreatedLayer ? 'createDrawGradientLayer' : undefined,
-            })
+            });
         }
 
         this.editingControlPoint = null;
@@ -320,9 +320,9 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         this.hasCreatedLayer = false;
     }
 
-    private getControlPointAtPosition(cursor: { x: number, y: number }, selectedLayers: WorkingFileAnyLayer[], editLayer = false) {
+    private getControlPointAtPosition(cursor: { x: number; y: number; }, selectedLayers: WorkingFileAnyLayer[], editLayer = false) {
         const decomposedTransform = canvasStore.state.decomposedTransform;
-        let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
+        const appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
         let controlPoint: 'start' | 'end' | 'focus' | null = null;
         for (const layer of selectedLayers as WorkingFileGradientLayer[]) {
             if (layer.type !== 'gradient') continue;
@@ -380,16 +380,16 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
     private onSelectAll() {
         if (activeSelectionMask.value || appliedSelectionMask.value) {
             historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
+                action: new ClearSelectionAction(),
             });
         }
     }
 
     private updateToolbarFromEditingLayers() {
         if (editingLayers.value.length > 0) {
-            let editingFillTypes = new Set<WorkingFileGradientFillType>();
-            let editingBlendColorSpace = new Set<WorkingFileGradientColorSpace>();
-            let editingSpreadMethod = new Set<WorkingFileGradientSpreadMethod>();
+            const editingFillTypes = new Set<WorkingFileGradientFillType>();
+            const editingBlendColorSpace = new Set<WorkingFileGradientColorSpace>();
+            const editingSpreadMethod = new Set<WorkingFileGradientSpreadMethod>();
             for (const layer of editingLayers.value) {
                 editingFillTypes.add(layer.data.fillType);
                 editingBlendColorSpace.add(layer.data.blendColorSpace);
@@ -410,7 +410,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         }
     }
 
-    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint } {
+    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint; } {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewTransformPoint = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)

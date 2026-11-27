@@ -2,7 +2,7 @@
 import wasmLoadModule, {
     path_contains_path as wasmPathContainsPath,
     path_to_polyline as wasmPathToPolyline,
-    simplify_path as wasmSimplifyPath,
+    simplify_path as wasmSimplifyPath
 } from './build/vector_process_wasm';
 
 import { Path } from 'three/src/extras/core/Path';
@@ -13,7 +13,7 @@ import { serializeVectorPathCommands, parseVectorPathCommand } from '@/lib/svg';
 
 import { VectorPathCommandType } from '@/types/vector';
 import type {
-    BrushDefinition, VectorPathCommand, VectorPathCommandMove, VectorPathCommandLine,
+    BrushDefinition, VectorPathCommand, VectorPathCommandMove, VectorPathCommandLine
 } from '@/types';
 
 let isWasmModuleLoaded = false;
@@ -38,7 +38,7 @@ export async function pathToPolylines(
     if (isWasmModuleLoaded) {
 
         const polylineCommand = wasmPathToPolyline(
-            typeof pathCommands === 'string' ? pathCommands : serializeVectorPathCommands(pathCommands)
+            typeof pathCommands === 'string' ? pathCommands : serializeVectorPathCommands(pathCommands),
         );
 
         const polylines: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = [];
@@ -125,7 +125,7 @@ export async function polylineToSimplifiedPath(
         const pathCommand = wasmSimplifyPath(polylineCommand);
 
         const path = parseVectorPathCommand(pathCommand);
-        
+
         return path;
     } else {
         return polyline;
@@ -139,10 +139,10 @@ export async function pathContainsPath(
     a: string | VectorPathCommand[],
     b: string | VectorPathCommand[],
 ): Promise<boolean> {
-    waitForWasmReady()
+    waitForWasmReady();
 
     if (isWasmModuleLoaded) {
-       return wasmPathContainsPath(
+        return wasmPathContainsPath(
             typeof a === 'string' ? a : serializeVectorPathCommands(a),
             typeof b === 'string' ? b : serializeVectorPathCommands(b),
         );
@@ -172,7 +172,7 @@ export async function pathContainsPath(
 }
 
 let brushStrokeIterator: number = 0;
-let brushStrokes: Record<number, Array<Array<{ x: number, y: number }>>> = {};
+const brushStrokes: Record<number, Array<Array<{ x: number; y: number; }>>> = {};
 
 export async function createPathBrushStroke(
     path: string,
@@ -216,7 +216,7 @@ export async function stopPathBrushStroke(
                 type: pointIndex == 0 ? VectorPathCommandType.MOVE : VectorPathCommandType.LINE,
                 x: point.x,
                 y: point.y,
-            }
+            };
         }));
     }
     return paths;
@@ -232,7 +232,7 @@ export function createBrushShapePathCap(
     if (shape === 'circle') {
         const k = 0.5522847498307936;
         let d = '';
-        let r = size / 2;
+        const r = size / 2;
         if (size > 0) {
             const rk = k * r;
             d = [
@@ -251,10 +251,10 @@ export function createBrushShapePathCap(
         const sin = Math.sin(rotation);
         const points = [
             [-r, -r],
-            [ r, -r],
-            [ r,  r],
-            [-r,  r],
-            [-r,  -r],
+            [r, -r],
+            [r, r],
+            [-r, r],
+            [-r, -r],
         ].map(([x, y]) => [
             cx + x * cos - y * sin,
             cy + x * sin + y * cos,
@@ -268,7 +268,7 @@ export function createBrushShapePathCap(
     return '';
 }
 
-type Point = { x: number; y: number };
+type Point = { x: number; y: number; };
 
 function quarterArc(
     x: number,

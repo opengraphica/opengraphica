@@ -6,7 +6,7 @@ export const CopyShader = {
 
     uniforms: {
         'tDiffuse': { value: null },
-        'opacity': { value: 1.0 }
+        'opacity': { value: 1.0 },
     },
 
     vertexShader: /* glsl */`
@@ -34,5 +34,5 @@ export const CopyShader = {
             gl_FragColor.a *= opacity;
 
 
-        }`
+        }`,
 };

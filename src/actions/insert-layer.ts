@@ -76,13 +76,13 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                 thumbnailImageSrc: null,
                 transform: new DOMMatrix(),
                 visible: true,
-            }
+            };
 
             switch (this.insertLayerOptions.type) {
                 case 'empty':
                     newLayer = {
                         ...sharedOptions,
-                        ...this.insertLayerOptions
+                        ...this.insertLayerOptions,
                     } as WorkingFileEmptyLayer<ColorModel>;
                     break;
                 case 'gradient':
@@ -102,7 +102,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         ...sharedOptions,
                         layers: [],
                         expanded: false,
-                        ...this.insertLayerOptions
+                        ...this.insertLayerOptions,
                     } as WorkingFileGroupLayer<ColorModel>;
                     break;
                 case 'raster':
@@ -119,9 +119,9 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: {},
-                        ...this.insertLayerOptions
+                        ...this.insertLayerOptions,
                     } as WorkingFileRasterSequenceLayer<ColorModel>;
-                    for (let frame of newLayer.data.sequence) {
+                    for (const frame of newLayer.data.sequence) {
                         if (frame.image.sourceUuid) {
                             reserveStoredImage(frame.image.sourceUuid, `${layerId}`);
                         }
@@ -131,14 +131,14 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: {},
-                        ...this.insertLayerOptions
+                        ...this.insertLayerOptions,
                     } as WorkingFileTextLayer<ColorModel>;
                     break;
                 case 'vector':
                     newLayer = {
                         ...sharedOptions,
                         data: [],
-                        ...this.insertLayerOptions
+                        ...this.insertLayerOptions,
                     } as WorkingFileVectorLayer<ColorModel>;
                     if (newLayer.data.sourceUuid) {
                         reserveStoredSvg(newLayer.data.sourceUuid, `${layerId}`);
@@ -148,7 +148,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: [],
-                        ...this.insertLayerOptions
+                        ...this.insertLayerOptions,
                     } as WorkingFileVideoLayer<ColorModel>;
                     if (newLayer.data.sourceUuid) {
                         reserveStoredVideo(newLayer.data.sourceUuid, `${layerId}`);
@@ -186,7 +186,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         if (parent) {
             if (['above', 'below'].includes(this.insertPosition)) {
                 let insertAroundIndex: number = -1;
-                for (let [i, layer] of parent.entries()) {
+                for (const [i, layer] of parent.entries()) {
                     if (layer.id === this.insertAroundLayerId) {
                         insertAroundIndex = i;
                         break;
@@ -224,7 +224,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         // Update the working file backup
         updateWorkingFile({
             layerIdCounter: workingFileStore.get('layerIdCounter'),
-            layers: workingFileStore.get('layers')
+            layers: workingFileStore.get('layers'),
         });
         updateWorkingFileLayer(this.insertedLayer, false, workingFileStore.state);
     }
@@ -246,7 +246,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             }
         }
         if (this.insertedLayer && parent) {
-            let childIndex = parent.findIndex((layer) => layer.id === (this.insertedLayer as any).id);
+            const childIndex = parent.findIndex((layer) => layer.id === (this.insertedLayer as any).id);
             parent.splice(childIndex, 1);
         }
 
@@ -260,7 +260,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         workingFileStore.set('layers', layers);
         workingFileStore.set('layerIdCounter', workingFileStore.get('layerIdCounter') - 1);
 
-        let oldInsertedLayerId = this.insertedLayerId;
+        const oldInsertedLayerId = this.insertedLayerId;
         this.insertedLayerId = -1;
 
         calculateLayerOrder();
@@ -269,7 +269,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         // Update the working file backup
         updateWorkingFile({
             layerIdCounter: workingFileStore.get('layerIdCounter'),
-            layers: workingFileStore.get('layers')
+            layers: workingFileStore.get('layers'),
         });
         deleteWorkingFileLayer(oldInsertedLayerId);
     }
@@ -287,7 +287,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                 }
             }
             else if (this.insertedLayer.type === 'rasterSequence') {
-                for (let frame of this.insertedLayer.data.sequence) {
+                for (const frame of this.insertedLayer.data.sequence) {
                     if (frame.image.sourceUuid) {
                         unreserveStoredImage(frame.image.sourceUuid, `${this.insertedLayer.id}`);
                     }

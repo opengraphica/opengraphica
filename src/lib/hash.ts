@@ -4,20 +4,20 @@ type HashAlgorithm = 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512';
 type HashEncoding = 'base64' | 'hex';
 
 let temporaryCanvas: HTMLCanvasElement;
-let imageComparisonResolution: number = 32;
-let imageComparisonDctSize: number = 8;
+const imageComparisonResolution: number = 32;
+const imageComparisonDctSize: number = 8;
 
 export async function generateArrayBufferHash(
     arrayBuffer: ArrayBuffer,
     algorithm: HashAlgorithm = 'SHA-1',
-    encoding: HashEncoding = 'hex'
+    encoding: HashEncoding = 'hex',
 ): Promise<string> {
-    const buffer = await crypto.subtle.digest(algorithm, arrayBuffer)
-    const typedArray = new Uint8Array(buffer)
+    const buffer = await crypto.subtle.digest(algorithm, arrayBuffer);
+    const typedArray = new Uint8Array(buffer);
     if (encoding === 'hex') {
         return Array.prototype.map.call(
             typedArray,
-            (x: number) => ('00' + x.toString(16)).slice(-2)
+            (x: number) => ('00' + x.toString(16)).slice(-2),
         ).join('');
     } else { // encoding === 'base64'
         return btoa(String.fromCharCode.apply(null, typedArray as unknown as number[]));
@@ -51,16 +51,16 @@ function dctCoefficient(
     pixels: Float64Array,
     width: number,
     u: number,
-    v: number
+    v: number,
 ): number {
     let sum = 0;
     for (let y = 0; y < width; y++) {
         for (let x = 0; x < width; x++) {
-        const pixel = pixels[y * width + x];
-        sum +=
-            pixel *
-            Math.cos(((2 * x + 1) * u * Math.PI) / (2 * width)) *
-            Math.cos(((2 * y + 1) * v * Math.PI) / (2 * width));
+            const pixel = pixels[y * width + x];
+            sum +=
+                pixel *
+                Math.cos(((2 * x + 1) * u * Math.PI) / (2 * width)) *
+                Math.cos(((2 * y + 1) * v * Math.PI) / (2 * width));
         }
     }
     return sum;
@@ -82,7 +82,7 @@ export async function generateImageHash(image: HTMLCanvasElement | HTMLImageElem
     const sourceHeight = image.height;
     const scale = Math.min(
         imageComparisonResolution / sourceWidth,
-        imageComparisonResolution / sourceHeight
+        imageComparisonResolution / sourceHeight,
     );
     const width = sourceWidth * scale;
     const height = sourceHeight * scale;
@@ -94,7 +94,7 @@ export async function generateImageHash(image: HTMLCanvasElement | HTMLImageElem
         0,
         0,
         imageComparisonResolution,
-        imageComparisonResolution
+        imageComparisonResolution,
     ).data;
 
     const grayscale = new Float64Array(imageComparisonResolution * imageComparisonResolution);
@@ -114,7 +114,7 @@ export async function generateImageHash(image: HTMLCanvasElement | HTMLImageElem
                 continue;
             }
             coefficients.push(
-                dctCoefficient(grayscale, imageComparisonResolution, u, v)
+                dctCoefficient(grayscale, imageComparisonResolution, u, v),
             );
         }
     }
@@ -137,14 +137,14 @@ export async function generateImageHash(image: HTMLCanvasElement | HTMLImageElem
  */
 export function generateStringHash(str: string, seed = 0) {
     let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-    for(let i = 0, ch; i < str.length; i++) {
+    for (let i = 0, ch; i < str.length; i++) {
         ch = str.charCodeAt(i);
         h1 = Math.imul(h1 ^ ch, 2654435761);
         h2 = Math.imul(h2 ^ ch, 1597334677);
     }
-    h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
     h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
     h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }

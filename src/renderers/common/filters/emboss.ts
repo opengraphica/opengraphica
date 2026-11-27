@@ -23,8 +23,8 @@ export default class EmbossCanvasFilter implements CanvasFilter<EmbossCanvasFilt
                 default: EmbossType.BLEND,
                 options: [
                     { key: 'blend', value: EmbossType.BLEND },
-                    { key: 'heightmap', value: EmbossType.HEIGHTMAP }
-                ]
+                    { key: 'heightmap', value: EmbossType.HEIGHTMAP },
+                ],
             },
             angle: {
                 type: 'percentage',

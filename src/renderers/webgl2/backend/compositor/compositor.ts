@@ -11,7 +11,7 @@ import type { WebGLRenderer } from 'three';
 import type { SelectionMask } from '../selection-mask';
 import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
-    Webgl2RendererMeshController, WorkingFileLayerBlendingMode,
+    Webgl2RendererMeshController, WorkingFileLayerBlendingMode
 } from '@/types';
 
 export class Compositor {
@@ -73,7 +73,7 @@ export class Compositor {
         index: number,
     ): Promise<RendererTextureTile[]> {
         const brushStroke = this.brushStrokes.get(index);
-        if (!brushStroke) return[];
+        if (!brushStroke) return [];
 
         const tiles = brushStroke.collectTiles();
         brushStroke.dispose();

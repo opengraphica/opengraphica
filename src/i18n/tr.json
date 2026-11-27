@@ -75,7 +75,9 @@
         "convertVectorShapesToPaths": "Path to Path",
         "flipLayerX": "Flip Katmanı Yatay",
         "flipLayerY": "Flip Katmanı Dikey",
-        "mergeEffects": "Merge Effects"
+        "mergeEffects": "Merge Effects",
+        "freeTransform": "Ücretsiz Dönüşüm",
+        "mergeLayerDown": "Merge Katman Down"
     },
     "app": {
         "colorPickerGradient": {
@@ -131,7 +133,9 @@
                 "vector": "Vector Katmanı",
                 "video": "Video Katmanı"
             },
-            "deleteSelection": "Delete Selection"
+            "deleteSelection": "Delete Selection",
+            "edit": "Edit",
+            "mergeDown": "Merge Down"
         },
         "wait": {
             "applyLayerTransform": "Katmanı Uygulayın",
@@ -196,7 +200,9 @@
         "updateApp": "Update App",
         "add": "Add",
         "mergeEffects": "Merge Effects",
-        "selectFiles": "Dosyaları seçin..."
+        "selectFiles": "Dosyaları seçin...",
+        "deletePlugin": "Delete Plugin",
+        "reload": "Reload"
     },
     "canvas": {
         "toolbar": {
@@ -333,6 +339,10 @@
                     "checkForUpdates": "Updates için kontrol",
                     "updateAvailableTitle": "Güncelleme kullanılabilir Güncelleme",
                     "updateAvailableMessage": "OpenGraphica için bir güncelleme mevcuttur. Onu yüklemek ister misiniz?"
+                },
+                "plugins": {
+                    "selectFile": "Add Plugin File...",
+                    "uninstall": "Uninstall"
                 }
             }
         }
@@ -440,8 +450,11 @@
             "param": {
                 "size": "Boyut Boyutu",
                 "xIntensity": "X Intensity",
-                "yIntensity": "Y Intensity"
-            }
+                "yIntensity": "Y Intensity",
+                "xRadius": "X Radius",
+                "yRadius": "Y Radius"
+            },
+            "help": "Blurs, Carl Friedrich Gauss tarafından icat edilen Gaussian işlevlerini kullanarak görüntü. Bu bulanık, görüntüyü translucent ekran aracılığıyla seyretmeye benzer, ki bu, dış kamera lensi tarafından yaratılan bokeh etkisinden farklıdır."
         },
         "grayscale": {
             "name": "Grayscale",
@@ -473,7 +486,8 @@
                 "rotate": "Rotate",
                 "targetColor": "Hedef Renk Hedefi",
                 "targetRange": "Range"
-            }
+            },
+            "help": "Görüntüdeki renklerin huesini taşır, algılanan rengini etkin bir şekilde değiştirir.\n\n**Renk Uzay**, yeni rengin parlaklığını ve tatmin ediciliğini belirlemek için kullanılır. **Oklab ** genellikle en doğru seçenektir.\n\n**Target Color**, görüntüde sadece belirli bir rengini seçici olarak değiştirmek için kullanılabilir. **Range**, **Target Color**'in neye benzediğini belirler."
         },
         "negative": {
             "name": "Negatif",
@@ -679,6 +693,67 @@
                 "centerX": "Merkez X",
                 "centerY": "Merkez Y"
             }
+        },
+        "cylinderBend": {
+            "name": "Silindir Bend",
+            "help": "3D silindirin etrafındaki görüntüyü çırpın. kutuplara kağıt işaretleri eklemek gibi senaryolar için kullanışlı, vs.\n\n* **Rotation** - x-simetrinin etrafındaki silindiri rotalar. Bu, herhangi bir ekran açısı elde etmek için katmanın z eksenli rotasyonuyla birleştirilebilir.\n* **Perspective** -% 0 sonsuz bir mesafeden görülüyor ve% 100 çok yakın.\n* **View Position** - bakış açısını değiştiren veya aşağı kaydırın.",
+            "param": {
+                "rotation": "Rotation",
+                "perspective": "Perspektif",
+                "viewPosition": "View Position"
+            }
+        },
+        "highlightBloom": {
+            "help": "Aynı zamanda israf olarak da bilinir; bu, görüntünün karanlık bölgelerine ışık kanamalarının parlak olduğu yumuşak bir ışıktır. Kameralarda, lens, diffüzyon filtrelerinde ışık saçılması veya bir filmin emülmesi üzerine ışık yansımaları olabilir.\n* **Threshold** - Bir çeşit renk ışığı kanamak için ne kadar parlak olmalıdır.\n* **Radius** - Ne kadar ışık kanama olacaktır.\n* **Strength** - Işık kanaması ne kadar parlak.",
+            "param": {
+                "threshold": "Threshold",
+                "radius": "Radius",
+                "strength": "Güçlü"
+            }
+        },
+        "mechanicalVignette": {
+            "name": "Mekanik Vignette",
+            "help": "Simulates, kamera sensörüne girmekten ışık tutan merkezi bir dairesel varlığa yol açan bir görüntünün kenarındaki gölgeleme.\n\n* **Pupil Distance** - Lensin sensöründen dışsal açılışı.\n* **Pupil Radius** - Öğrencinin dairesel açılışının yarısı.\n* **Barrel Distance** - Sensörin yanındaki lensin içinde bir iç dairesel açılış mesafe.\n* **Barrel Radius ** - Satıcının dairesel açılışının yarıçapı.",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "simulate": "Simulate",
+                    "remove": "Kaldırın"
+                },
+                "sensorWidth": "Sensör Genişlik",
+                "sensorHeight": "Sensör Yükseklik",
+                "exitPupilDistance": "Pupil Distance",
+                "exitPupilRadius": "Pupil Radius",
+                "barrelOpeningDistance": "Uzak",
+                "barrelOpeningRadius": "Kovan Radius"
+            }
+        },
+        "naturalVignette": {
+            "name": "Doğal Vignette",
+            "help": "Ayrıca doğal aydınlatma düşüş olarak da bilinir, bu, sahnenin kapalı bölgelerinden gelen ışık ışınları nedeniyle bir kamera sensörünün kenarına gölgelenir.\n\nBu etki daha geniş ekran kamera lensleri üzerinde daha belirgindir, böylece ışık sensör perpendiculara çarptı.",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "simulate": "Simulate",
+                    "remove": "Kaldırın"
+                },
+                "sensorWidth": "Sensör Genişlik",
+                "sensorHeight": "Sensör Yükseklik",
+                "focalLength": "Focal Length"
+            }
+        },
+        "radialSpeedLines": {
+            "name": "Radial Speed Lines",
+            "help": "Parlak bir modelde hareket hatları çizer; genellikle mangada kullanılır. Çoğu değer rastgele bir aralığıdır.\n* **Radius ** - hatların merkeze ne kadar çizileceği.\n* **Spacing** - hatların kabukları arasındaki alan.\n* **Clumping** - Her bir clump'ta birbirlerine bir sonraki kaç çizgi çizilecektir.\n* **Thickness** - maksimum çizgi kalınlığı.\n* **Seed** - Çizgileri rastgele.",
+            "param": {
+                "centerRadius": "Radius",
+                "lineSpacing": "Spacing",
+                "lineClumping": "Clumping",
+                "lineThickness": "Kalınlık",
+                "horizontalOffset": "Yatay",
+                "verticalOffset": "Dikey",
+                "seed": "Tohum"
+            }
         }
     },
     "layerFilterGroup": {
@@ -702,6 +777,12 @@
         },
         "noise": {
             "name": "Gürültü"
+        },
+        "artistic": {
+            "name": "Sanatçı"
+        },
+        "lightShadow": {
+            "name": "Işık ve Gölge"
         }
     },
     "layoutShortcutGroup": {
@@ -1214,6 +1295,21 @@
                 "title": "Hiçbir Katman Seçilmedi",
                 "message": "Dönüştürmek için tabakalarda en az bir tabaka seçin. Bazı katman türleri dönüştürülemez."
             }
+        },
+        "pluginInstallError": {
+            "title": "Hata yükleme",
+            "message": "Bir hata, \"{pluginName}\" eklentisini yüklemede gerçekleşti. Bu, editörü yeniden başlatırsanız çözülebilir."
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "Plugin Yükleme Edildi",
+            "message": "Editör, eklentinin yürürlüğe girmesinden önce yeniden yüklenmelidir. Hala çalışıyorsanız, ilk önce değişikliklerinizi kurtarın."
+        },
+        "pluginInstallZip": {
+            "title": "Plugin ZIP",
+            "installError": {
+                "title": "Hata yükleme",
+                "message": "Ya seçilmiş dosya OpenGraphica editör eklenti değildir, ya da editörün mevcut versiyonu ile uyumlu değildir."
+            }
         }
     },
     "moduleGroup": {
@@ -1401,6 +1497,16 @@
                 "update": {
                     "name": "Update App",
                     "description": "Uygulamayı yeni işlevsellik almak için güncelleyin."
+                }
+            }
+        },
+        "plugin": {
+            "name": "Plugin",
+            "description": "Plugin yönetimi.",
+            "modules": {
+                "installZip": {
+                    "name": "Plugin ZIP",
+                    "description": "Bir ZIP dosyasından bir editör eklentisi yükleyin."
                 }
             }
         }
@@ -1777,6 +1883,17 @@
         "layerOpacity": {
             "title": "Opakity",
             "opacity": "Opakity"
+        },
+        "cloneBrush": {
+            "brushOpacity": "Opakity",
+            "brushSize": "Boyut Boyutu",
+            "brushHardness": "Hardness",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Hiçbir Katman Seçilmedi",
+                    "message": "Lütfen katmanların iskelesinde en az bir görüntü katmanı seçin. Bazı katman türleri klon fırça ile kullanılamaz."
+                }
+            }
         }
     },
     "toolGroup": {
@@ -2066,6 +2183,20 @@
                     "Bir alana dokunun. Aşağı tutarken, bölgenin ne kadar silindiğini ayarlamanız için sol veya sağa sürüklenebilirsiniz."
                 ]
             }
+        },
+        "cloneBrushToolIntroduction": {
+            "title": "Clone",
+            "introduction": [
+                "Klon fırça bir görüntünün bir kısmını kopyalar, böylece başka bir yerde aynı bölgeyi boyayabilirsiniz. Genellikle blemishes, istenmeyen nesneleri kaldırmak veya hasarlı bir yerde doldurmak için kullanılır."
+            ],
+            "body": {
+                "mouse": [
+                    "Klon alanı klon damga simgesi ile bir daire olarak gösterir. Onu mevcut fare konumuna ayarlamak için etrafında veya ctrl + tıklayabilirsiniz."
+                ],
+                "touch": [
+                    "Klon alanı klon damga simgesi ile bir daire olarak gösterir. Onu etrafta sürükleyebilirsiniz."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -2106,7 +2237,8 @@
         "chroma": "Chroma",
         "color": "Renkli Renk",
         "lightness": "Işık",
-        "luminance": "Luminance"
+        "luminance": "Luminance",
+        "merge": "Merge"
     },
     "defaultBrush": {
         "default": "Varsayılan olarak",
@@ -2130,6 +2262,10 @@
                 "sharpen": {
                     "title": "Sharpen",
                     "description": "Sharpen'in görüntü alanları"
+                },
+                "cloneBrush": {
+                    "title": "Clone",
+                    "description": "Görüntünün görüntü alanları"
                 }
             },
             "name": "Deform"
@@ -2222,6 +2358,233 @@
                 }
             },
             "name": "Blood Viewport"
+        }
+    },
+    "mcp": {
+        "common": {
+            "response": {
+                "deleteSuccess": "Delete başarısı.",
+                "updateSuccess": "Güncelleme başarısı."
+            },
+            "error": {
+                "required": "{propertyName} gereklidir.",
+                "notArray": "{propertyName} bir dizi olmalıdır.",
+                "notArrayNumber": "Mülkiyet {propertyName} sayıları olan değerlere sahip olmalıdır.",
+                "notArrayString": "Mülkiyet {propertyName}, dizeleri olan değerlere sahip olmalıdır.",
+                "notNumber": "Mülkiyet {propertyName} bir sayı olmalıdır.",
+                "notString": "Mülkiyet {propertyName} bir dize olmalıdır.",
+                "notInEnumList": "Mülkiyet {propertyName} kabul edilen değerlerden biri değildir.",
+                "layerNotFound": "Belirtilen tabaka bulunamadı.",
+                "2dTransformLength": "Dönüşüm serisi tam olarak 6 numaraya sahip olmalıdır."
+            }
+        },
+        "createCircleShape": {
+            "description": "Mevcut seçilmiş katmana bir SVG <circle> şekli ekleyin veya mevcut seçilmiş tabaka bir vektör tabakası değilse yeni bir katmana ekleyin. Yeni şekil, katmandaki diğer tüm şekillerin üstünde çizilir.",
+            "property": {
+                "cx": "Çemberin merkezinin x pozisyonu piksel.",
+                "cy": "Çemberin merkezinin pikseldeki y pozisyonu.",
+                "r": "Çember pikselinin ikizi."
+            }
+        },
+        "createEllipseShape": {
+            "description": "Mevcut seçilmiş tabakaya bir SVG <ellipse> şeklini ekleyin veya mevcut seçilen tabaka bir vektör tabakası değilse yeni bir katmana ekleyin. Yeni şekil, katmandaki diğer tüm şekillerin üstünde çizilir.",
+            "property": {
+                "cx": "Elpse'nin merkezinin pikseldeki x pozisyonu.",
+                "cy": "Elpse'nin merkezinin pikseldeki y pozisyonu.",
+                "rx": "X eksen boyunca elpse'nin yarısı pikselde.",
+                "ry": "Y eksen boyunca elpse'nin yarısı pikselde."
+            }
+        },
+        "createLineShape": {
+            "description": "Mevcut seçilmiş katmana bir SVG <line> şekli ekleyin veya mevcut seçilmiş tabaka bir vektör tabakası değilse yeni bir katmana ekleyin. Yeni şekil, katmandaki diğer tüm şekillerin üstünde çizilir.",
+            "property": {
+                "x1": "Çizginin pikseldeki başlangıcının x pozisyonu.",
+                "y1": "Çizginin pikseldeki başlangıcının y pozisyonu.",
+                "x2": "Çizginin sonundaki x pozisyonu piksel.",
+                "y2": "Çizginin sonundaki y pozisyonu piksel."
+            }
+        },
+        "createPathShape": {
+            "description": "Mevcut seçilmiş katmana bir SVG <path> şekli ekleyin veya mevcut seçilmiş tabaka bir vektör tabakası değilse yeni bir katmana ekleyin. Yeni şekil, katmandaki diğer tüm şekillerin üstünde çizilir.",
+            "property": {
+                "d": "SVG yol komutlarının listesi. SVG spec'ı takip edin. Örnek: \"M 10 80 Q 52.5 10, 95 80 T 180 80\""
+            }
+        },
+        "createPolygonShape": {
+            "description": "Mevcut seçilmiş katmana bir SVG <poligon> şekli ekleyin veya mevcut seçilmiş tabaka bir vektör tabakası değilse yeni bir katmana ekleyin. Yeni şekil, katmandaki diğer tüm şekillerin üstünde çizilir.",
+            "property": {
+                "points": "Şekilin dış kenarını tanımlayan noktalar. Örnek: \"0,0 20,0 10,5\""
+            }
+        },
+        "createPolylineShape": {
+            "description": "Mevcut seçilmiş katmana bir SVG <poliline> şekli ekleyin veya mevcut seçilmiş tabaka bir vektör tabakası değilse yeni bir katmana ekleyin. Yeni şekil, katmandaki diğer tüm şekillerin üstünde çizilir.",
+            "property": {
+                "points": "Bağlantı çizgilerini tanımlayan noktalar. Örnek: \"0,0 20,0 10,5\""
+            }
+        },
+        "createRectangleShape": {
+            "description": "Mevcut seçilmiş katmana bir SVG <rect> şekli ekleyin veya mevcut seçilmiş tabaka bir vektör tabakası değilse yeni bir katmana ekleyin. Yeni şekil, katmandaki diğer tüm şekillerin üstünde çizilir.",
+            "property": {
+                "x": "Rehinen'in sol kenarının x pozisyonu piksel'de.",
+                "y": "Arkak perdenin sol kenarının y pozisyonu piksel.",
+                "rx": "Tamamlanan köşelerin x yarıçapı pikselde.",
+                "ry": "Tamamlamanın köşelerinin yçası pikselde.",
+                "width": "Ekranın genişliği pikselde.",
+                "height": "Geometride dikdörtgenin yüksekliği."
+            }
+        },
+        "createShapeCommon": {
+            "property": {
+                "fill": "Kanal hex başına RGB 8-bit olarak renk doldurun. Omit for no fill. Örnek: \"#000000\"",
+                "fillOpacity": "Ayı renginin bir dekimal sayı olarak 0 ila 1.",
+                "stroke": "Kanal hex başına RGB 8bit olarak vuruş rengi. Omit for no Rush. Örnek: \"#000000\"",
+                "strokeLinecap": "Hatların sonu nasıl yapılır, SVG spec'ta tanımlandığı gibi.",
+                "strokeLinejoin": "Katılan çizgilerin köşeleri nasıl yapılır, SVG spec'de tanımlandığı gibi.",
+                "strokeOpacity": "İnme renginin opaklığı 0 ila 1.",
+                "strokeWidth": "Zombideki vuruşun genişliği.",
+                "transform": "Şekildeki dönüşüm özellikleri. SVG 2D matrix dönüştürme işlevi olmalıdır. Örnek: \"matrix (1,0,0,1,0,0)\""
+            },
+            "error": {
+                "fill": "Invalid dolum sözlüğü. kanal hex başına bir RGBA 8-bit sağlayın. Örnek: \"#000000\"",
+                "stroke": "Invalid Rush syntax. kanal hex başına bir RGBA 8-bit sağlayın. Örnek: \"#000000\"",
+                "transform": "Invalid dönüştürücüm. SVG 2D matrisi dönüştürücü işlevi sağlayın. Örnek: \"matrix (1,0,0,1,0,0)\""
+            }
+        },
+        "cropWorkingFile": {
+            "description": "Çalışma dosyasındaki tüm görüntü tuvali ekler (tüm tabakalar). Olumsuz bir ek, tuval boyutunu artırmak için kullanılabilir.",
+            "property": {
+                "left": "Sağlanmış görüntünün sol sınırı pikselde. Bu olumsuz olabilir.",
+                "top": "Eklenen görüntünün en üst sınırı pikselde. Bu olumsuz olabilir.",
+                "width": "Tazeleştirilmiş görüntünün pikseldeki yeni genişliği. Bu orijinal genişlikten daha büyük olabilir.",
+                "height": "Tazeleştirilmiş görüntünün pikselde yeni yüksekliği. Bu orijinal yükseklikten daha büyük olabilir."
+            },
+            "response": {
+                "success": "Bitki başarısı."
+            }
+        },
+        "deleteLayers": {
+            "description": "Belirtilen kimliklerle Deletes tabakaları.",
+            "property": {
+                "layerIds": "Katmanların kimlikleri silmek için. Katman kimlikleri, get-katlı liste aracından alınabilir."
+            },
+            "error": {
+                "noIds": "En az 1 katman ID sağlayın."
+            },
+            "response": {
+                "success": "Katmanlar silindi."
+            }
+        },
+        "deleteShape": {
+            "description": "Herhangi bir seçilmiş vektör tabakalarından bir SVG şeklini alır.",
+            "property": {
+                "id": "Şekilin kimliğini silmek için. Bu, get-shape-list aracından alınabilir."
+            }
+        },
+        "getAvailableFontList": {
+            "description": "Metin katmanları ile kullanmak için mevcut olan tüm font aileleri listeleyin."
+        },
+        "getEditorGuide": {
+            "description": "OpenGraphica görüntü editörünün nasıl çalıştığının doğal bir dili özetini sağlar.",
+            "summary": "OpenGraphica 2D karışık-medya resmi editörüdür. Özünde, hem de vektör şekilleri düzenleyebilir ve hem de vektör görüntü formatlarına ihraç edebilir.\n\nOpenGraphica'daki çalışma dosyası bir veya daha fazla tabaka ile bir görüntü belgesidir. Sabit bir dikdörtgen çözümü vardır, pikselde tanımlanmıştır. Ekran amaçları için UI'de mm gibi diğer ölçüm birimleri desteklenmektedir, ancak kararX ve çözünürlük ayarlarını kullanarak ayarlama için piksellere dönüştürülürler. Çalışma dosyası resmi belgesinin +x'in haklı olduğu bir koordinat sistemi var, +y aşağı ve -z ekrana gidiyor, izleyiciden uzak.\n\nÇalışma dosyası bireysel katmanların bir yığınından oluşur. Tüm tabakaların pikselde tanımlanmış bir genişlik / sekizi vardır ve pozisyon / rotasyon / ölçeklerini belirleyen 3x3 2D dönüşüm matrisi vardır. Bir kimlik dönüşüm matrisi ile, çalışma dosyasının ilk solunda bir katman çizilir.\n\nKatmanlar, içerdikleri görüntü türünü gösteren farklı türleri vardır:\n* **gradient** - Çalışma dosyasının tamamını kapsayan lineer veya radial gradient.\n**raster** - kanal başına 8bit RGBA piksel tabanlı bir görüntü.\n* **rasterSequence ** - Kanal başına 8bit kullanan bir animasyon dizisi RGBA piksel tabanlı görüntüler her çerçeve için.\n* **text** - Bir veya daha zengin metin paragrafları yatay veya dikey olarak çizilir.\n* **vector** - Bir SVG 1.x belgesi.\n* **video** - Bir web destekli kodc kullanarak bir video.\n\nKatmanlar alttan üste yığılır, alt tabaka ilk çizilir ve üst tabaka diğer tüm katmanların önünde çizilir. Katmanlar depolanır, böylece serideki ilk katman en alt tabakadır, ancak en üst tabakaların listesinin son kullanıcısına gösterilirler. Katmanlar lineer RGB'de karıştırmak ve tüm kota işlemleri tamamlandıktan sonra sRGB'ye dönüştürülür."
+        },
+        "getLayerList": {
+            "description": "Çalışma dosyasındaki tüm katmanların bir JSON özet tanımı, katmanların seri sırayla çekildiği (son üstte)."
+        },
+        "getRasterLayerImage": {
+            "description": "Belirtilen raster tabakası için görüntü verilerini döndürür.",
+            "property": {
+                "id": "Bulucu tabakasının kimliği. Bu, en katmanlı liste aracından alınabilir."
+            }
+        },
+        "getShapeList": {
+            "description": "Şu anda seçilmiş vektör tabakalarında tüm şekilleri listeleyen bir JSON tanımı, alttan üst sıraya. Şekil kimlikleri, yeni bir şekil eklendiğinde, silinebilir veya yeniden sipariş edilebilir."
+        },
+        "getVectorLayerSvg": {
+            "description": "Belirtilen vektör tabakası ile ilişkili serileştirilmiş SVG belgesi döndürür.",
+            "property": {
+                "id": "Vektör tabakasının kimliği. Bu, en katmanlı liste aracından alınabilir."
+            }
+        },
+        "getWorkingFileDimensions": {
+            "description": "Mevcut çalışma dosyasının genişliği ve yüksekliği pikselde döndürür. Tüm tabakaların oturduğu genel görüntü tuvalinin büyüklüğü budur."
+        },
+        "insertRasterLayer": {
+            "description": "8bit RGBA görüntüsü, katmanın üst kısmında yeni bir raster tabakası olarak adlandırılır.",
+            "property": {
+                "imageDataUri": "A base64 kodlanmış görüntü verileri URI. Media types image/JP veya görüntü/jpeg kabul edilebilir.",
+                "name": "Yeni tabakanın adı; genellikle görüntünün dosya adı.",
+                "transform": "2D dönüştürme matrixini temsil eden 6 sayının bir dizi. Örnek kimlik dönüşümü: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Raster tabakası eklendi."
+            }
+        },
+        "insertTextLayer": {
+            "description": "Bir metin katmanı çizin. Üst/sol, üstin fontun ascent çizgisi olduğu çizik kökenidir.",
+            "property": {
+                "text": "Eklemek için metin",
+                "name": "Yeni metin katmanının adı.",
+                "transform": "2D dönüştürme matrixini temsil eden 6 sayının bir dizi. Bir kimlik dönüşümü ile, katmanı, çalışma dosyasının ilk solunda yer alan üst solunda çizilir. Örnek kimlik dönüşümü: [1, 0, 0, 1, 0, 1]",
+                "fontFamily": "Font ailesinin adı kullanmak için. Bir isim listesini almak için get-bilgi-list aracı arayın.",
+                "fontSize": "Font büyüklüğü.",
+                "fill": "Kanal hex başına RGB veya RGBA 8bit olarak renk doldurun. Örnek: \"#000000\" veya \"#000000FF\""
+            }
+        },
+        "reorderLayers": {
+            "description": "Katmanların siparişini değiştirir",
+            "property": {
+                "insertLayerIds": "Katmanların kimlikleri, belirtilen eklentide bulunanPosition in the floor. Katman kimlikleri, get-katlı liste aracından alınabilir.",
+                "referenceLayerId": "Etrafa eklemek için tabakanın kimliği, eklemePosition mülküne dayanıyor.",
+                "insertPosition": "ReferansLayerId tarafından yönlendirilen tabakanın etrafındaki pozisyon. \"above\" veya \"below\"."
+            },
+            "error": {
+                "noInsertIds": "AddLayerIds mülklerinde en az bir kimlik sağlayın"
+            },
+            "response": {
+                "success": "Katmanlar yeniden sipariş edildi."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "Çalışma dosyasında tüm görüntü tuvalini (tüm tabakalar) farklı bir kararda yeniden yapılandırın. Ayrıca görüntü boyutunu ölçeklendirme olarak da bilinir.",
+            "property": {
+                "width": "Resampled görüntünün pikseldeki yeni genişliği.",
+                "height": "Resampled görüntünün pikseldeki yeni yüksekliği. Yükseklikin yüksekliğe olan yönü orijinal görüntüyü eşleştirmelidir."
+            },
+            "response": {
+                "success": "Resample başarısı."
+            }
+        },
+        "selectLayers": {
+            "description": "Hangi katmanlar şu anda editörde kimliklerini sağlayarak seçilir",
+            "property": {
+                "ids": "Bir dizi katman kimlikleri (sayı değerleri)"
+            },
+            "error": {
+                "noIds": "Ids mülkte en az bir katman kimlik sağlamalıdır."
+            },
+            "response": {
+                "success": "Katmanlar başarıyla seçildi."
+            }
+        },
+        "setLayerTransform": {
+            "description": "Şu anda seçilmiş katmanların 3x3 2D dönüşüm matrisini ayarlar, konumunu, rotasyonunu ve ölçeklerini kontrol eder.",
+            "property": {
+                "transform": "2D dönüştürme matrixini temsil eden 6 sayının bir dizi. Örnek kimlik dönüşümü: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Geçerliliği başarıyla döndürür."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "Şu anda seçilmiş vektör tabakalarında herhangi bir vektör şeklinin SVG özelliklerini günceller: <rect>, <circle>, <ellipse>, <line>, <poliline>, <poligon> veya <path>.",
+            "property": {
+                "id": "Güncelleme için şeklin kimliği. Bu, get-shape-list aracından alınabilir.",
+                "cx": "Bir çemberin merkezi veya pikselde elipse'nin x pozisyonu.",
+                "cy": "Bir çemberin merkezi veya pikselde elipse pozisyonu.",
+                "rx": "Bir dikdörtgenin köşelerinin x yarıçapçısı veya bir elpse'nin pikseldeki yarıçapı.",
+                "ry": "Bir dikdörtgenin köşelerinin ya da bir elpse'nin pikseldeki yarınması.",
+                "points": "Bir poliline veya poligon şeklinin dış kenarını tanımlayan noktalar. Örnek: \"0,0 20,0 10,5\""
+            }
         }
     }
 }

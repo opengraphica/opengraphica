@@ -7,7 +7,7 @@ import appEmitter from '@/lib/emitter';
 export class UpdateFileAction extends BaseAction {
 
     private updateFileOptions!: Partial<WorkingFileState>;
-    private previousState: { [key: string]: any } = {};
+    private previousState: { [key: string]: any; } = {};
 
     constructor(updateFileOptions: Partial<WorkingFileState>) {
         super('updateFile', 'action.updateFile');
@@ -16,7 +16,7 @@ export class UpdateFileAction extends BaseAction {
     public async do() {
         super.do();
 
-        for (let prop in this.updateFileOptions) {
+        for (const prop in this.updateFileOptions) {
             this.previousState[prop] = workingFileStore.get(prop as keyof WorkingFileState);
             workingFileStore.set(prop as keyof WorkingFileState, (this.updateFileOptions as any)[prop]);
         }
@@ -33,7 +33,7 @@ export class UpdateFileAction extends BaseAction {
     public async undo() {
         super.undo();
 
-        for (let prop in this.previousState) {
+        for (const prop in this.previousState) {
             workingFileStore.set(prop as keyof WorkingFileState, (this.previousState as any)[prop]);
         }
 

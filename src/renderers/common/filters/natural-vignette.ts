@@ -30,7 +30,7 @@ export default class NaturalVignetteCanvasFilter implements CanvasFilter<Natural
                 options: [
                     { key: 'simulate', value: NaturalVignetteMode.SIMULATE },
                     { key: 'remove', value: NaturalVignetteMode.REMOVE },
-                ]
+                ],
             },
             sensorWidth: {
                 type: 'float',
@@ -55,7 +55,7 @@ export default class NaturalVignetteCanvasFilter implements CanvasFilter<Natural
                 step: 5,
                 units: 'mm',
                 default: 15,
-            }
+            },
         } as CanvasFilterEditConfig;
     }
 }

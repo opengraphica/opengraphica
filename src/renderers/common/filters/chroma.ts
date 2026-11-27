@@ -2,7 +2,7 @@ import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
 export enum ChromaModifyMode {
     MULTIPLY = 0,
-    SHIFT = 1
+    SHIFT = 1,
 }
 
 export interface ChromaCanvasFilterParams {
@@ -23,15 +23,15 @@ export default class ChromaCanvasFilter implements CanvasFilter<ChromaCanvasFilt
                 options: [
                     { key: 'multiply', value: ChromaModifyMode.MULTIPLY },
                     { key: 'shift', value: ChromaModifyMode.SHIFT },
-                ]
+                ],
             },
             chroma: {
                 type: 'percentage',
                 default: 0,
                 preview: 0.4,
                 min: -1,
-                max: 1
-            }
+                max: 1,
+            },
         } as CanvasFilterEditConfig;
     }
 

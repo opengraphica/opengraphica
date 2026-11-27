@@ -1,17 +1,18 @@
+import { Vector4 } from 'three/src/math/Vector4';
 import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Float32BufferAttribute } from 'three/src/core/BufferAttribute';
 
 class ImagePlaneGeometry extends BufferGeometry {
-    parameters!: { width: number, height: number };
+    parameters!: { width: number; height: number; };
 
     geometryType = 'ImagePlaneGeometry';
 
-    constructor( width = 1, height = 1) {
+    constructor(width = 1, height = 1, left = 0, top = 0, uvOverride?: number[]) {
         super();
 
         this.parameters = {
             width: width,
-            height: height
+            height: height,
         };
 
         const indices: number[] = [];
@@ -23,10 +24,10 @@ class ImagePlaneGeometry extends BufferGeometry {
             const y = iy * height;
             for (let ix = 0; ix < 2; ix++) {
                 const x = ix * width;
-                vertices.push(x, y, 0);
+                vertices.push(x + left, y + top, 0);
                 normals.push(0, 0, 1);
-                uvs.push(ix);
-                uvs.push(1 - iy);
+                uvs.push(uvOverride ? uvOverride[ix * 2] : ix);
+                uvs.push(uvOverride ? uvOverride[1 + (1 - iy) * 2] : (1 - iy));
             }
         }
 
@@ -49,7 +50,7 @@ class ImagePlaneGeometry extends BufferGeometry {
         this.computeTangents();
     }
 
-    static fromJSON(data: { width: number, height: number }) {
+    static fromJSON(data: { width: number; height: number; }) {
         return new ImagePlaneGeometry(data.width, data.height);
     }
 }

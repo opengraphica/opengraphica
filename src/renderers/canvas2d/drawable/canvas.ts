@@ -259,7 +259,7 @@ export default class DrawableCanvas {
         let right = -Infinity;
         let bottom = -Infinity;
 
-        let updateInfo: Record<string, any> = {};
+        const updateInfo: Record<string, any> = {};
         for (const drawableUpdate of drawableUpdates) {
             const drawableInfo = this.drawables.get(drawableUpdate.uuid);
             if (!drawableInfo?.drawable) continue;
@@ -293,8 +293,8 @@ export default class DrawableCanvas {
             }
         }
 
-        let drawX = left == Infinity ? 0 : Math.max(0, Math.floor(left * renderScale));
-        let drawY = top == Infinity ? 0 : Math.max(0, Math.floor(top * renderScale));
+        const drawX = left == Infinity ? 0 : Math.max(0, Math.floor(left * renderScale));
+        const drawY = top == Infinity ? 0 : Math.max(0, Math.floor(top * renderScale));
 
         const newCanvasWidth = Math.pow(2, nearestPowerOf2((right - left) * renderScale));
         const newCanvasHeight = Math.pow(2, nearestPowerOf2((bottom - top) * renderScale));

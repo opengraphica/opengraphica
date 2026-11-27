@@ -1,7 +1,7 @@
 import {
     ClampToEdgeWrapping, CustomBlending, DoubleSide, LinearFilter, LinearSRGBColorSpace, NearestFilter,
     NormalBlending, OneFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, SRGBColorSpace, RepeatWrapping,
-    RGBAFormat, UnsignedByteType, ZeroFactor,
+    RGBAFormat, UnsignedByteType, ZeroFactor
 } from 'three/src/constants';
 import { Box2 } from 'three/src/math/Box2';
 import { DataTexture } from 'three/src/textures/DataTexture';
@@ -25,12 +25,14 @@ import applySelectionMaskToAlphaChannelFragmentShader from './shader/apply-selec
 import type { Camera, PixelFormatGPU, TextureDataType, WebGLRenderer } from 'three';
 import type { RendererTextureTile } from '@/types';
 
+/* eslint-disable @stylistic/no-multi-spaces */
 const selectionMaskPatternPixels = new Uint8Array([
     255, 255, 255, 195,  255, 255, 255, 195,  255, 255, 255, 195,  78, 78, 78, 195,
     255, 255, 255, 195,  255, 255, 255, 195,  78, 78, 78, 195,  255, 255, 255, 195,
     255, 255, 255, 195,  78, 78, 78, 195,  255, 255, 255, 195,  255, 255, 255, 195,
     78, 78, 78, 195,  255, 255, 255, 195,  255, 255, 255, 195,  255, 255, 255, 195,
 ]);
+/* eslint-enable @stylistic/no-multi-spaces */
 
 export class SelectionMask {
     scene!: Scene;
@@ -112,7 +114,7 @@ export class SelectionMask {
         }
     }
 
-    setImage(image?: ImageBitmap, offset?: { x: number, y: number }) {
+    setImage(image?: ImageBitmap, offset?: { x: number; y: number; }) {
         this.selectionMaskMaterial.uniforms.selectedMaskMap.value?.dispose();
         this.selectionMaskMaterial.uniforms.selectedMaskMap.value?.image?.close?.();
         if (image) {
@@ -145,7 +147,7 @@ export class SelectionMask {
     getOffset(): number[] {
         return [
             this.selectionMaskMaterial.uniforms.selectedMaskOffset.value[0],
-            this.selectionMaskMaterial.uniforms.selectedMaskOffset.value[1]
+            this.selectionMaskMaterial.uniforms.selectedMaskOffset.value[1],
         ];
     }
 
@@ -237,22 +239,22 @@ export class SelectionMask {
                         new Matrix4().makeTranslation(new Vector3(
                             -selectionMaskOffset[0] / selectionMaskWidth,
                             1.0 + (selectionMaskOffset[1] / selectionMaskHeight),
-                            0.0
-                        ))
+                            0.0,
+                        )),
                     )
                     .multiply(
                         new Matrix4().makeScale(
                             1.0 / selectionMaskWidth,
                             -1.0 / selectionMaskHeight,
                             1.0,
-                        )
+                        ),
                     );
                 const tileTransformResetInverse = tileTransformReset.clone().invert();
 
                 material.uniforms.selectionMaskTransform.value = new Matrix4()
                     .multiply(tileTransformReset)
                     .multiply(
-                        maskTransform
+                        maskTransform,
                     )
                     .multiply(tileTransformResetInverse)
                     .multiply(
@@ -260,14 +262,14 @@ export class SelectionMask {
                             selectionMaskTileOffsetX,
                             1.0 - selectionMaskTileOffsetY - selectionMaskTileScaleY,
                             1.0,
-                        ))
+                        )),
                     )
                     .multiply(
                         new Matrix4().makeScale(
                             selectionMaskTileScaleX,
                             selectionMaskTileScaleY,
                             1.0,
-                        )
+                        ),
                     );
 
                 // Why was this here?
@@ -309,7 +311,7 @@ export class SelectionMask {
                         beforeTile,
                         afterTile,
                         tileBitmaps,
-                    )
+                    ),
                 );
             }
         }
@@ -323,7 +325,7 @@ export class SelectionMask {
 
         geometry.dispose();
         material.dispose();
-        
+
         renderer.setRenderTarget(null);
         renderer.setViewport(originalViewport);
 
@@ -384,7 +386,7 @@ export class SelectionMask {
         renderer: WebGLRenderer,
         beforeTile: WebGLRenderTarget,
         afterTile: WebGLRenderTarget,
-        tileBitmaps: RendererTextureTile[]
+        tileBitmaps: RendererTextureTile[],
     ) {
         const beforeBuffer = new Uint8Array(tileWidth * tileHeight * 4);
         const afterBuffer = new Uint8Array(tileWidth * tileHeight * 4);
@@ -397,11 +399,11 @@ export class SelectionMask {
             height: tileHeight,
             oldImage: await createImageBitmap(
                 new ImageData(new Uint8ClampedArray(beforeBuffer), tileWidth, tileHeight),
-                { imageOrientation: 'flipY' }
+                { imageOrientation: 'flipY' },
             ),
             image: await createImageBitmap(
                 new ImageData(new Uint8ClampedArray(afterBuffer), tileWidth, tileHeight),
-                { imageOrientation: 'flipY' }
+                { imageOrientation: 'flipY' },
             ),
         });
         this.reclaimRenderTarget(beforeTile);

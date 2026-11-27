@@ -14,7 +14,7 @@ import { VideoLayerMeshController } from '@/renderers/webgl2/layers/video/mesh-c
 
 const rendererBackend = getWebgl2RendererBackend();
 
-let timelineCursor = 0;
+const timelineCursor = 0;
 
 function logError(error: any) {
     self.postMessage({
@@ -31,7 +31,7 @@ const meshControllerClassesByType = {
     text: TextLayerMeshController,
     vector: VectorLayerMeshController,
     video: VideoLayerMeshController,
-}
+};
 
 self.onmessage = ({ data }) => {
     switch (data.type) {
@@ -191,14 +191,14 @@ self.onmessage = ({ data }) => {
             rendererBackend.createBucketFill(data.settings).then(() => {
                 self.postMessage({
                     type: BackendWorkerMessage.CREATE_BUCKET_FILL_RESULT,
-                })
+                });
             }).catch(logError);
             break;
         case BackendWorkerMessage.PREVIEW_BUCKET_FILL:
             rendererBackend.previewBucketFill(data.strength).then(() => {
                 self.postMessage({
                     type: BackendWorkerMessage.PREVIEW_BUCKET_FILL_RESULT,
-                })
+                });
             }).catch(logError);
             break;
         case BackendWorkerMessage.APPLY_BUCKET_FILL:
@@ -224,7 +224,7 @@ self.onmessage = ({ data }) => {
             ).then(() => {
                 self.postMessage({
                     type: BackendWorkerMessage.ADD_VECTOR_LAYER_ELEMENT_RESULT,
-                })
+                });
             }).catch(logError);
             break;
         case BackendWorkerMessage.UPDATE_VECTOR_LAYER_ATTRIBUTES:
@@ -235,7 +235,7 @@ self.onmessage = ({ data }) => {
             ).then(() => {
                 self.postMessage({
                     type: BackendWorkerMessage.UPDATE_VECTOR_LAYER_ATTRIBUTES_RESULT,
-                })
+                });
             }).catch(logError);
             break;
         case BackendWorkerMessage.PICK_VECTOR_LAYER_ELEMENT:
@@ -247,7 +247,7 @@ self.onmessage = ({ data }) => {
                 self.postMessage({
                     type: BackendWorkerMessage.PICK_VECTOR_LAYER_ELEMENT_RESULT,
                     elements,
-                })
+                });
             }).catch(logError);
             break;
         case BackendWorkerMessage.WAIT_FOR_RASTER_READINESS:
@@ -256,7 +256,7 @@ self.onmessage = ({ data }) => {
             ).then((elements) => {
                 self.postMessage({
                     type: BackendWorkerMessage.WAIT_FOR_RASTER_READINESS_RESULT,
-                })
+                });
             }).catch(logError);
             break;
         case BackendWorkerMessage.SET_DIRTY:
@@ -291,7 +291,7 @@ self.onmessage = ({ data }) => {
             break;
         case BackendWorkerMessage.UPDATE_MESH_CONTROLLER:
             const meshController = meshControllers.get(data.id);
-            let result = meshController[data.methodName].apply(meshController, data.arguments);
+            const result = meshController[data.methodName].apply(meshController, data.arguments);
             if (result?.then) {
                 result.then((result) => {
                     self.postMessage({

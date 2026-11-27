@@ -22,7 +22,7 @@ export class FontCache {
     private fontFamilyMap: Map<string, FontFamilyFontCache> = new Map();
     private fontFamilyLoadingPromiseMap: Map<string, Promise<void>> = new Map();
     private fontFetchDefinitions: Record<string, FontFamilyFetchDefinition> = {};
-    
+
     constructor(options?: CreateFontCacheOptions) {
         this.fetchBaseUrl = options?.fetchBaseUrl ?? '';
     }
@@ -70,7 +70,7 @@ export class FontCache {
         this.fontFamilyLoadingPromiseMap.set(family, loadingPromise);
         try {
             const fontFamilyDefinition = await this.getFontFamilyDefinition(family);
-            const fontFetchPromises: Promise<{ variant: string; font: Font }>[] = [];
+            const fontFetchPromises: Promise<{ variant: string; font: Font; }>[] = [];
             for (const variantName in fontFamilyDefinition.variants) {
                 const fileUrl = fontFamilyDefinition.variants[variantName].file;
                 const fontUrl = (fileUrl.startsWith('http') ? '' : this.fetchBaseUrl) + fileUrl;
@@ -114,7 +114,7 @@ export class FontCache {
         let definition = this.fontFetchDefinitions[family];
         if (definition && window.location.protocol === 'file:') {
             let isDefaultFont = false;
-            for (let variantKey in definition.variants) {
+            for (const variantKey in definition.variants) {
                 if (definition.variants[variantKey].file.startsWith('fonts/')) {
                     isDefaultFont = true;
                     break;
@@ -130,9 +130,9 @@ export class FontCache {
                             accumulator[variantKey] = {
                                 name: '',
                                 file: googleDefinition.files[variantKey],
-                            }
+                            };
                             return accumulator;
-                        }, {} as { [key: string]: FontFamilyFetchDefinitionVariant }),
+                        }, {} as { [key: string]: FontFamilyFetchDefinitionVariant; }),
                     };
                 }
             }
@@ -146,7 +146,7 @@ export class FontCache {
 
 const isInWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
 const fontCache = new FontCache({
-    fetchBaseUrl: isInWorker ? '../../' : ''
+    fetchBaseUrl: isInWorker ? '../../' : '',
 });
 
 export default fontCache;

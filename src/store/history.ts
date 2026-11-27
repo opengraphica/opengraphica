@@ -79,18 +79,18 @@ const store = new PerformantStore<HistoryStore>({
             case 'undo':
                 return dispatchUndo(set);
         }
-    }
+    },
 });
 
 async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'], set: PerformantStore<HistoryStore>['directSet']) {
-    let actionStack = store.get('actionStack');
+    const actionStack = store.get('actionStack');
     let actionStackIndex = store.get('actionStackIndex');
     let totalMemoryFreed = 0;
     let totalDatabaseFreed = 0;
     let hasError = false;
     let freeComplete = false;
     while (actionStackIndex > 0) {
-        let action = actionStack.shift();
+        const action = actionStack.shift();
         if (action) {
             totalMemoryFreed += action.freeEstimates.memory;
             totalDatabaseFreed += action.freeEstimates.database;
@@ -108,7 +108,7 @@ async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'
     }
     if (!freeComplete) {
         for (let i = actionStack.length - 1; i >= 0; i--) {
-            let action = actionStack[i];
+            const action = actionStack[i];
             totalMemoryFreed += action.freeEstimates.memory;
             totalDatabaseFreed += action.freeEstimates.database;
             try {
@@ -133,14 +133,14 @@ async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'
 
     return {
         totalMemoryFreed,
-        totalDatabaseFreed
+        totalDatabaseFreed,
     };
 }
 
 async function dispatchReserve({ token }: HistoryDispatch['reserve'], set: PerformantStore<HistoryStore>['directSet']) {
-    let actionReserveQueue = store.get('actionReserveQueue');
+    const actionReserveQueue = store.get('actionReserveQueue');
     let resolve!: () => void;
-    let promise = new Promise<void>((promiseResolve) => {
+    const promise = new Promise<void>((promiseResolve) => {
         resolve = promiseResolve;
     });
     actionReserveQueue.push({ token, promise, resolve });
@@ -148,7 +148,7 @@ async function dispatchReserve({ token }: HistoryDispatch['reserve'], set: Perfo
 }
 
 async function dispatchUnreserve({ token }: HistoryDispatch['unreserve'], set: PerformantStore<HistoryStore>['directSet']) {
-    let actionReserveQueue = store.get('actionReserveQueue');
+    const actionReserveQueue = store.get('actionReserveQueue');
     const reserveIndex = actionReserveQueue.findIndex(reserve => reserve.token === token);
     if (reserveIndex > -1) {
         const reserve = actionReserveQueue[reserveIndex];
@@ -163,7 +163,7 @@ async function dispatchRunAction(
     set: PerformantStore<HistoryStore>['directSet'],
 ) {
 
-    let actionRunStatus: { status: string, reason?: any } = { status: 'completed' };
+    let actionRunStatus: { status: string; reason?: any; } = { status: 'completed' };
     let resolveActiveAction = (value: void) => {};
     let rejectActiveAction = (error: any) => {};
 
@@ -179,7 +179,7 @@ async function dispatchRunAction(
         await nextTick();
         await new Promise((resolve) => {
             setTimeout(resolve, 0);
-        })
+        });
     }
 
     try {
@@ -195,8 +195,8 @@ async function dispatchRunAction(
         let actionReserveQueue = store.get('actionReserveQueue');
         while (actionReserveQueue.length > 0) {
             let reserveIgnoreResolve!: () => void;
-            let reserveIgnorePromise = new Promise<void>(resolve => { reserveIgnoreResolve = resolve; });
-            let reserveIgnoreTimeoutHandle = setTimeout(async () => {
+            const reserveIgnorePromise = new Promise<void>(resolve => { reserveIgnoreResolve = resolve; });
+            const reserveIgnoreTimeoutHandle = setTimeout(async () => {
                 actionReserveQueue = store.get('actionReserveQueue');
                 const reserve = actionReserveQueue.shift();
                 set('actionReserveQueue', actionReserveQueue);
@@ -240,7 +240,7 @@ async function dispatchRunAction(
         if (actionStackIndex < actionStack.length) {
             const freedActions = actionStack.slice(actionStackIndex, actionStack.length).reverse();
             actionStack = actionStack.slice(0, actionStackIndex);
-            for (let freedAction of freedActions) {
+            for (const freedAction of freedActions) {
                 try {
                     await freedAction.free();
                 } catch (error: any) {
@@ -260,7 +260,7 @@ async function dispatchRunAction(
                 actionStack[actionStack.length - 1] = new BundleAction(
                     lastAction.id,
                     lastAction.description,
-                    [lastAction, action]
+                    [lastAction, action],
                 );
                 shouldPushAction = false;
             }
@@ -277,7 +277,7 @@ async function dispatchRunAction(
         if (shouldPushAction) {
             actionStack.push(action);
             if (actionStack.length > preferencesStore.get('historyStatesMax')) {
-                let actionToFree = actionStack.shift();
+                const actionToFree = actionStack.shift();
                 try {
                     if (actionToFree) {
                         await actionToFree.free();
@@ -300,7 +300,7 @@ async function dispatchRunAction(
             action: {
                 id: action.id,
                 description: action.description,
-            }
+            },
         });
 
         // Chrome arbitrary method to determine memory usage, but most people use Chrome so...
@@ -339,8 +339,8 @@ async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
         let actionReserveQueue = store.get('actionReserveQueue');
         while (actionReserveQueue.length > 0) {
             let reserveIgnoreResolve!: () => void;
-            let reserveIgnorePromise = new Promise<void>(resolve => { reserveIgnoreResolve = resolve; });
-            let reserveIgnoreTimeoutHandle = setTimeout(async () => {
+            const reserveIgnorePromise = new Promise<void>(resolve => { reserveIgnoreResolve = resolve; });
+            const reserveIgnoreTimeoutHandle = setTimeout(async () => {
                 actionReserveQueue = store.get('actionReserveQueue');
                 const reserve = actionReserveQueue.shift();
                 set('actionReserveQueue', actionReserveQueue);
@@ -380,7 +380,7 @@ async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
         await nextTick();
         await new Promise((resolve) => {
             setTimeout(resolve, 0);
-        })
+        });
 
         try {
             actionStackIndex--;
@@ -394,7 +394,7 @@ async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
                 action: {
                     id: actionStack[actionStackIndex].id,
                     description: actionStack[actionStackIndex].description,
-                }
+                },
             });
         } catch (error) {
             console.error('[src/store/history.ts] Error during action undo:', error);
@@ -431,7 +431,7 @@ async function dispatchRedo(set: PerformantStore<HistoryStore>['directSet']) {
         await nextTick();
         await new Promise((resolve) => {
             setTimeout(resolve, 0);
-        })
+        });
 
         try {
             const action = actionStack[actionStackIndex];
@@ -446,7 +446,7 @@ async function dispatchRedo(set: PerformantStore<HistoryStore>['directSet']) {
                 action: {
                     id: action.id,
                     description: action.description,
-                }
+                },
             });
         } catch (error) {
             console.error('[src/store/history.ts] Error during action redo:', error);
@@ -500,7 +500,7 @@ export async function historyBlockInteractionUntilComplete() {
         actionReserveQueue = store.get('actionReserveQueue');
     }
     await historyActionQueueFree();
-    
+
     appEmitter.emit('editor.history.stopBlocking');
 }
 

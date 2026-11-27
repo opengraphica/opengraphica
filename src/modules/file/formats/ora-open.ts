@@ -1,5 +1,5 @@
 /**
- * This file implements the Open Raster specification, with customizations to support 
+ * This file implements the Open Raster specification, with customizations to support
  * OpenGraphica's specific functionality.
  * @see https://www.openraster.org/
  */
@@ -28,7 +28,7 @@ import type {
     WorkingFileLayerMask, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, WorkingFileGradientColorStop,
     WorkingFileGradientColorSpace, WorkingFileGradientFillType, WorkingFileGradientSpreadMethod,
     WorkingFileGradientLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileGroupLayer,
-    WorkingFileVectorLayer, WorkingFileVideoLayer, WorkingFileTextLayer,
+    WorkingFileVectorLayer, WorkingFileVideoLayer, WorkingFileTextLayer
 } from '@/types';
 
 function parseXmlAttributeValue(serialized: string): any {
@@ -80,23 +80,23 @@ function compositeOpToBlendingMode(compositeOp: string): WorkingFileLayerBlendin
 }
 
 interface ParseLayersToActionsOptions {
-    colorModel: ColorModelName,
-    fileWidth: number,
-    fileHeight: number,
-    layerIdCounter: number,
-    selectedLayerIds: number[],
+    colorModel: ColorModelName;
+    fileWidth: number;
+    fileHeight: number;
+    layerIdCounter: number;
+    selectedLayerIds: number[];
     insert?: boolean;
 }
 async function parseLayersToActions(
     stackNode: Element,
     groupLayerId: number,
     archive: fflate.Unzipped,
-    options: ParseLayersToActionsOptions
+    options: ParseLayersToActionsOptions,
 ) {
     let insertLayerActions: InsertLayerAction<any>[] = [];
     let groupInsertLayerActions: InsertLayerAction<any>[] = [];
 
-    for (let layerNode of Array.from(stackNode.children).reverse()) {
+    for (const layerNode of Array.from(stackNode.children).reverse()) {
         if (!(layerNode.tagName === 'layer' || layerNode.tagName === 'stack')) continue;
 
         const id = options.layerIdCounter++;
@@ -104,7 +104,7 @@ async function parseLayersToActions(
         const type = layerNode.getAttribute('og:type')
             ?? (
                 layerNode.tagName === 'stack' ? 'group'
-                : (src.endsWith('.svg') ? 'vector' : 'raster')
+                    : (src.endsWith('.svg') ? 'vector' : 'raster')
             );
 
         const blendingMode = layerNode.getAttribute('og:blending-mode')
@@ -125,7 +125,7 @@ async function parseLayersToActions(
             options.selectedLayerIds.push(id);
         }
 
-        let parsedLayer: Partial<WorkingFileLayer<any>> = {
+        const parsedLayer: Partial<WorkingFileLayer<any>> = {
             blendingMode: validateWorkingFileLayerBlendingMode(blendingMode),
             groupId: groupLayerId,
             id,
@@ -151,7 +151,7 @@ async function parseLayersToActions(
                     params: {},
                     disabled,
                     maskId,
-                }
+                };
 
                 for (const filterParamNode of Array.from(filterNode.children)) {
                     if (filterParamNode.tagName !== 'og:filter-param') continue;
@@ -207,13 +207,13 @@ async function parseLayersToActions(
                     y: focusY,
                 },
                 blendColorSpace: validateWorkingFileGradientColorSpace(
-                    layerNode.getAttribute('og:gradient-blend-color-space') ?? 'oklab'
+                    layerNode.getAttribute('og:gradient-blend-color-space') ?? 'oklab',
                 ),
                 fillType: validateWorkingFileGradientFillType(
-                    layerNode.getAttribute('og:gradient-fill-type') ?? 'linear'
+                    layerNode.getAttribute('og:gradient-fill-type') ?? 'linear',
                 ),
                 spreadMethod: validateWorkingFileGradientSpreadMethod(
-                    layerNode.getAttribute('og:gradient-spread-method') ?? 'pad'
+                    layerNode.getAttribute('og:gradient-spread-method') ?? 'pad',
                 ),
                 stops,
             };
@@ -227,13 +227,13 @@ async function parseLayersToActions(
                     id,
                     archive,
                     options,
-                )
+                ),
             );
         } else if (type === 'raster') {
             if (!archive[src]) continue;
             const sourceUuid = await createStoredImage(
                 await createImageFromBlob(new Blob([archive[src]]))
-                    .catch(() => new Image())
+                    .catch(() => new Image()),
             ).catch(() => undefined);
             const sourceImage = getStoredImageOrCanvas(sourceUuid);
             if (!sourceImage) continue;
@@ -257,7 +257,7 @@ async function parseLayersToActions(
                 if (!archive[src]) continue;
                 const sourceUuid = await createStoredImage(
                     await createImageFromBlob(new Blob([archive[src]]))
-                        .catch(() => new Image())
+                        .catch(() => new Image()),
                 ).catch(() => undefined);
 
                 if (isFirstFrame) {
@@ -323,7 +323,7 @@ async function parseLayersToActions(
                     alignment: alignment ? validateTextLineAlignment(alignment) : undefined,
                     direction: direction ? validateTextDirection(direction) : undefined,
                     spans,
-                }
+                };
 
                 lines.push(line);
             }
@@ -353,9 +353,9 @@ async function parseLayersToActions(
                 const modifiedSvgString = xmlSerializer.serializeToString(svgDocument);
                 svgBytes = new TextEncoder().encode(modifiedSvgString) as Uint8Array<ArrayBuffer>;
             }
-            let sourceUuid = await createStoredSvg(
+            const sourceUuid = await createStoredSvg(
                 await createImageFromBlob(new Blob([svgBytes], { type: 'image/svg+xml' }))
-                    .catch(() => new Image())
+                    .catch(() => new Image()),
             ).catch(() => undefined);
             const sourceImage = getStoredSvgImage(sourceUuid);
             if (!sourceImage) continue;
@@ -366,9 +366,9 @@ async function parseLayersToActions(
             parsedLayer.height = sourceImage.height;
         } else if (type === 'video') {
             if (!archive[src]) continue;
-            let sourceUuid = await createStoredVideo(
+            const sourceUuid = await createStoredVideo(
                 await createVideoFromBlob(new Blob([archive[src]], { type: 'video/mp4' }))
-                    .catch(() => document.createElement('video'))
+                    .catch(() => document.createElement('video')),
             ).catch(() => undefined);
             const sourceVideo = getStoredVideo(sourceUuid);
             if (!sourceVideo) continue;
@@ -380,7 +380,7 @@ async function parseLayersToActions(
         }
 
         insertLayerActions.push(
-            new InsertLayerAction<InsertAnyLayerOptions<any>>(parsedLayer as InsertAnyLayerOptions<any>)
+            new InsertLayerAction<InsertAnyLayerOptions<any>>(parsedLayer as InsertAnyLayerOptions<any>),
         );
     }
 
@@ -402,7 +402,7 @@ export async function parseSerializedFileToActions(
         fflate.unzip(fileData, {
             filter(file) {
                 return file.name !== 'mergedimage.png' && !file.name.startsWith('Thumbnails');
-            }
+            },
         }, (error, data) => {
             if (error) {
                 reject(error);
@@ -588,7 +588,7 @@ function validateResolutionUnits(resolutionUnits: string): ResolutionUnits {
 
 function validateWorkingFileLayerType(workingFileLayerType: string): WorkingFileLayerType {
     if ([
-        'empty', 'gradient', 'group', 'raster', 'rasterSequence', 'vector', 'video', 'text'
+        'empty', 'gradient', 'group', 'raster', 'rasterSequence', 'vector', 'video', 'text',
     ].includes(workingFileLayerType)) {
         return workingFileLayerType as WorkingFileLayerType;
     }
@@ -598,11 +598,11 @@ function validateWorkingFileLayerType(workingFileLayerType: string): WorkingFile
 function validateWorkingFileLayerBlendingMode(workingFileLayerBlendingMode: string): WorkingFileLayerBlendingMode {
     if ([
         'normal', 'dissolve', 'colorErase', 'erase', 'merge', 'split',
-         'lightenOnly', 'lumaLightenOnly', 'screen', 'dodge', 'linearDodge', 'addition',
-         'darkenOnly', 'lumaDarkenOnly', 'multiply', 'burn', 'linearBurn',
-         'overlay', 'softLight', 'hardLight', 'vividLight', 'pinLight', 'linearLight', 'hardMix',
-         'difference', 'exclusion', 'subtract', 'grainExtract', 'grainMerge', 'divide',
-         'hue', 'chroma', 'color', 'lightness', 'luminance',
+        'lightenOnly', 'lumaLightenOnly', 'screen', 'dodge', 'linearDodge', 'addition',
+        'darkenOnly', 'lumaDarkenOnly', 'multiply', 'burn', 'linearBurn',
+        'overlay', 'softLight', 'hardLight', 'vividLight', 'pinLight', 'linearLight', 'hardMix',
+        'difference', 'exclusion', 'subtract', 'grainExtract', 'grainMerge', 'divide',
+        'hue', 'chroma', 'color', 'lightness', 'luminance',
     ].includes(workingFileLayerBlendingMode)) {
         return workingFileLayerBlendingMode as WorkingFileLayerBlendingMode;
     }

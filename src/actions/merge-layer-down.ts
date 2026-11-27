@@ -125,7 +125,7 @@ export class MergeLayerDownAction extends BaseAction {
                 };
                 image.onerror = () => {
                     resolve(image);
-                }
+                };
                 image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
             });
 
@@ -138,10 +138,10 @@ export class MergeLayerDownAction extends BaseAction {
                     data: {
                         sourceUuid: await createStoredSvg(image),
                     },
-                })
+                }),
             );
             this.actions.push(
-                new DeleteLayersAction([mergeLayer.id])
+                new DeleteLayersAction([mergeLayer.id]),
             );
 
         } else {
@@ -152,7 +152,7 @@ export class MergeLayerDownAction extends BaseAction {
             \*------------------------------------------------------------*/
 
             const renderer = await useRenderer();
-            
+
             const snapshotBitmap = await renderer.takeSnapshot(workingFileStore.state.width, workingFileStore.state.height, {
                 layerIds: [mergeLayer.id, destinationLayer.id],
                 disableBackground: true,
@@ -169,15 +169,15 @@ export class MergeLayerDownAction extends BaseAction {
                             // { transfer: true } creates artifacting in transparency in Firefox.
                             sourceUuid: await createStoredImage(snapshotBitmap, { transfer: false }),
                         },
-                    })
+                    }),
                 );
                 for (let i = destinationLayer.filters.length - 1; i >= 0; i--) {
                     this.actions.push(
-                        new DeleteLayerFilterAction(destinationLayer.id, i)
+                        new DeleteLayerFilterAction(destinationLayer.id, i),
                     );
                 }
                 this.actions.push(
-                    new DeleteLayersAction([mergeLayer.id])
+                    new DeleteLayersAction([mergeLayer.id]),
                 );
             } else {
                 this.actions.push(
@@ -191,10 +191,10 @@ export class MergeLayerDownAction extends BaseAction {
                             // { transfer: true } creates artifacting in transparency in Firefox.
                             sourceUuid: await createStoredImage(snapshotBitmap, { transfer: false }),
                         },
-                    })
+                    }),
                 );
                 this.actions.push(
-                    new DeleteLayersAction([mergeLayer.id, destinationLayer.id])
+                    new DeleteLayersAction([mergeLayer.id, destinationLayer.id]),
                 );
             }
 

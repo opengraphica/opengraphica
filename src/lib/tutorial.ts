@@ -8,7 +8,7 @@ import preferencesStore from '@/store/preferences';
 interface TutorialNotification {
     flag: keyof TutorialFlags;
     title: string;
-    message: string | { touch: string, mouse: string };
+    message: string | { touch: string; mouse: string; };
 }
 
 const tutorialNotificationStack: TutorialNotification[] = [];
@@ -95,7 +95,7 @@ function showNextTutorialNotification() {
                     currentlyShowingTutorialNotificationHandle = null;
                     editorStore.dispatch('addTutorialFlag', notification.flag);
                     showNextTutorialNotification();
-                }
+                },
             });
         }
     }

@@ -52,12 +52,12 @@ export function buildShortcutKeyMap(keyboardMapConfig: KeyboardMapConfigCategory
                         primaryKey = key;
                     }
                 }
-                let existingShortcuts = shortcutKeyMap.get(primaryKey) || [];
+                const existingShortcuts = shortcutKeyMap.get(primaryKey) || [];
                 existingShortcuts.push({
                     alt: isAlt,
                     ctrl: isCtrl,
                     shift: isShift,
-                    action: action.action
+                    action: action.action,
                 });
                 shortcutKeyMap.set(primaryKey, existingShortcuts);
             }
@@ -130,13 +130,13 @@ export async function runShortcutAction(action: ShortcutDefinition['action']) {
         (async () => {
             const editorStore = (await import('@/store/editor')).default;
             editorStore.dispatch('setActiveTool', { group: action.target });
-        });
+        })();
     } else if (action.type === 'tool') {
         (async () => {
             const editorStore = (await import('@/store/editor')).default;
-            const [ group, tool ] = action.target.split(';');
+            const [group, tool] = action.target.split(';');
             editorStore.dispatch('setActiveTool', { group, tool });
-        });
+        })();
     } else if (action.type === 'dock') {
         appEmitter.emit('app.dialogs.openFromDock', { name: action.target });
     } else if (action.type === 'runModule') {
@@ -147,7 +147,7 @@ export async function runShortcutAction(action: ShortcutDefinition['action']) {
             appEmitter.emit('app.notify', {
                 title: t(`moduleGroup.${actionSplit[0]}.modules.${actionSplit[1]}.name`),
                 message: 'Error running action: ' + error,
-                duration: 5000
+                duration: 5000,
             });
         }
     } else if (action.type === 'appEmit') {
@@ -199,7 +199,7 @@ async function onDocumentPaste(e: ClipboardEvent) {
         if (items) {
             for (let i = 0; i < items.length; i++) {
                 const item = items[i];
-                if (item.type.indexOf("image") !== -1) {
+                if (item.type.indexOf('image') !== -1) {
                     const file = item.getAsFile();
                     if (file) {
                         files.push(file);
@@ -213,7 +213,7 @@ async function onDocumentPaste(e: ClipboardEvent) {
     }
 
     e.preventDefault();
-} 
+}
 
 window.addEventListener('blur', onWindowBlur, true);
 document.addEventListener('keydown', onDocumentKeyDown, true);

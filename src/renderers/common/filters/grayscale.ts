@@ -5,11 +5,11 @@ export enum GrayscaleDesaturationMode {
     LUMA = 1,
     LIGHTNESS = 2,
     AVERAGE = 3,
-    VALUE = 4
+    VALUE = 4,
 }
 
 export interface GrayscaleCanvasFilterParams {
-    mode?: GrayscaleDesaturationMode,
+    mode?: GrayscaleDesaturationMode;
     mix?: number;
 }
 
@@ -28,16 +28,16 @@ export default class GrayscaleCanvasFilter implements CanvasFilter<GrayscaleCanv
                     { key: 'luma', value: GrayscaleDesaturationMode.LUMA },
                     { key: 'lightness', value: GrayscaleDesaturationMode.LIGHTNESS },
                     { key: 'average', value: GrayscaleDesaturationMode.AVERAGE },
-                    { key: 'value', value: GrayscaleDesaturationMode.VALUE }
+                    { key: 'value', value: GrayscaleDesaturationMode.VALUE },
                 ],
-                optionsHaveDescriptions: true
+                optionsHaveDescriptions: true,
             },
             mix: {
                 type: 'percentage',
                 default: 1,
                 min: 0,
-                max: 1
-            }
+                max: 1,
+            },
         } as CanvasFilterEditConfig;
     }
 }

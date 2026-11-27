@@ -51,7 +51,7 @@ export enum RendererBrushStrokeDrawMode {
 
 export interface RendererBrushStrokeSettingsCommon {
     color: Float16Array;
-    shape: BrushDefinition['shape'],
+    shape: BrushDefinition['shape'];
     size: number;
     hardness: number;
     colorBlendingPersistence: number;

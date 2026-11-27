@@ -23,7 +23,7 @@ import {
     brushShape, brushSpacing, brushSize, brushOpacity,
     brushPixelSnap, brushHardness, brushPressureMinSize, brushPressureTaper,
     brushAngle, brushDensity, brushPressureMinDensity, brushSmoothing, brushJitter,
-    applyPixelSnapping,
+    applyPixelSnapping
 } from '../store/erase-brush-state';
 
 import type { BaseAction } from '@/actions/base';
@@ -38,7 +38,7 @@ import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/render
 
 import type {
     RendererFrontend, RendererTextureTile, UpdateRasterLayerOptions,
-    VectorPathCommandMove, VectorPathCommandLine, WorkingFileAnyLayer,
+    VectorPathCommandMove, VectorPathCommandLine, WorkingFileAnyLayer
 } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -76,7 +76,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         this.layerIdsNeedTrim.clear();
 
         this.eraseLoop = this.eraseLoop.bind(this);
-        
+
         useRenderer().then((renderer) => {
             this.renderer = renderer;
         });
@@ -86,7 +86,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             if (brushPixelSnap.value) {
                 cursorHoverPosition.value = new DOMPoint(
                     this.lastCursorX * devicePixelRatio,
-                    this.lastCursorY * devicePixelRatio
+                    this.lastCursorY * devicePixelRatio,
                 ).matrixTransform(canvasStore.state.transform.inverse());
                 applyPixelSnapping(cursorHoverPosition.value);
             }
@@ -118,14 +118,14 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         this.isPreviewingSizeUnwatch = watch(() => isPreviewingSize.value, () => {
             if (isPreviewingSize.value) {
                 cursorHoverPosition.value = new DOMPoint(
-                    canvasStore.get('dndAreaLeft') + canvasStore.get('dndAreaWidth') / 2,
-                    canvasStore.get('dndAreaTop') + canvasStore.get('dndAreaHeight') / 2,
+                    canvasStore.get('dndAreaOffsetLeft') + canvasStore.get('dndAreaLeft') + canvasStore.get('dndAreaWidth') / 2,
+                    canvasStore.get('dndAreaOffsetTop') + canvasStore.get('dndAreaTop') + canvasStore.get('dndAreaHeight') / 2,
                 ).matrixTransform(canvasStore.state.transform.inverse());
                 applyPixelSnapping(cursorHoverPosition.value);
             } else {
                 cursorHoverPosition.value = new DOMPoint(
                     -100000000000,
-                    -100000000000
+                    -100000000000,
                 );
             }
         });
@@ -134,17 +134,17 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         appEmitter.on('editor.tool.delete', this.onDelete);
         this.onSelectAll = this.onSelectAll.bind(this);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
-        
+
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
-            -100000000000
+            -100000000000,
         );
         cursorHoverAngle.value = 0;
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.eraseToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.eraseToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.eraseToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -152,8 +152,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     title: t('tutorialTip.eraseToolIntroduction.title'),
                     message: {
                         touch: message,
-                        mouse: message
-                    }
+                        mouse: message,
+                    },
                 });
             });
         }
@@ -189,11 +189,11 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             const trimActions: TrimLayerEmptySpaceAction[] = [];
             for (const layerId of this.layerIdsNeedTrim) {
                 trimActions.push(
-                    new TrimLayerEmptySpaceAction(layerId)
+                    new TrimLayerEmptySpaceAction(layerId),
                 );
             }
             historyStore.dispatch('runAction', {
-                action: new BundleAction('trimLayerEmptySpace', 'action.trimLayerEmptySpace', trimActions)
+                action: new BundleAction('trimLayerEmptySpace', 'action.trimLayerEmptySpace', trimActions),
             });
             this.layerIdsNeedTrim.clear();
         }
@@ -215,7 +215,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             applyPixelSnapping(cursorHoverPosition.value);
             cursorHoverAngle.value = brushAngle.value + e.twist;
@@ -274,7 +274,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     }
 
     protected async eraseStart(e: PointerEvent) {
-        let selectedLayers = getSelectedLayers().filter((layer) => layer.type === 'raster' || layer.type === 'vector');
+        const selectedLayers = getSelectedLayers().filter((layer) => layer.type === 'raster' || layer.type === 'vector');
         if (selectedLayers.length === 0) {
             appEmitter.emit('app.notify', {
                 type: 'info',
@@ -327,7 +327,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 tiltX: 0,
                 tiltY: 0,
                 twist: e.twist,
-            }
+            },
         );
 
         // Draw first point
@@ -351,7 +351,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     brushShape.value,
                     size,
                     e.twist,
-                )
+                ),
             );
         }
 
@@ -364,7 +364,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         if ((e.pointerType === 'pen' || !editorStore.state.isPenUser) && !isPreviewingSize.value) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             applyPixelSnapping(cursorHoverPosition.value);
             cursorHoverAngle.value = brushAngle.value + e.twist;
@@ -376,7 +376,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         ) {
             const transformedPoint = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
 
             const pressure = this.erasingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
@@ -452,14 +452,14 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             prevPoint.size,
                             brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
                             brushAngle.value + -canvasStore.state.decomposedTransform.rotation + prevPoint.twist,
-                        )
+                        ),
                     );
                 }
             }
 
             if (count > 60) break;
         }
-        
+
         if (now - this.eraseLoopLastPointerMoveTimestamp > 25) {
             this.eraseLoopDeltaAccumulator += now - this.eraseLoopLastRunTimestamp;
 
@@ -531,7 +531,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                                 this.erasingBrushStroke.previousRetrievedPoint1.size,
                                 brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
                                 brushAngle.value + -canvasStore.state.decomposedTransform.rotation + this.erasingBrushStroke.previousRetrievedPoint1.twist,
-                            )
+                            ),
                         );
                     }
                 }
@@ -563,7 +563,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                                 this.erasingBrushStroke.previousRetrievedPoint1.size,
                                 brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
                                 brushAngle.value + -canvasStore.state.decomposedTransform.rotation + this.erasingBrushStroke.previousRetrievedPoint1.twist,
-                            )
+                            ),
                         );
                     }
                 }
@@ -577,7 +577,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             brushShape.value,
                             point.size,
                             brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
-                        )
+                        ),
                     );
                 }
 
@@ -585,7 +585,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     collectedTiles.push(
                         this.renderer.stopBrushStroke(
                             layer.id,
-                        )
+                        ),
                     );
                 }
                 if (this.selectionHasVectorLayers) {
@@ -616,8 +616,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                                     await collectedTiles[layerIndex],
                                 ),
                                 alreadyRendererd: true,
-                            }
-                        })
+                            },
+                        }),
                     );
 
                 } else if (layer.type === 'vector') {
@@ -629,7 +629,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                                 appliedSelectionPaths: vectorClipPath,
                                 clearSelection: false,
                             },
-                        )
+                        ),
                     );
                     this.layerIdsNeedTrim.add(layer.id);
 
@@ -664,7 +664,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     private onSelectAll() {
         if (activeSelectionMask.value || appliedSelectionMask.value) {
             historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
+                action: new ClearSelectionAction(),
             });
         }
     }
@@ -678,7 +678,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     }
 
     protected handleCursorIcon() {
-        let newIcon = super.handleCursorIcon();
+        const newIcon = super.handleCursorIcon();
         canvasStore.set('cursor', newIcon);
         return newIcon;
     }

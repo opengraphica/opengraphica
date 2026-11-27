@@ -15,7 +15,7 @@ export function fragment(
     const effectiveRange = (filter.params.effectiveRange ?? [0, 1]);
     const effectiveRangeFeather = (filter.params.effectiveRangeFeather ?? [0, 1]);
 
-    let rgba = mode === BrightnessMode.LUMINANCE
+    const rgba = mode === BrightnessMode.LUMINANCE
         ? transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition)
         : transfer8BitImageDataToSrgb(sourceImageData, dataPosition);
     let newRgba = { ...rgba };

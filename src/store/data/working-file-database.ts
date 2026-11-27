@@ -14,7 +14,7 @@ import type {
     ColorModel, FontFamilyFetchDefinition,
     WorkingFile, WorkingFileLayerMask, WorkingFileGroupLayer, WorkingFileLayer, WorkingFileAnyLayer,
     WorkingFileGradientLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
-    WorkingFileVectorLayer, SerializedFileVectorLayer, WorkingFileVideoLayer, SerializedFileVideoLayer,
+    WorkingFileVectorLayer, SerializedFileVectorLayer, WorkingFileVideoLayer, SerializedFileVideoLayer
 } from '@/types';
 
 interface DatabaseMetaLayer {
@@ -47,7 +47,7 @@ export async function init() {
                 if (window.indexedDB) {
                     // Initialize database
                     await new Promise<void>((resolve, reject) => {
-                        let openRequest = window.indexedDB.open('openGraphicaWorkingFileStore', 2);
+                        const openRequest = window.indexedDB.open('openGraphicaWorkingFileStore', 2);
                         openRequest.onupgradeneeded = function(event) {
                             database = openRequest.result as IDBDatabase;
                             const oldVersion = event.oldVersion;
@@ -62,11 +62,11 @@ export async function init() {
                         };
                         openRequest.onerror = () => {
                             reject(openRequest.error);
-                        }
+                        };
                         openRequest.onsuccess = () => {
                             resolve();
                             database = openRequest.result as IDBDatabase;
-                        }
+                        };
                     });
                     if (!database) {
                         throw new Error('indexedDB not initialized');
@@ -83,7 +83,7 @@ export async function init() {
 
 /** Converts layers array to the database meta format, that only contains hierarcy information. */
 function convertWorkingFileLayersToMeta(layers: WorkingFileLayer[]): DatabaseMetaLayer[] {
-    let metaLayers: DatabaseMetaLayer[] = [];
+    const metaLayers: DatabaseMetaLayer[] = [];
     for (const layer of layers) {
         const layerInfo: DatabaseMetaLayer = {
             id: layer.id,
@@ -105,7 +105,7 @@ async function storeLayersRecursive(layers: WorkingFileLayer[], workingFile?: Pa
 
         if (layer.type === 'group') {
             putRequests.push(
-                storeLayersRecursive((layer as WorkingFileGroupLayer).layers, workingFile)
+                storeLayersRecursive((layer as WorkingFileGroupLayer).layers, workingFile),
             );
         }
     }
@@ -168,12 +168,12 @@ export async function updateStoredFontFamily(definition: FontFamilyFetchDefiniti
             subsets: deepToRaw(definition.subsets),
             variant: variantKey,
             data: await (await fetch(variant.file)).blob(),
-        }))
+        })),
     );
 
     const transaction = (database as IDBDatabase).transaction('fonts', 'readwrite');
     const fontsStore = transaction.objectStore('fonts');
-    let requests: IDBRequest<IDBValidKey>[] = [];
+    const requests: IDBRequest<IDBValidKey>[] = [];
     for (const record of records) {
         if (record.status === 'fulfilled') {
             requests.push(fontsStore.put(record.value));
@@ -198,7 +198,7 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[], workin
         const layerResult = await new Promise<WorkingFileAnyLayer>((resolve, reject) => {
             layerRequest.onsuccess = () => {
                 resolve(layerRequest.result);
-            },
+            };
             layerRequest.onerror = reject;
         });
         const transformArray: number[] = layerResult.transform as never;
@@ -332,7 +332,7 @@ export async function writeWorkingFile(workingFile: WorkingFile<ColorModel>) {
             if (key === 'layers') {
                 request = metaStore.put({
                     id: 'layers',
-                    data: convertWorkingFileLayersToMeta(value as WorkingFileLayer[])
+                    data: convertWorkingFileLayersToMeta(value as WorkingFileLayer[]),
                 });
             } else {
                 request = metaStore.put({ id: key, data: value });
@@ -393,7 +393,7 @@ export async function updateWorkingFile(workingFile: Partial<WorkingFile<ColorMo
             if (key === 'layers') {
                 request = metaStore.put({
                     id: 'layers',
-                    data: convertWorkingFileLayersToMeta(value as WorkingFileLayer[])
+                    data: convertWorkingFileLayersToMeta(value as WorkingFileLayer[]),
                 });
             } else {
                 request = metaStore.put({ id: key, data: value });
@@ -410,7 +410,7 @@ export async function updateWorkingFile(workingFile: Partial<WorkingFile<ColorMo
     }
 }
 
-let updateWorkingFileLayerRequestIds = new Map<number, number>();
+const updateWorkingFileLayerRequestIds = new Map<number, number>();
 
 export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNew: boolean = false, workingFile?: Partial<WorkingFile>): Promise<void> {
     const requestId = Math.random();
@@ -430,7 +430,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
             request.onsuccess = () => {
                 existingLayer = request.result;
                 resolve();
-            }
+            };
             request.onerror = resolve;
         });
     }
@@ -464,7 +464,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
                     new Promise<Event>((resolve, reject) => {
                         imageStoreRequest.onsuccess = resolve;
                         imageStoreRequest.onerror = reject;
-                    })
+                    }),
                 );
             }
         } else {
@@ -495,7 +495,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
                         new Promise<Event>((resolve, reject) => {
                             imageStoreRequest.onsuccess = resolve;
                             imageStoreRequest.onerror = reject;
-                        })
+                        }),
                     );
                 }
             } else {
@@ -539,7 +539,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
                             new Promise<Event>((resolve, reject) => {
                                 imageStoreRequest.onsuccess = resolve;
                                 imageStoreRequest.onerror = reject;
-                            })
+                            }),
                         );
                     }
                 }
@@ -549,7 +549,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
             updateWorkingFileMasks(
                 workingFile.masks,
                 workingFile.maskIdCounter
-                    ?? (parseInt(Object.keys(workingFile.masks).sort((a, b) => (a < b ? 1 : -1))[0]) + 1)
+                    ?? (parseInt(Object.keys(workingFile.masks).sort((a, b) => (a < b ? 1 : -1))[0]) + 1),
             );
         }
     }
@@ -562,7 +562,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
         new Promise<Event>((resolve, reject) => {
             request.onsuccess = resolve;
             request.onerror = reject;
-        })
+        }),
     );
 
     return Promise.all(putRequests) as unknown as Promise<void>;
@@ -589,8 +589,8 @@ export async function readWorkingFile(): Promise<WorkingFile<ColorModel>> {
         if (meta.id === 'layers') {
             layers = meta.data;
         } else if (meta.id === 'masks') {
-            let databaseMasks = meta.data;
-            let masks: Record<number, WorkingFileLayerMask> = {};
+            const databaseMasks = meta.data;
+            const masks: Record<number, WorkingFileLayerMask> = {};
             for (const maskId of Object.keys(meta.data).map(key => parseInt(key))) {
                 const mask = databaseMasks[maskId];
                 try {
@@ -626,7 +626,7 @@ export async function hasWorkingFile(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
         layersRequest.onsuccess = () => {
             resolve(layersRequest.result?.length > 0);
-        }
+        };
         layersRequest.onerror = reject;
     });
 }

@@ -5,6 +5,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 class ModuleChunkManifestPlugin {
     apply(compiler) {
@@ -171,6 +172,9 @@ module.exports = function setupConfig(config) {
                 __INTLIFY_PROD_DEVTOOLS__: false,
                 __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
                 __BUILD_GIT_COMMIT_ID__: `'${execSync('git rev-parse HEAD').toString().trim()}'`,
+            }),
+            new ESLintPlugin({
+                extensions: ['js', 'jsx', 'ts', 'tsx'],
             }),
             new ForkTsCheckerWebpackPlugin(),
             new ProgressPlugin({

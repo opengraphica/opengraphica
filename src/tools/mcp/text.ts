@@ -1,6 +1,6 @@
 import { t } from '@/i18n';
 import { registerTool } from './validation';
-import type { FontFamilyFetchDefinition, GoogleFontFamilyDefinition } from '@/types'
+import type { FontFamilyFetchDefinition, GoogleFontFamilyDefinition } from '@/types';
 
 async function addFontFamily(fontFamily?: string) {
     const { default: defaultFontFamilies } = await import('@/config/default-font-families.json');
@@ -37,9 +37,9 @@ registerTool({
         return {
             structuredContent: {
                 fontFamilies: googleWebfonts.items.map((item) => item.family),
-            }
-        }
-    }
+            },
+        };
+    },
 });
 
 registerTool({
@@ -86,7 +86,7 @@ registerTool({
             const insertLayerAction = new InsertLayerAction({
                 type: 'text',
                 name: name ?? ensureUniqueLayerSiblingName(
-                    workingFileStore.state.layers[0]?.id, t('toolbar.text.newTextLayerName')
+                    workingFileStore.state.layers[0]?.id, t('toolbar.text.newTextLayerName'),
                 ),
                 transform: transform ? new DOMMatrix(transform) : new DOMMatrix(),
                 data: {
@@ -130,5 +130,5 @@ registerTool({
                 createdLayerHeight,
             },
         };
-    }
+    },
 });

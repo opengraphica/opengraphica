@@ -10,7 +10,7 @@ export interface CreateStoredFont {
     subsets: string[];
     variants: {
         [key: string]: Blob;
-    }
+    };
 }
 
 const fontUuidMap = ref<Map<string | undefined, FontFamilyFetchDefinition>>(new Map());
@@ -72,7 +72,7 @@ export async function createStoredFont(storedFontBlobs: CreateStoredFont) {
             family: storedFontBlobs.family,
             subsets: storedFontBlobs.subsets.slice(),
             variants: {},
-        }
+        };
         for (const variantKey in storedFontBlobs.variants) {
             storedFont.variants[variantKey] = {
                 name: generateFontVariantName(variantKey),
@@ -136,7 +136,7 @@ export async function deleteAllStoredFonts() {
  * @param uuid - ID of the database entry for the font
  */
 export function reserveStoredFont(fontUuid: string, userId: string) {
-    let users = fontUserUuidMap.get(fontUuid) ?? new Set<string>();
+    const users = fontUserUuidMap.get(fontUuid) ?? new Set<string>();
     users.add(userId);
     fontUserUuidMap.set(fontUuid, users);
 }
@@ -146,7 +146,7 @@ export function reserveStoredFont(fontUuid: string, userId: string) {
  * @param uuid - ID of the database entry for the font
  */
 export function unreserveStoredFont(fontUuid: string, userId: string) {
-    let users = fontUserUuidMap.get(fontUuid) ?? new Set<string>();
+    const users = fontUserUuidMap.get(fontUuid) ?? new Set<string>();
     users.delete(userId);
     fontUserUuidMap.set(fontUuid, users);
     if (users.size === 0) {

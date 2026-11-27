@@ -12,19 +12,19 @@ export function isInput(element: HTMLElement | any) {
 
 class PointerEventPolyfill {
     constructor(options: any) {
-        for (let optionName in options) {
+        for (const optionName in options) {
             (this as any)[optionName] = options[optionName];
         }
     }
 }
 
-let pointerIdCounter: number = 0;
+const pointerIdCounter: number = 0;
 
 /**
  * Polyfill to translate mouse event to pointer event for browsers that do not support pointer events.
  */
- export function translateMouseEventToPointerEvent(type: string, e: MouseEvent): PointerEvent {
-    let pointerEvent = new PointerEventPolyfill({
+export function translateMouseEventToPointerEvent(type: string, e: MouseEvent): PointerEvent {
+    const pointerEvent = new PointerEventPolyfill({
         altKey: e.altKey,
         altitudeAngle: 1.5707963267948966, // PI / 2
         azimuthAngle: 0,
@@ -75,8 +75,8 @@ let pointerIdCounter: number = 0;
         which: 1,
         width: 23,
         x: e.clientX,
-        y: e.clientY
-    } as any) as unknown as PointerEvent
+        y: e.clientY,
+    } as any) as unknown as PointerEvent;
     return pointerEvent;
 }
 
@@ -139,8 +139,8 @@ export function translateTouchEventToPointerEvents(type: string, e: TouchEvent):
                 which: 1,
                 width: 23,
                 x: touch.clientX,
-                y: touch.clientY
-            } as any) as unknown as PointerEvent
+                y: touch.clientY,
+            } as any) as unknown as PointerEvent,
         );
     }
     return pointerEvents;

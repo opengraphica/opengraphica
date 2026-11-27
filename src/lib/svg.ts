@@ -60,8 +60,8 @@ const unitConversion = {
     },
 };
 
-function cssColorToHex(colorName): string | null {
-    const el = document.createElement("span");
+function cssColorToHex(colorName: string): string | null {
+    const el = document.createElement('span');
     el.style.color = colorName;
     document.body.appendChild(el);
 
@@ -71,10 +71,10 @@ function cssColorToHex(colorName): string | null {
     const values = rgb.match(/\d+(?:\.\d+)?/g)?.map(Number);
     if (!values) return null;
 
-    return "#" + values
+    return '#' + values
         .slice(0, 3)
-        .map(value => Math.round(value).toString(16).padStart(2, "0"))
-        .join("");
+        .map(value => Math.round(value).toString(16).padStart(2, '0'))
+        .join('');
 }
 
 /**
@@ -96,7 +96,7 @@ function parseFloats(input: string, flags?: number[], stride?: number) {
         POINT: /\./,
         COMMA: /,/,
         EXP: /e/i,
-        FLAGS: /[01]/
+        FLAGS: /[01]/,
     };
 
     // States
@@ -111,7 +111,7 @@ function parseFloats(input: string, flags?: number[], stride?: number) {
     const result: Number[] = [];
 
     function throwSyntaxError(current, i, partial) {
-        const error = new SyntaxError( 'Unexpected character "' + current + '" at index ' + i + '.' );
+        const error = new SyntaxError('Unexpected character "' + current + '" at index ' + i + '.');
         (error as any).partial = partial;
         throw error;
     }
@@ -162,8 +162,8 @@ function parseFloats(input: string, flags?: number[], stride?: number) {
 
             // throw on double commas (e.g. "1, , 2")
             if (RE.COMMA.test(current)) {
-                if ( seenComma ) {
-                    throwSyntaxError( current, i, result );
+                if (seenComma) {
+                    throwSyntaxError(current, i, result);
                 }
                 seenComma = true;
             }
@@ -281,7 +281,7 @@ function parseFloats(input: string, flags?: number[], stride?: number) {
 
 export function parseFloatWithUnits(
     string: string | String,
-    defaultUnit: 'mm'|'cm'|'in'|'pt'|'pc'|'px',
+    defaultUnit: 'mm' | 'cm' | 'in' | 'pt' | 'pc' | 'px',
     defaultDPI: number,
 ) {
     let theUnit = 'px';
@@ -319,7 +319,7 @@ function getReflection(a: number, b: number) {
 
 interface ParseNodeGlobalOptions {
     defaultDPI: number;
-    defaultUnit: 'mm'|'cm'|'in'|'pt'|'pc'|'px';
+    defaultUnit: 'mm' | 'cm' | 'in' | 'pt' | 'pc' | 'px';
     attributeInheritance?: 'disable' | 'enable' | 'inheritedOnly';
 }
 
@@ -332,14 +332,14 @@ export function getDefaultParseNodeGlobalOptions(options?: ParseNodeGlobalOption
 }
 
 function parseTransformString(text: string, transform: DOMMatrix) {
-    let tempTransform0 = new DOMMatrix();
+    const tempTransform0 = new DOMMatrix();
     let tempTransform1 = new DOMMatrix();
     let tempTransform2 = new DOMMatrix();
     let tempTransform3 = new DOMMatrix();
 
     let currentTransform = tempTransform0;
 
-    const transformsTexts = text.split( ')' );
+    const transformsTexts = text.split(')');
 
     for (let tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex--) {
         const transformText = transformsTexts[tIndex].trim();
@@ -413,8 +413,8 @@ function parseTransformString(text: string, transform: DOMMatrix) {
                     break;
 
                 case 'matrix':
-                    if ( array.length === 6 ) {
-                        currentTransform = new DOMMatrix([array[0], array[1], array[2], array[3], array[4], array[5]])
+                    if (array.length === 6) {
+                        currentTransform = new DOMMatrix([array[0], array[1], array[2], array[3], array[4], array[5]]);
                     }
                     break;
 
@@ -429,11 +429,11 @@ function parseTransformString(text: string, transform: DOMMatrix) {
 export function parseNodeTransform(node: Element, options?: ParseNodeGlobalOptions) {
     const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions(options);
 
-    let transform = new DOMMatrix();
+    const transform = new DOMMatrix();
     let currentNode = node;
     while (currentNode.parentElement) {
         const currentTransform = new DOMMatrix();
-        
+
         if (currentNode.nodeName === 'use' && (currentNode.hasAttribute('x') || currentNode.hasAttribute('y'))) {
             const tx = parseFloatWithUnits(currentNode.getAttribute('x') || '0', defaultUnit, defaultDPI);
             const ty = parseFloatWithUnits(currentNode.getAttribute('y') || '0', defaultUnit, defaultDPI);
@@ -494,7 +494,7 @@ export function parseCommonNodeAttributes(node: Element, options?: ParseNodeGlob
         stroke += componentToHex(Math.round(strokeOpacity * 255));
     }
 
-    let strokeWidth = parseFloatWithUnits(
+    const strokeWidth = parseFloatWithUnits(
         getInheritedAttribute(node, 'stroke-width') ?? '1',
         defaultUnit,
         defaultDPI,
@@ -508,8 +508,8 @@ export function parseRectNodeAttributes(node: Element, options?: ParseNodeGlobal
 
     const x = parseFloatWithUnits(node.getAttribute('x') || '0', defaultUnit, defaultDPI);
     const y = parseFloatWithUnits(node.getAttribute('y') || '0', defaultUnit, defaultDPI);
-    const rx = parseFloatWithUnits(node.getAttribute('rx') || node.getAttribute( 'ry' ) || '0', defaultUnit, defaultDPI);
-    const ry = parseFloatWithUnits(node.getAttribute('ry') || node.getAttribute( 'rx' ) || '0', defaultUnit, defaultDPI);
+    const rx = parseFloatWithUnits(node.getAttribute('rx') || node.getAttribute('ry') || '0', defaultUnit, defaultDPI);
+    const ry = parseFloatWithUnits(node.getAttribute('ry') || node.getAttribute('rx') || '0', defaultUnit, defaultDPI);
     const width = parseFloatWithUnits(node.getAttribute('width') || '0', defaultUnit, defaultDPI);
     const height = parseFloatWithUnits(node.getAttribute('height') || '0', defaultUnit, defaultDPI);
 
@@ -553,7 +553,7 @@ export function parsePolylineNodeAttributes(node: Element, options?: ParseNodeGl
     const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g;
 
     let index = 0;
-    node.getAttribute( 'points' )?.replace(regex, iterator);
+    node.getAttribute('points')?.replace(regex, iterator);
 
     return { points };
 }
@@ -635,7 +635,7 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
     const commands = dAttr.match(/[a-df-z][^a-df-z]*/ig) ?? [];
 
     for (let i = 0, l = commands.length; i < l; i ++) {
-        const command = commands[ i ];
+        const command = commands[i];
         const type = command.charAt(0);
         const data = command.slice(1).trim();
 
@@ -678,7 +678,7 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
 
             case 'H':
                 numbers = parseFloats(data);
-                for (let j = 0, jl = numbers.length; j < jl; j ++ ) {
+                for (let j = 0, jl = numbers.length; j < jl; j ++) {
                     point.x = numbers[j];
                     control.x = point.x;
                     control.y = point.y;
@@ -748,10 +748,10 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                         x: numbers[j + 4],
                         y: numbers[j + 5],
                     });
-                    control.x = numbers[ j + 2 ];
-                    control.y = numbers[ j + 3 ];
-                    point.x = numbers[ j + 4 ];
-                    point.y = numbers[ j + 5 ];
+                    control.x = numbers[j + 2];
+                    control.y = numbers[j + 3];
+                    point.x = numbers[j + 4];
+                    point.y = numbers[j + 5];
 
                     if (j === 0 && doSetFirstPoint === true) {
                         firstPoint.x = point.x;
@@ -761,7 +761,7 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                 break;
 
             case 'S':
-                numbers = parseFloats( data );
+                numbers = parseFloats(data);
                 for (let j = 0, jl = numbers.length; j < jl; j += 4) {
                     d.push({
                         type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
@@ -771,11 +771,11 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                         y2: numbers[j + 1],
                         x: numbers[j + 2],
                         y: numbers[j + 3],
-                    })
-                    control.x = numbers[ j + 0 ];
-                    control.y = numbers[ j + 1 ];
-                    point.x = numbers[ j + 2 ];
-                    point.y = numbers[ j + 3 ];
+                    });
+                    control.x = numbers[j + 0];
+                    control.y = numbers[j + 1];
+                    point.x = numbers[j + 2];
+                    point.y = numbers[j + 3];
 
                     if (j === 0 && doSetFirstPoint === true) {
                         firstPoint.x = point.x;
@@ -785,7 +785,7 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                 break;
 
             case 'Q':
-                numbers = parseFloats( data );
+                numbers = parseFloats(data);
                 for (let j = 0, jl = numbers.length; j < jl; j += 4) {
                     d.push({
                         type: VectorPathCommandType.QUADRATIC_BEZIER_CURVE,
@@ -794,10 +794,10 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                         x: numbers[j + 2],
                         y: numbers[j + 3],
                     });
-                    control.x = numbers[ j + 0 ];
-                    control.y = numbers[ j + 1 ];
-                    point.x = numbers[ j + 2 ];
-                    point.y = numbers[ j + 3 ];
+                    control.x = numbers[j + 0];
+                    control.y = numbers[j + 1];
+                    point.x = numbers[j + 2];
+                    point.y = numbers[j + 3];
 
                     if (j === 0 && doSetFirstPoint === true) {
                         firstPoint.x = point.x;
@@ -807,10 +807,10 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                 break;
 
             case 'T':
-                numbers = parseFloats( data );
+                numbers = parseFloats(data);
                 for (let j = 0, jl = numbers.length; j < jl; j += 2) {
-                    const rx = getReflection( point.x, control.x );
-                    const ry = getReflection( point.y, control.y );
+                    const rx = getReflection(point.x, control.x);
+                    const ry = getReflection(point.y, control.y);
                     d.push({
                         type: VectorPathCommandType.QUADRATIC_BEZIER_CURVE,
                         x1: rx,
@@ -844,8 +844,8 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                     control.y = point.y;
                     d.push(
                         parseArcCommand(
-                            numbers[j], numbers[j + 1], numbers[j + 2], numbers[j + 3], numbers[j + 4], start, point
-                        )
+                            numbers[j], numbers[j + 1], numbers[j + 2], numbers[j + 3], numbers[j + 4], start, point,
+                        ),
                     );
 
                     if (j === 0 && doSetFirstPoint === true) {
@@ -1048,7 +1048,7 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                 break;
 
             case 'a':
-                numbers = parseFloats(data, [ 3, 4 ], 7);
+                numbers = parseFloats(data, [3, 4], 7);
                 for (let j = 0, jl = numbers.length; j < jl; j += 7) {
 
                     // skip command if no displacement
@@ -1068,7 +1068,7 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                             numbers[j + 4],
                             start,
                             point,
-                        )
+                        ),
                     );
 
                     if (j === 0 && doSetFirstPoint === true) {
@@ -1082,14 +1082,14 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
             case 'z':
                 d.push({
                     type: VectorPathCommandType.CLOSE,
-                })
+                });
                 point.x = firstPoint.x;
                 point.y = firstPoint.y;
                 isFirstPoint = true;
                 break;
 
             default:
-                console.warn( command );
+                console.warn(command);
 
         }
 
@@ -1163,7 +1163,7 @@ export function serializeVectorPathCommands(commands: VectorPathCommand[], close
     for (let i = 0; i < commands.length; i++) {
         d += ' ' + serializeVectorPathCommand(commands[i], commands[i - 1]);
     }
-    if (close && commands[commands.length -1].type !== VectorPathCommandType.CLOSE) {
+    if (close && commands[commands.length - 1].type !== VectorPathCommandType.CLOSE) {
         d += ' Z';
     }
     return d.trim();
@@ -1191,11 +1191,11 @@ export function ancestralTagNameSelector(node: Element) {
             ? Array.prototype.indexOf.call(parent.children, current) + 1
             : 1;
         selectors.unshift(
-            `${CSS.escape(current.localName)}:nth-child(${index})`
+            `${CSS.escape(current.localName)}:nth-child(${index})`,
         );
         current = parent;
     }
-    return selectors.join(">");
+    return selectors.join('>');
 }
 
 export async function generateSvgElementIds(document: Document) {
@@ -1221,7 +1221,7 @@ function quadraticCoordinateBounds(v0: number, v1: number, v2: number) {
 
 function cubicCoordinateBounds(v0: number, v1: number, v2: number, v3: number) {
     const a = -v0 + 3 * v1 - 3 * v2 + v3;
-    const b =  2 * (v0 - 2 * v1 + v2);
+    const b = 2 * (v0 - 2 * v1 + v2);
     const c = v1 - v0;
 
     const ts = [0, 1];

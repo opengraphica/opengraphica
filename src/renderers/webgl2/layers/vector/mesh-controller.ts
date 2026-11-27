@@ -35,7 +35,7 @@ import type { ShaderMaterial, SvgShapePath } from 'three';
 import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
     WorkingFileLayerBlendingMode, WorkingFileVectorLayer, WorkingFileLayerFilter,
-    RendererPickedVectorLayerElement,
+    RendererPickedVectorLayerElement
 } from '@/types';
 
 const epsilon = 0.000001;
@@ -46,7 +46,7 @@ interface QueuedAddVectorLayerElement {
 }
 
 export class VectorLayerMeshController implements Webgl2RendererMeshController {
-    
+
     /** @deprecated use materials */
     material: InstanceType<typeof ShaderMaterial> | undefined;
     materials: InstanceType<typeof ShaderMaterial>[] = [];
@@ -166,9 +166,11 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                         opacity: this.opacity,
                         premultiplyAlphaFix: true,
                         isHalfFloat: this.isHalfFloat,
-                    })
+                    });
                 }
-                this.plane && (this.plane.material = this.materials[this.materials.length - 1]);
+                if (this.plane) {
+                    this.plane.material = this.materials[this.materials.length - 1];
+                }
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
                     markRenderDirty();
@@ -216,7 +218,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         backend.renderer.autoClear = true;
         backend.renderer.getViewport(originalViewport);
         backend.renderer.setViewport(0, 0, this.sourceTexture.width, this.sourceTexture.height);
-        for (let [materialIndex, currentMaterial] of this.materials.entries()) {
+        for (const [materialIndex, currentMaterial] of this.materials.entries()) {
             if (materialIndex < this.materials.length - 1) {
                 const nextMaterial = this.materials[materialIndex + 1];
                 backend.renderer.setRenderTarget(nextMaterial.userData.srcRenderTarget);
@@ -292,9 +294,9 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             const width = viewBox.max.x;
             const height = viewBox.max.y;
             this.shapeGroup.matrix = this.plane.matrix.clone().multiply(
-                new Matrix4().makeScale(this.width / width, this.height / height, 0.0)
+                new Matrix4().makeScale(this.width / width, this.height / height, 0.0),
             ).multiply(
-                new Matrix4().makeTranslation(-viewBox.min.x, -viewBox.min.y, 0.0)
+                new Matrix4().makeTranslation(-viewBox.min.x, -viewBox.min.y, 0.0),
             );
         }
         this.handleResize?.();
@@ -304,7 +306,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         this.plane?.matrix.set(
             transform[0], transform[1], transform[2], transform[3],
             transform[4], transform[5], transform[6], transform[7],
-            transform[8], transform[9], transform[10], transform[11], 
+            transform[8], transform[9], transform[10], transform[11],
             transform[12], transform[13], transform[14], transform[15],
         );
         if (this.plane) {
@@ -313,9 +315,9 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 const width = viewBox.max.x;
                 const height = viewBox.max.y;
                 shapeGroup.matrix = this.plane.matrix.clone().multiply(
-                    new Matrix4().makeScale(this.width / width, this.height / height, 1.0)
+                    new Matrix4().makeScale(this.width / width, this.height / height, 1.0),
                 ).multiply(
-                    new Matrix4().makeTranslation(-viewBox.min.x, -viewBox.min.y, 0.0)
+                    new Matrix4().makeTranslation(-viewBox.min.x, -viewBox.min.y, 0.0),
                 );
             }
         }
@@ -325,8 +327,10 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
 
     updateVisible(visible: boolean) {
         this.visible = visible;
-        let oldVisibility = this.plane?.visible;
-        this.plane && (this.plane.visible = this.visibleOverride ?? this.visible);
+        const oldVisibility = this.plane?.visible;
+        if (this.plane) {
+            this.plane.visible = this.visibleOverride ?? this.visible;
+        }
         for (const shapeGroup of this.createdShapeGroups) {
             shapeGroup.visible = this.visibleOverride ?? this.visible;
         }
@@ -340,7 +344,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         if (this.sourceUuid && this.plane) {
             const generateSvgMeshesUuid = this.generateSvgMeshesUuid;
 
-            let scale = new Vector3();
+            const scale = new Vector3();
             this.plane.matrix.decompose(new Vector3(), new Quaternion(), scale);
             const scaledWidth = scale.x * this.width;
             const scaledHeight = scale.y * this.height;
@@ -407,9 +411,9 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             const width = viewBox.max.x;
             const height = viewBox.max.y;
             this.shapeGroup.matrix = this.plane.matrix.clone().multiply(
-                new Matrix4().makeScale(this.width / width, this.height / height, 1.0)
+                new Matrix4().makeScale(this.width / width, this.height / height, 1.0),
             ).multiply(
-                new Matrix4().makeTranslation(-viewBox.min.x, -viewBox.min.y, 0.0)
+                new Matrix4().makeTranslation(-viewBox.min.x, -viewBox.min.y, 0.0),
             );
         }
 
@@ -419,7 +423,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         if (this.plane) {
             this.scene?.remove(this.plane);
         }
-        
+
         this.scene?.add(this.shapeGroup);
 
         if (this.queuedAddVectorLayerElements.length > 0) {
@@ -428,7 +432,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             let promiseChain = Promise.resolve();
             for (const { tagName, attributes } of queuedAddVectorLayerElements) {
                 promiseChain = promiseChain.then(() =>
-                    this.addVectorLayerElement(tagName, attributes, generateUuid)
+                    this.addVectorLayerElement(tagName, attributes, generateUuid),
                 );
             }
         }
@@ -456,7 +460,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         const renderOrder = (this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0) + originalSuborder + 0.00001;
 
         // TODO - Creating xml document doesn't work inside webworker.
-        var newDoc = window.document.implementation.createDocument(null, 'svg');
+        const newDoc = window.document.implementation.createDocument(null, 'svg');
         for (const attribute of Array.from(this.sourceDocument.documentElement.attributes)) {
             newDoc.documentElement.setAttribute(attribute.name, attribute.value);
         }
@@ -501,7 +505,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         }
 
         const renderOrder = (this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0) + originalSuborder;
-        
+
         let currentChildNode: Element | null = null;
         let isTargetAttributeNode = true;
         while (node.parentElement) {
@@ -518,7 +522,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 isTargetAttributeNode = false;
             }
             if (currentChildNode) {
-                clonedNode.append(currentChildNode)
+                clonedNode.append(currentChildNode);
             }
             currentChildNode = clonedNode;
             node = node?.parentElement;
@@ -529,7 +533,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         //        also it's missing the styles and defs.
 
         // TODO - Creating xml document doesn't work inside webworker.
-        var newDoc = window.document.implementation.createDocument(null, 'svg');
+        const newDoc = window.document.implementation.createDocument(null, 'svg');
         for (const attribute of Array.from(this.sourceDocument.documentElement.attributes)) {
             newDoc.documentElement.setAttribute(attribute.name, attribute.value);
         }
@@ -574,7 +578,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 return b.object.renderOrder - a.object.renderOrder;
             }
             return 0;
-        })
+        });
 
         for (const intersection of intersections) {
             elements.push({
@@ -591,7 +595,9 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         const node = path.userData.node as Element;
         const id = node?.getAttribute('data-ogr-id');
         const nodeName = node?.nodeName ?? 'path';
-        id && (this.shapeGroup.userData.svgMeshesById[id] = []);
+        if (id) {
+            this.shapeGroup.userData.svgMeshesById[id] = [];
+        }
         createFill:
         if (true) {
             const shapes = path.toShapes();
@@ -699,7 +705,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             }
         }
     }
- 
+
     reorder(order: number) {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
@@ -750,7 +756,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     setDraftTexture(texture?: Texture<any>) {
         // TODO
     }
-    
+
     swapScene(scene: Scene) {
         if (!this.plane) return;
         this.scene?.remove(this.plane);
@@ -855,19 +861,21 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         this.materials[this.materials.length - 1].uniforms.dstTexture.value = texture;
         this.materials[this.materials.length - 1].uniformsNeedUpdate = true;
     }
-    
+
     detach() {
         const backend = getWebgl2RendererBackend();
         backend.removeMeshController(this.id);
 
         messageBus.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
-        
+
         this.generateSvgMeshesUuid = null;
 
         this.planeGeometry?.dispose();
         this.planeGeometry = undefined;
 
-        this.plane && this.scene?.remove(this.plane);
+        if (this.plane) {
+            this.scene?.remove(this.plane);
+        }
         this.plane = undefined;
 
         this.disposeSvgMeshes();

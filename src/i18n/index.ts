@@ -24,7 +24,7 @@ const i18n = createI18n({
     warnHtmlMessage: false,
     messages: {
         en: i18nMessagesEn,
-    }
+    },
 });
 
 export async function initializeI18n() {

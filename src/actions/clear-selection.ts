@@ -16,7 +16,7 @@ export class ClearSelectionAction extends BaseAction {
 
     private oldActiveSelectionPath: Array<VectorPathCommand> = [];
     private oldAppliedSelectionPaths: Array<VectorPathCommand[]> = [];
-    
+
     private oldAppliedMaskOffset: DOMPoint = new DOMPoint();
     private oldAppliedMaskDatabaseId: string | null = null;
     private oldAppliedMaskDatabaseSizeEstimate: number = 0;

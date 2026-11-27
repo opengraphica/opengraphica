@@ -22,7 +22,7 @@ interface PermanentStorageState {
     sourceDrawingOffsetY: number; // Canvas space coordinates
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'cloneBrushStateStore',
     state: {
         brushDensity: 1,
@@ -38,7 +38,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
         sourceDrawingOffsetX: 0,
         sourceDrawingOffsetY: 0,
     },
-    restore: ['brushHardness', 'brushOpacity', 'brushSize']
+    restore: ['brushHardness', 'brushOpacity', 'brushSize'],
 });
 
 export const brushDensity = permanentStorage.getWritableRef('brushDensity');

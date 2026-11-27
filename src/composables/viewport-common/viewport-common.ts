@@ -24,7 +24,7 @@ export function useViewportCommon(options: ViewportCommonOptions) {
         // document.removeEventListener('visibilitychange', onDocumentVisibilityChange);
     });
 
-    // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 
+    // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller.
     async function resetTransform(event?: AppEmitterEvents['app.canvas.resetTransform']) {
         appEmitter.emit('app.canvas.calculateDndArea');
         const margin: number = (event && event.margin) || 48;
@@ -44,8 +44,8 @@ export function useViewportCommon(options: ViewportCommonOptions) {
                 scaledHeight = imageHeight / heightToDisplayRatio;
                 scaledWidth = scaledHeight * imageSizeRatio;
             }
-            const centerX = canvasStore.get('dndAreaLeft') + (canvasStore.get('dndAreaWidth') / 2);
-            const centerY = canvasStore.get('dndAreaTop') + (canvasStore.get('dndAreaHeight') / 2);
+            const centerX = canvasStore.get('dndAreaOffsetLeft') + canvasStore.get('dndAreaLeft') + (canvasStore.get('dndAreaWidth') / 2);
+            const centerY = canvasStore.get('dndAreaOffsetTop') + canvasStore.get('dndAreaTop') + (canvasStore.get('dndAreaHeight') / 2);
             const transform = new DOMMatrix();
             transform.translateSelf(Math.round(centerX - (scaledWidth / 2)), Math.round(centerY - (scaledHeight / 2)));
             if (widthToDisplayRatio > 1 || heightToDisplayRatio > 1) {

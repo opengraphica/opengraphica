@@ -102,11 +102,19 @@
         "name": "layerFilter.newsprint.name",
         "group": "distort"
     },
+    "shapeMask": {
+        "name": "layerFilter.shapeMask.name",
+        "group": "distort"
+    },
     "whirlPinch": {
         "name": "layerFilter.whirlPinch.name",
         "group": "distort"
     },
 
+    "dropShadow": {
+        "name": "layerFilter.dropShadow.name",
+        "group": "lightShadow"
+    },
     "highlightBloom": {
         "name": "layerFilter.highlightBloom.name",
         "group": "lightShadow"

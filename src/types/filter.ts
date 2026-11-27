@@ -5,6 +5,6 @@ interface FilterChain {
 }
 
 export interface FilterAugment {
-    name: string,
-    handler: (value: any, ...args: any[]) => any
+    name: string;
+    handler: (value: any, ...args: any[]) => any;
 }

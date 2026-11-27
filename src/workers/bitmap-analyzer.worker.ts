@@ -5,7 +5,7 @@ self.onmessage = ({ data }) => {
     if (data.type === 'CONTRAST_LINES') {
         findContrastLines(data);
     }
-}
+};
 
 function getImageDataLuminance(data: Uint8ClampedArray, i: number) {
     const r = data[i];
@@ -35,14 +35,14 @@ function findContrastLines(request: FindContrastLinesRequest) {
             for (let x = 0; x < width; x++) {
                 const i = (y * width + x) * 4;
                 const lum = getImageDataLuminance(data, i);
-            
+
                 // Check vertical contrast (compare with right neighbor)
                 if (x < width - 1) {
                     const iRight = i + 4;
                     const lumRight = getImageDataLuminance(data, iRight);
                     verticalContrast[x] += Math.abs(lum - lumRight);
                 }
-            
+
                 // Check horizontal contrast (compare with bottom neighbor)
                 if (y < height - 1) {
                     const iBelow = i + width * 4;
@@ -55,13 +55,13 @@ function findContrastLines(request: FindContrastLinesRequest) {
         const horizontalContrastBreakpoint = height * 50;
         const verticalContrastBreakpoint = width * 50;
 
-        for (let [i, contrast] of horizontalContrast.entries()) {
+        for (const [i, contrast] of horizontalContrast.entries()) {
             if (contrast > horizontalContrastBreakpoint) {
                 horizontalLines.push(i + 1);
             }
         }
 
-        for (let [i, contrast] of verticalContrast.entries()) {
+        for (const [i, contrast] of verticalContrast.entries()) {
             if (contrast > verticalContrastBreakpoint) {
                 verticalLines.push(i + 1);
             }

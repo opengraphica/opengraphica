@@ -40,22 +40,27 @@ export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLay
         if (!filterConfig.disabled || options.createDisabled) {
             const canvasFilter = new (await getCanvasFilterClass(filterConfig.name))();
             const kebabCaseName = camelCaseToKebabCase(filterConfig.name);
-            let fragmentShaders: string[] = [];
+            const fragmentShaders: string[] = [];
             const passCount = canvasFilter.passes || 1;
             if (passCount > 1) {
                 for (let i = 0; i < passCount; i++) {
                     const passKebabCaseName = kebabCaseName + '-' + i;
                     fragmentShaders.push(
-                        (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${passKebabCaseName}.frag`)).default
+                        (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${passKebabCaseName}.frag`)).default,
                     );
                 }
             } else {
                 fragmentShaders.push(
-                    (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default
+                    (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default,
                 );
+            }
+            let vertexShader: string | undefined;
+            if (canvasFilter.hasVertexShader) {
+                vertexShader = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.vert`)).default;
             }
             canvasFilter.fragmentShader = fragmentShaders[0];
             canvasFilter.fragmentShaders = fragmentShaders;
+            canvasFilter.vertexShader = vertexShader;
             canvasFilter.maskId = filterConfig.maskId;
             canvasFilter.params = filterConfig.params ?? {};
             canvasFilters.push(canvasFilter);
@@ -82,8 +87,9 @@ export function applyCanvasFilter(imageData: ImageData, canvasFilter: Webgl2Rend
     return appliedImageData;
 }
 
-export function buildCanvasFilterParamsFromFormData(canvasFilter: Webgl2RendererCanvasFilter, formData: Record<string,unknown>): Record<string, unknown> {
+export function buildCanvasFilterParamsFromFormData(canvasFilter: Webgl2RendererCanvasFilter, formData: Record<string, unknown>): Record<string, unknown> {
     const params: Record<string, unknown> = {};
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const editConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
     for (const paramName in editConfig) {
         const paramConfig = editConfig[paramName];
@@ -98,6 +104,7 @@ export function buildCanvasFilterParamsFromFormData(canvasFilter: Webgl2Renderer
 }
 
 export function buildCanvasFilterPreviewParams(canvasFilter: Webgl2RendererCanvasFilter): Record<string, unknown> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const filterEditConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
     const previewParams: Record<string, unknown> = {};
     for (const paramName in filterEditConfig) {
@@ -107,9 +114,9 @@ export function buildCanvasFilterPreviewParams(canvasFilter: Webgl2RendererCanva
 }
 
 export interface CombinedFilterShaderResult {
-    fragmentShader: string,
-    vertexShader: string,
-    uniforms: Record<string, IUniform>,
-    defines: Record<string, unknown>,
-    textures: Texture[],
+    fragmentShader: string;
+    vertexShader: string;
+    uniforms: Record<string, IUniform>;
+    defines: Record<string, unknown>;
+    textures: Texture[];
 }

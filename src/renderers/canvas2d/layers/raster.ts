@@ -18,7 +18,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             0,
             0,
             layer.width,
-            layer.height
+            layer.height,
         );
         if (isFlipY) {
             ctx.restore();

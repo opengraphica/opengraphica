@@ -33,8 +33,8 @@ export function getCanvasColorSpace(): 'srgb' | 'display-p3' {
 export function getCanvasRenderingContext2DSettings(): CanvasRenderingContext2DSettings {
     return {
         alpha: true,
-        colorSpace: getCanvasColorSpace()
-    }
+        colorSpace: getCanvasColorSpace(),
+    };
 }
 
 /**
@@ -62,7 +62,7 @@ export function getImageDataEmptyBounds(imageData: ImageData, options: GetImageD
         left: 0,
         right: 0,
         top: 0,
-        bottom: 0
+        bottom: 0,
     };
 
     const { data, width, height } = imageData;
@@ -235,7 +235,7 @@ export async function createImageBlobFromImage(image: HTMLImageElement): Promise
  * @param imageData The image data to convert.
  * @returns The resulting image.
  */
- export async function createImageBlobFromImageData(imageData: ImageData): Promise<Blob> {
+export async function createImageBlobFromImageData(imageData: ImageData): Promise<Blob> {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) {
@@ -331,7 +331,7 @@ export function createImageFromBlob(blob: Blob, options: CreateImageFromOptions 
                 };
                 fileReader.onerror = (error) => {
                     dataUrlReject(error);
-                }
+                };
                 fileReader.readAsDataURL(blob);
             });
         } else {
@@ -346,7 +346,7 @@ export function createImageFromBlob(blob: Blob, options: CreateImageFromOptions 
  * @param height The image height.
  * @returns The new HTMLImageElement.
  */
- export async function createEmptyImage(width: number, height: number): Promise<HTMLImageElement> {
+export async function createEmptyImage(width: number, height: number): Promise<HTMLImageElement> {
     let canvas: HTMLCanvasElement | undefined = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -367,7 +367,7 @@ export function createImageFromBlob(blob: Blob, options: CreateImageFromOptions 
  * @returns The new HTMLCanvasElement.
  */
 export function createEmptyCanvas(width: number, height: number): HTMLCanvasElement {
-    let canvas: HTMLCanvasElement | undefined = document.createElement('canvas');
+    const canvas: HTMLCanvasElement | undefined = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     return canvas;
@@ -379,8 +379,8 @@ export function createEmptyCanvas(width: number, height: number): HTMLCanvasElem
  * @param height The image height.
  * @returns The new HTMLCanvasElement and context object.
  */
-export function createEmptyCanvasWith2dContext(width: number, height: number): { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D | null } {
-    let canvas: HTMLCanvasElement | undefined = document.createElement('canvas');
+export function createEmptyCanvasWith2dContext(width: number, height: number): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D | null; } {
+    const canvas: HTMLCanvasElement | undefined = document.createElement('canvas');
     canvas.width = Math.floor(width);
     canvas.height = Math.floor(height);
     const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
@@ -392,7 +392,7 @@ export function createEmptyCanvasWith2dContext(width: number, height: number): {
 
 /**
  * Creates an HTMLCanvasElement from the given HTMLImageElement.
- * @param image 
+ * @param image
  */
 interface CreateCanvasFromImageOptions {
     transfer?: boolean;
@@ -401,7 +401,7 @@ interface CreateCanvasFromImageOptions {
     height?: number;
 }
 export function createCanvasFromImage(image: HTMLImageElement | ImageBitmap, options?: CreateCanvasFromImageOptions): HTMLCanvasElement {
-    let canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.width = options?.width ?? image.width;
     canvas.height = options?.height ?? image.height;
     if (options?.transfer) {
@@ -425,7 +425,7 @@ export function createCanvasFromImage(image: HTMLImageElement | ImageBitmap, opt
 }
 
 export function cloneCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
-    let newCanvas = document.createElement('canvas');
+    const newCanvas = document.createElement('canvas');
     newCanvas.width = canvas.width;
     newCanvas.height = canvas.height;
     const ctx = newCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
@@ -436,7 +436,7 @@ export function cloneCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
 }
 
 export async function resizeImage(imageCanvas: HTMLCanvasElement | HTMLImageElement, newWidth: number, newHeight: number): Promise<HTMLCanvasElement> {
-    let imageResizeCanvas = document.createElement('canvas');
+    const imageResizeCanvas = document.createElement('canvas');
     imageResizeCanvas.width = newWidth;
     imageResizeCanvas.height = newHeight;
     if (imageCanvas.width > 4096 || imageCanvas.height > 4096) {

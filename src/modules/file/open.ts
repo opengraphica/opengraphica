@@ -41,7 +41,7 @@ import type {
     ShowOpenFilePicker, FileSystemFileHandle,
     ColorModel,
     InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions,
-    InsertVideoLayerOptions, WorkingFileRasterSequenceLayer,
+    InsertVideoLayerOptions, WorkingFileRasterSequenceLayer
 } from '@/types';
 
 interface FileDialogOpenOptions {
@@ -94,10 +94,10 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
                         accept: {
                             'text/plain': ['.json'],
                             'image/*': ['.ora'],
-                            'video/*': []
-                        }
-                    }
-                ]
+                            'video/*': [],
+                        },
+                    },
+                ],
             }) as never;
         } catch (error: any) {
             if (
@@ -153,7 +153,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
         fileInput.multiple = true;
         temporaryFileInputContainer.appendChild(fileInput);
         await new Promise<void>((resolve, reject) => {
-            let activeElement = document.activeElement;
+            const activeElement = document.activeElement;
             const checkFocusInterval = setInterval(() => {
                 if (activeElement !== document.activeElement) {
                     onFocusAway();
@@ -210,7 +210,7 @@ export async function openFromTemporaryStorage() {
     }
     const workingFile = await readWorkingFile();
     const maxMaskId = Object.keys(workingFile.masks).reduce((accumulator, value) => {
-        let maskId = parseInt(value);
+        const maskId = parseInt(value);
         if (maskId > accumulator) {
             return maskId;
         } else {
@@ -243,7 +243,7 @@ export async function openFromTemporaryStorage() {
     activeSelectionPath.value = [];
     await historyStore.dispatch('free', {
         memorySize: Infinity,
-        databaseSize: Infinity
+        databaseSize: Infinity,
     });
     await nextTick();
     appEmitter.emit('app.canvas.resetTransform');
@@ -276,12 +276,12 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
 
     type FileReadType = 'json' | 'media' | 'ora';
     type FileReadResolve =
-        { type: 'image', result: HTMLImageElement, file: File }
-        | { type: 'imageSequence', result: { image: HTMLImageElement, duration: number }[], file: File }
-        | { type: 'json', result: string, file: File }
-        | { type: 'ora', result: ArrayBuffer, file: File }
-        | { type: 'svg', result: HTMLImageElement, file: File }
-        | { type: 'video', result: HTMLVideoElement, file: File};
+        { type: 'image'; result: HTMLImageElement; file: File; }
+        | { type: 'imageSequence'; result: { image: HTMLImageElement; duration: number; }[]; file: File; }
+        | { type: 'json'; result: string; file: File; }
+        | { type: 'ora'; result: ArrayBuffer; file: File; }
+        | { type: 'svg'; result: HTMLImageElement; file: File; }
+        | { type: 'video'; result: HTMLVideoElement; file: File; };
 
     const readerPromises: Promise<FileReadResolve>[] = [];
 
@@ -314,7 +314,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
 
                     if (fileReadType === 'media') {
                         if (fileType === 'image/gif') {
-                            const result: { image: HTMLImageElement, duration: number }[] = [];
+                            const result: { image: HTMLImageElement; duration: number; }[] = [];
                             const gifArrayBuffer = await new Promise<ArrayBuffer | null>((resolveArrayBuffer) => {
                                 fileReader.onload = async () => {
                                     if (dialogOptions?.cancelRef?.value === true) {
@@ -357,7 +357,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                                 ctx.clearRect(0, 0, gif.width, gif.height);
                             }
                             const gifFrameImage = new Image();
-                            for (let [i, frame] of gif.frames.entries()) {
+                            for (const [i, frame] of gif.frames.entries()) {
                                 if (isNeedManualMerge) {
                                     await new Promise<void>((resolveImage, rejectImage) => {
                                         gifFrameImage.onload = () => {
@@ -393,14 +393,14 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                                         image.src = URL.createObjectURL(GifPresenter.writeToBlob(gifSplit[i].writeToArrayBuffer()));
                                     }
                                 });
-                                // @ts-ignore 2365
+                                // @ts-expect-error 2365
                                 if (dialogOptions?.cancelRef?.value === true) {
                                     rejectReader('File open canceled.');
                                     return;
                                 }
                                 result.push({
                                     image,
-                                    duration: frame.delayCentiSeconds * 10
+                                    duration: frame.delayCentiSeconds * 10,
                                 });
                             }
                             if (result.length === 1) {
@@ -411,8 +411,8 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                                 rejectReader('No frames found in gif file "' + file.name + '".');
                             }
                         } else if (fileType.startsWith('video/')) {
-                            let videoObjectUrl = URL.createObjectURL(file);
-                            let video = document.createElement('video');
+                            const videoObjectUrl = URL.createObjectURL(file);
+                            const video = document.createElement('video');
                             await new Promise<void>((resolve, reject) => {
                                 video.addEventListener('loadedmetadata', function() {
                                     resolve();
@@ -496,7 +496,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                 } catch (error: any) {
                     rejectReader('An error occurred while parsing the file. ' + error?.toString());
                 }
-            })
+            }),
         );
     }
 
@@ -508,22 +508,22 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
     let isAnyLayerLoaded: boolean = false;
 
     const newFileOptions: Partial<WorkingFileState> = {
-        fileName
+        fileName,
     };
 
     const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
     let hasResizedDueToMaxTextureConstraints = false;
 
     const settledReaderPromises = await Promise.allSettled(readerPromises);
-    for (let readerSettle of settledReaderPromises) {
+    for (const readerSettle of settledReaderPromises) {
         if (readerSettle.status === 'fulfilled') {
             isAnyLayerLoaded = true;
             if (readerSettle.value.type === 'image') {
                 let image: HTMLImageElement | HTMLCanvasElement = readerSettle.value.result;
-                let originalWidth = image.width;
-                let originalHeight = image.height;
+                const originalWidth = image.width;
+                const originalHeight = image.height;
 
-                let transform = new DOMMatrix();
+                const transform = new DOMMatrix();
                 if (originalWidth > maxTextureSize || originalHeight > maxTextureSize) {
                     const { width: textureWidth, height: textureHeight } = limitMaxDimension(
                         originalWidth, originalHeight, maxTextureSize,
@@ -548,17 +548,17 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         transform,
                         data: {
                             sourceUuid: await createStoredImage(image),
-                        }
-                    })
+                        },
+                    }),
                 );
             }
             else if (readerSettle.value.type === 'imageSequence') {
                 const results = readerSettle.value.result;
                 const firstImage = results[0].image;
-                let originalWidth = firstImage.width;
-                let originalHeight = firstImage.height;
+                const originalWidth = firstImage.width;
+                const originalHeight = firstImage.height;
 
-                let transform = new DOMMatrix();
+                const transform = new DOMMatrix();
                 const { width: textureWidth, height: textureHeight } = limitMaxDimension(
                     originalWidth, originalHeight, maxTextureSize,
                 );
@@ -575,7 +575,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                 }
                 let timeIterator = 0;
                 const sequence: WorkingFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
-                for (let result of results) {
+                for (const result of results) {
                     let frameImage: HTMLImageElement | HTMLCanvasElement = result.image;
                     if (originalWidth > maxTextureSize || originalHeight > maxTextureSize) {
                         frameImage = await resizeImage(frameImage, textureWidth, textureHeight);
@@ -586,7 +586,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         image: {
                             sourceUuid: await createStoredImage(frameImage),
                         },
-                        thumbnailImageSrc: null
+                        thumbnailImageSrc: null,
                     });
                     timeIterator += result.duration;
                 }
@@ -599,9 +599,9 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         transform,
                         data: {
                             currentFrame: sequence[0].image,
-                            sequence
-                        }
-                    })
+                            sequence,
+                        },
+                    }),
                 );
             }
             else if (readerSettle.value.type === 'ora') {
@@ -610,10 +610,10 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                     const { workingFileDefinition, insertLayerActions: workingFileInsertLayerActions }
                         = await parseSerializedFileToActions(
                             new Uint8Array(readerSettle.value.result),
-                            { insert: dialogOptions.insert }
+                            { insert: dialogOptions.insert },
                         );
-                    
-                    for (let prop in workingFileDefinition) {
+
+                    for (const prop in workingFileDefinition) {
                         if (prop === 'width') {
                             newFileOptions.width = Math.max(newFileOptions.width || 1, workingFileDefinition.width || 1);
                         } else if (prop === 'height') {
@@ -632,7 +632,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                 const { parseSerializedFileToActions } = await import('@/modules/file/formats/json-open');
                 const { workingFileDefinition, insertLayerActions: workingFileInsertLayerActions }
                     = await parseSerializedFileToActions(JSON.parse(readerSettle.value.result));
-                for (let prop in workingFileDefinition) {
+                for (const prop in workingFileDefinition) {
                     if (prop === 'width') {
                         newFileOptions.width = Math.max(newFileOptions.width || 1, workingFileDefinition.width || 1);
                     } else if (prop === 'height') {
@@ -660,7 +660,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         data: {
                             sourceUuid: await createStoredSvg(image),
                         },
-                    })
+                    }),
                 );
             }
             else if (readerSettle.value.type === 'video') {
@@ -679,8 +679,8 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         height: video.videoHeight,
                         data: {
                             sourceUuid: await createStoredVideo(video),
-                        }
-                    })
+                        },
+                    }),
                 );
             }
         } else if (readerSettle.status === 'rejected') {
@@ -703,13 +703,13 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                 fileUpdateActions.push(
                     new UpdateFileAction({
                         width: largestWidth,
-                        height: largestHeight
-                    })
+                        height: largestHeight,
+                    }),
                 );
             }
         } else {
             fileUpdateActions.push(
-                new CreateFileAction(newFileOptions)
+                new CreateFileAction(newFileOptions),
             );
         }
 
@@ -717,8 +717,8 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
         await historyStore.dispatch('runAction', {
             action: new BundleAction('openFile', 'action.openFile', [
                 ...fileUpdateActions,
-                ...insertLayerActions
-            ])
+                ...insertLayerActions,
+            ]),
         });
         if (!dialogOptions.insert) {
             discardAllUnusedMasks();
@@ -726,7 +726,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
         if (!dialogOptions.insert) {
             await historyStore.dispatch('free', {
                 memorySize: Infinity,
-                databaseSize: Infinity
+                databaseSize: Infinity,
             });
         }
 

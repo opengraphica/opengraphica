@@ -30,7 +30,7 @@ interface PermanentStorageState {
     selectedBrush: string;
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'eraseBrushStateStore',
     state: {
         brushSize: 100,

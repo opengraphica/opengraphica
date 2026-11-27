@@ -7,9 +7,9 @@ import type { defineComponent, defineAsyncComponent } from 'vue';
 import type BaseCanvasController from '@/tools/controllers/base';
 import type { CanvasFilter, ClassType } from '@/types';
 
-declare var __webpack_require__: any;
+declare let __webpack_require__: any;
 
-let moduleChunkMap: Record<string, { id: string, chunks: number[] }> | null = null;
+let moduleChunkMap: Record<string, { id: string; chunks: number[]; }> | null = null;
 
 interface CreateFilterDefinition {
     name: string;
@@ -153,7 +153,7 @@ export function createEditorPluginApi(pluginId: string) {
 
     const notifyPluginInstallSuccess = () => {
         resolvePluginInstall();
-    }
+    };
 
     const notifyPluginInstallError = (error) => {
         rejectPluginInstall();
@@ -171,24 +171,22 @@ export function createEditorPluginApi(pluginId: string) {
 
     const pluginScopedImport = async (path: string) => {
         if (path.startsWith('#/')) {
+            const importUrl = path.replace(/^#\//g, 'plugins/' + pluginId + '/');
             if (/\.(?:json)$/.test(path)) {
-                return import(/*webpackIgnore: true*/ path.replace(/^#\//g, 'plugins/' + pluginId + '/'), {
-                    with: {
-                        type: 'json',
-                    },
-                });
+                const url = editorStore.state.pluginImportMap[importUrl];
+                return await (await fetch(url)).json();
             } else if (/\.(?:frag|vert)$/.test(path)) {
-                const url = editorStore.state.pluginImportMap[path.replace(/^#\//g, 'plugins/' + pluginId + '/')];
+                const url = editorStore.state.pluginImportMap[importUrl];
                 return await (await fetch(url)).text();
             } else if (/\.(?:bmp|gif|jpg|jpx|jpeg|png|tiff|webp)$/.test(path)) {
-                const url = editorStore.state.pluginImportMap[path.replace(/^#\//g, 'plugins/' + pluginId + '/')];
+                const url = editorStore.state.pluginImportMap[importUrl];
                 return await (await fetch(url)).blob();
             }
-            return import(/*webpackIgnore: true*/ path.replace(/^#\//g, 'plugins/' + pluginId + '/'));
+            return import(/*webpackIgnore: true*/ importUrl);
         } else if (path.startsWith('@/')) {
             if (moduleChunkMap == null) {
                 moduleChunkMap = await (await fetch(
-                    preferencesStore.state.assetsBasePath + 'module-chunk-map.json'
+                    preferencesStore.state.assetsBasePath + 'module-chunk-map.json',
                 )).json();
             }
             let normalizedPath = path.replace(/@\//g, 'src/');
@@ -228,5 +226,5 @@ export function createEditorPluginApi(pluginId: string) {
         _installPromise: pluginInstallPromise,
         _notifyPluginInstallSuccess: notifyPluginInstallSuccess,
         _notifyPluginInstallError: notifyPluginInstallError,
-    }
+    };
 }

@@ -19,6 +19,8 @@ interface CanvasState {
     dndAreaTop: number; // devicePixelRatio IS applied.
     dndAreaWidth: number; // devicePixelRatio IS applied.
     dndAreaHeight: number; // devicePixelRatio IS applied.
+    dndAreaOffsetLeft: number; // devicePixelRatio IS applied.
+    dndAreaOffsetTop: number; // devicePixelRatio IS applied.
     drawing: boolean;
     isBufferInUse: boolean;
     isDisplayingNonRasterLayer: boolean;
@@ -44,7 +46,7 @@ interface CanvasDispatch {
     setTransformTranslate: {
         x: number;
         y: number;
-    },
+    };
     setTransformFlipX: boolean;
     setTransformFlipY: boolean;
 }
@@ -67,9 +69,11 @@ const store = new PerformantStore<CanvasStore>({
         decomposedTransform: decomposeMatrix(new DOMMatrix),
         dirty: true,
         dndAreaLeft: 0, // devicePixelRatio IS applied.
-        dndAreaTop: 0,  // devicePixelRatio IS applied.
-        dndAreaWidth: 1,  // devicePixelRatio IS applied.
-        dndAreaHeight: 1,  // devicePixelRatio IS applied.
+        dndAreaTop: 0, // devicePixelRatio IS applied.
+        dndAreaWidth: 1, // devicePixelRatio IS applied.
+        dndAreaHeight: 1, // devicePixelRatio IS applied.
+        dndAreaOffsetLeft: 0, // devicePixelRatio IS applied.
+        dndAreaOffsetTop: 0, // devicePixelRatio IS applied.
         drawing: false,
         isBufferInUse: false,
         isDisplayingNonRasterLayer: false,
@@ -86,7 +90,7 @@ const store = new PerformantStore<CanvasStore>({
         viewportCanvasOffsetLeft: 0,
         viewportCanvasOffsetTop: 0,
         viewWidth: 100, // Maps to screen width; devicePixelRatio IS applied.
-        workingImageBorderColor: '#cccccc'
+        workingImageBorderColor: '#cccccc',
     },
     nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'selectionMaskCanvas'],
     onSet(key, value, set) {
@@ -119,9 +123,9 @@ const store = new PerformantStore<CanvasStore>({
                 const transform = store.get('transform');
                 const inverseTransform = transform.inverse();
 
-                let handleX = store.get('dndAreaLeft') + (store.get('dndAreaWidth') / 2);
-                let handleY = store.get('dndAreaTop') + (store.get('dndAreaHeight') / 2);
-                let centerPoint = new DOMPoint(handleX, handleY).matrixTransform(inverseTransform);
+                const handleX = store.get('dndAreaLeft') + (store.get('dndAreaWidth') / 2);
+                const handleY = store.get('dndAreaTop') + (store.get('dndAreaHeight') / 2);
+                const centerPoint = new DOMPoint(handleX, handleY).matrixTransform(inverseTransform);
 
                 if (actionName === 'setTransformRotation') {
                     rotationDelta = (value - decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES;
@@ -152,7 +156,7 @@ const store = new PerformantStore<CanvasStore>({
                 store.set('viewDirty', true);
                 break;
         }
-    }
+    },
 });
 
 dummyCanvas = null;
@@ -162,7 +166,7 @@ async function getCanvasRenderingContext(canvas: HTMLCanvasElement) {
     if (store.state.renderer === '2d') {
         return canvas.getContext('2d', getCanvasRenderingContext2DSettings());
     } else if (store.state.renderer === 'webgl') {
-        
+
     }
     return null;
 }
@@ -172,5 +176,5 @@ export default store;
 export {
     CanvasStore,
     CanvasState,
-    getCanvasRenderingContext,
+    getCanvasRenderingContext
 };

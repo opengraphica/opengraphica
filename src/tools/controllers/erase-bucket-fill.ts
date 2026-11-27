@@ -26,7 +26,7 @@ import { UpdateVectorLayerAttributesAction } from '@/actions/update-vector-layer
 
 import type {
     UpdateRasterLayerOptions, RendererFrontend,
-    WorkingFileVectorLayer, UpdateVectorLayerOptions,
+    WorkingFileVectorLayer, UpdateVectorLayerOptions
 } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -55,7 +55,7 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
         // Tutorial message
         if (!editorStore.state.tutorialFlags.eraseBucketFillToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.eraseBucketFillToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.eraseBucketFillToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -63,12 +63,12 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
                     title: t('tutorialTip.eraseBucketFillToolIntroduction.title'),
                     message: {
                         touch: message + (tm('tutorialTip.eraseBucketFillToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`;
                         }).join(''),
                         mouse: message + (tm('tutorialTip.eraseBucketFillToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`;
                         }).join(''),
-                    }
+                    },
                 });
             });
         }
@@ -126,7 +126,7 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
     private async bucketFillStart() {
         if (!this.renderer) return;
 
-        let selectedLayers = getSelectedLayers().filter((layer) => layer.type === 'raster' || layer.type === 'vector');
+        const selectedLayers = getSelectedLayers().filter((layer) => layer.type === 'raster' || layer.type === 'vector');
         if (selectedLayers.length === 0) {
             appEmitter.emit('app.notify', {
                 type: 'info',
@@ -137,7 +137,7 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
             return;
         }
 
-        let { viewTransformPoint } = this.getTransformedCursorInfo();
+        const { viewTransformPoint } = this.getTransformedCursorInfo();
 
         this.fillingVectorLayerShapes = [];
         const vectorLayerIds = selectedLayers.filter((layer) => layer.type === 'vector').map((layer) => layer.id);
@@ -169,7 +169,7 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
                     isDelete = true;
                 }
             }
-            this.renderer?.updateVectorLayerAttributes(layerId, element.id, attributes)
+            this.renderer?.updateVectorLayerAttributes(layerId, element.id, attributes);
             this.fillingVectorLayerShapes.push([layerId, element.id, attributes, isDelete]);
         }
 
@@ -221,16 +221,16 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
         this.applyBucketFill();
     }
 
-    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix } {
+    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint; viewDecomposedTransform: DecomposedMatrix; } {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewDecomposedTransform = canvasStore.get('decomposedTransform');
         const viewTransformPoint = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
             .matrixTransform(viewTransform.inverse());
-        
+
         return {
             viewTransformPoint,
-            viewDecomposedTransform
+            viewDecomposedTransform,
         };
     }
 
@@ -260,7 +260,7 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
                         generateSvgElementIds(newLayerDocument);
 
                         const svgString = serializer.serializeToString(newLayerDocument).replace(/xmlns=""/g, '');
-                        
+
                         const image = await new Promise<HTMLImageElement>((resolve) => {
                             const image = new Image();
                             image.onload = () => {
@@ -268,10 +268,10 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
                             };
                             image.onerror = () => {
                                 resolve(image);
-                            }
+                            };
                             image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
                         });
-    
+
                         layerActions.push(new UpdateLayerAction<UpdateVectorLayerOptions>(
                             {
                                 id: layer.id,
@@ -282,7 +282,7 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
                         ));
                     } else {
                         layerActions.push(
-                            new UpdateVectorLayerAttributesAction(layerId, nodeId, attributes, true)
+                            new UpdateVectorLayerAttributesAction(layerId, nodeId, attributes, true),
                         );
                     }
                 }
@@ -301,8 +301,8 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
                             data: {
                                 tileUpdates: await transferRendererTilesToRasterLayerUpdates([renderTiles[renderTileIndex]]),
                                 alreadyRendererd: true,
-                            }
-                        })
+                            },
+                        }),
                     );
                 }
             }
@@ -343,7 +343,7 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
     onSelectAll() {
         if (activeSelectionMask.value || appliedSelectionMask.value) {
             historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
+                action: new ClearSelectionAction(),
             });
         }
     }

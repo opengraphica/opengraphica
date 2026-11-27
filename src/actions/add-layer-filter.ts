@@ -10,7 +10,7 @@ import workingFileStore, { getLayerById, getLayerGlobalTransform, regenerateLaye
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
-    appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds,
+    appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds
 } from '@/tools/store/selection-state';
 import { useRenderer } from '@/renderers';
 
@@ -47,7 +47,7 @@ export class AddLayerFilterAction extends BaseAction {
 
         const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
 
-        let layerFilter = { ...this.layerFilter };
+        const layerFilter = { ...this.layerFilter };
 
         if (this.createdMaskImageUuid || (this.selectionMask && this.selectionMaskCanvasOffset)) {
             const { width: textureWidth, height: textureHeight } =

@@ -57,8 +57,8 @@ export interface CanvasFilterEditConfigComputedFloat extends CanvasFilterEditCon
     preview?: number;
     valueMap: {
         referenceParam: string;
-        map: { [key: number]: number };
-    }
+        map: { [key: number]: number; };
+    };
 }
 
 export interface CanvasFilterEditConfigPercentage extends CanvasFilterEditConfigFieldCommon {
@@ -99,15 +99,18 @@ export interface CanvasFilter<T extends Object = Record<string, unknown>> {
     passes?: number;
     pass?: number;
     maxPassTextureSize?: number;
+    hasVertexShader?: boolean;
     maskId?: number;
     disabled?: boolean;
     overrideDisabled?: boolean;
     getEditConfig(): CanvasFilterEditConfig;
+    getExtendedBounds?: (params: T) => number[];
 }
 
 export interface Webgl2RendererCanvasFilter<T extends Object = Record<string, unknown>> extends Omit<CanvasFilter<T>, 'getEditConfig'> {
     fragmentShader: string;
     fragmentShaders?: string[];
+    vertexShader?: string;
     getEditConfig?: () => CanvasFilterEditConfig;
     editConfig?: CanvasFilterEditConfig;
 }

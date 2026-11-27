@@ -15,7 +15,7 @@ import wasmLoadModule, {
     update_mesh_controller_visible as wasmUpdateMeshControllerVisible,
     update_mesh_controller_source_image_data as wasmUpdateMeshControllerSourceImageData,
     reorder_mesh_controller as wasmReorderMeshController,
-    remove_mesh_controller as wasmRemoveMeshController,
+    remove_mesh_controller as wasmRemoveMeshController
 } from './build/renderer_wgpu_wasm';
 
 import { messageBus } from './message-bus';
@@ -25,10 +25,10 @@ import type {
     Webgl2RendererCanvasFilter, WgpuWasmRendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
     RendererFrontendTakeSnapshotCropOptions, ClassType,
-    WasmImageData, WasmRendererMeshControllerType,
+    WasmImageData, WasmRendererMeshControllerType
 } from '@/types';
 
-export type MeshControllerInterface = any & { dispose: () => void };
+export type MeshControllerInterface = any & { dispose: () => void; };
 
 export interface WgpuWasmRendererApplySelectionMaskToAlphaChannelOptions {
     invert?: boolean;
@@ -45,14 +45,14 @@ export interface WgpuWasmRendererBackendTakeSnapshotOptions {
 
 export interface WgpuWasmRendererBackendPublic {
     isOffscreen: boolean;
-    onRequestFrontendSvg?: (request: { sourceUuid: string, width: number, height: number }) => void;
+    onRequestFrontendSvg?: (request: { sourceUuid: string; width: number; height: number; }) => void;
     onRequestFrontendTexture?: (sourceUuid: string) => void;
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     enableImageBoundaryMask(enabled: boolean): Promise<void>;
     setBackgroundColor(r: number, g: number, b: number, alpha: number): Promise<void>;
     setMasks(masks: Record<number, WorkingFileLayerMask>): Promise<void>;
-    setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }): Promise<void>;
+    setSelectionMask(image?: ImageBitmap, offset?: { x: number; y: number; }): Promise<void>;
     setViewTransform(transform: Float32Array): Promise<void>;
     setLayerOrder(layerOrder: WorkingFileLayer[]): Promise<void>;
     queueCreateLayerPasses(): Promise<void>;
@@ -140,7 +140,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
     async setMasks(masks: Record<number, WorkingFileLayerMask>) {
 
     }
-    async setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }) {
+    async setSelectionMask(image?: ImageBitmap, offset?: { x: number; y: number; }) {
 
     }
     async setViewTransform(transform: Float32Array) {
@@ -159,10 +159,10 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
     async takeSnapshot(imageWidth: number, imageHeight: number, options?: WgpuWasmRendererBackendTakeSnapshotOptions): Promise<ImageBitmap> {
         // The purpose of this interval is to force redraw while taking a snapshot, otherwise
         // WebGL2 can't read back the pixels from the canvas.
-        let dirtyInterval = setInterval(() => {
+        const dirtyInterval = setInterval(() => {
             this.dirty = true;
         }, 16);
-        let wasmImageData: WasmImageData = await this.queueWasmCall(() => wasmTakeSnapshot(
+        const wasmImageData: WasmImageData = await this.queueWasmCall(() => wasmTakeSnapshot(
             imageWidth,
             imageHeight,
             options?.cameraTransform,
@@ -189,10 +189,10 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
         return [];
     }
     async createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap> {
-        let dirtyInterval = setInterval(() => {
+        const dirtyInterval = setInterval(() => {
             this.dirty = true;
         }, 16);
-        let wasmImageData: WasmImageData = await this.queueWasmCall(() => wasmCreateBrushPreview(
+        const wasmImageData: WasmImageData = await this.queueWasmCall(() => wasmCreateBrushPreview(
             new Float32Array([settings.color[0], settings.color[1], settings.color[2], settings.color[3]]),
             settings.size,
             settings.hardness,
@@ -222,7 +222,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
 
     }
     async dispose() {
-        
+
     }
 
     render(timelineCursor: number) {

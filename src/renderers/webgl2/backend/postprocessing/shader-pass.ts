@@ -40,7 +40,7 @@ class ShaderPass extends Pass {
     }
 
     // ts-ignore-next
-    render(renderer: WebGLRenderer, writeBuffer: WebGLRenderTarget, readBuffer: WebGLRenderTarget, deltaTime?: number, maskActive?: boolean ) {
+    render(renderer: WebGLRenderer, writeBuffer: WebGLRenderTarget, readBuffer: WebGLRenderTarget, deltaTime?: number, maskActive?: boolean) {
         if (this.uniforms[this.textureID]) {
             this.uniforms[this.textureID].value = readBuffer.texture;
         }

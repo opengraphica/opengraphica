@@ -5,20 +5,20 @@ import { Vector2 } from 'three/src/math/Vector2';
 import {
     angleTo, directionTo, isEqualApprox,
     cubicBezierAt, findCubicBezierDirectionAt, splitCubicBezier,
-    slicePolynomial,
+    slicePolynomial
 } from './svg-bezier';
 
 import {
     intersectLineWithLine,
     findPolynomialIntersections,
     findCubicBezierSelfIntersections,
-    type IntersectionResult,
+    type IntersectionResult
 } from './svg-intersection';
 
 import { ellipseToCubicBeziers } from './svg-arc';
 
 import type {
-    ShapePath,
+    ShapePath
 } from 'three';
 
 export interface CreatePathStrokeShapesOptions {
@@ -31,7 +31,7 @@ export interface CreatePathStrokeShapesOptions {
 
 export function createPathStrokeShapes(
     shapePath: ShapePath,
-    options?: CreatePathStrokeShapesOptions
+    options?: CreatePathStrokeShapesOptions,
 ): Array<Shape> {
     const lineCap = options?.lineCap ?? 'butt';
     const lineJoin = options?.lineJoin ?? 'miter';
@@ -143,7 +143,7 @@ export function createPathStrokeShapes(
                             currentDirection.clone().multiplyScalar(-1),
                             currentDirection,
                             width,
-                            Math.PI
+                            Math.PI,
                         );
                         break;
                 }
@@ -185,13 +185,13 @@ export function createPathStrokeShapes(
                                 new Vector2(
                                     instruction.v0.x + (2 / 3) * (instruction.v1.x - instruction.v0.x),
                                     instruction.v0.y + (2 / 3) * (instruction.v1.y - instruction.v0.y),
-                                )
+                                ),
                             );
                             curvePoints.push(
                                 new Vector2(
                                     instruction.v2.x + (2 / 3) * (instruction.v1.x - instruction.v2.x),
                                     instruction.v2.y + (2 / 3) * (instruction.v1.y - instruction.v2.y),
-                                )
+                                ),
                             );
                             curvePoints.push(instruction.v2);
                         } else {
@@ -201,8 +201,8 @@ export function createPathStrokeShapes(
                         }
                         const insideOffset = outsideIsRight ? -halfWidth : halfWidth;
                         const outsideOffset = -insideOffset;
-                        insidePoints = adaptiveOffsetCurve(curvePoints, insideOffset)
-                        outsidePoints = adaptiveOffsetCurve([...curvePoints], outsideOffset)
+                        insidePoints = adaptiveOffsetCurve(curvePoints, insideOffset);
+                        outsidePoints = adaptiveOffsetCurve([...curvePoints], outsideOffset);
                         break;
                     }
                     case 'EllipseCurve': {
@@ -213,10 +213,10 @@ export function createPathStrokeShapes(
                         outsidePoints = [];
                         for (const curve of curves) {
                             insidePoints = insidePoints.concat(
-                                adaptiveOffsetCurve([curve.v0, curve.v1, curve.v2, curve.v3], insideOffset)
+                                adaptiveOffsetCurve([curve.v0, curve.v1, curve.v2, curve.v3], insideOffset),
                             );
                             outsidePoints = outsidePoints.concat(
-                                adaptiveOffsetCurve([curve.v0, curve.v1, curve.v2, curve.v3], outsideOffset)
+                                adaptiveOffsetCurve([curve.v0, curve.v1, curve.v2, curve.v3], outsideOffset),
                             );
                         }
                         break;
@@ -256,7 +256,7 @@ export function createPathStrokeShapes(
                     if (useLineJoin == 'arcs') {
                         useLineJoin = 'miter';
                     }
-                    
+
                     let miterOutsideIntersection: Vector2 | null = outsidePoints[0];
                     let calculatedMiterLimit = 0;
                     if (useLineJoin == 'miter' || useLineJoin == 'miter-clip') {
@@ -292,7 +292,7 @@ export function createPathStrokeShapes(
                             if (!isEqualApprox(outsidePoints[0], outsidePath.currentPoint)) {
                                 outsidePath.lineTo(
                                     outsidePoints[0].x,
-                                    outsidePoints[0].y
+                                    outsidePoints[0].y,
                                 );
                             }
                             break;
@@ -336,19 +336,19 @@ export function createPathStrokeShapes(
                             if (miterLimit < calculatedMiterLimit) {
                                 const clipLength = (miterLimit / 2) * width;
                                 const cornerDirection = directionTo(insideIntersectionPoint, miterOutsideIntersection);
-                                var clipPoint = currentPoint.clone().add(cornerDirection.clone().multiplyScalar(clipLength));
-                                var clipDirection = cornerDirection.clone().rotateAround(new Vector2(), Math.PI / 2);
-                                var outsideEdgeStart = intersectLineWithLine(
+                                const clipPoint = currentPoint.clone().add(cornerDirection.clone().multiplyScalar(clipLength));
+                                const clipDirection = cornerDirection.clone().rotateAround(new Vector2(), Math.PI / 2);
+                                const outsideEdgeStart = intersectLineWithLine(
                                     currentPoint.clone().add(previousDirection.clone().rotateAround(new Vector2(), outside90Rotation).multiplyScalar(halfWidth)),
                                     previousDirection,
                                     clipPoint,
-                                    clipDirection
+                                    clipDirection,
                                 )[0]?.point ?? currentPoint.clone();
-                                var outsideEdgeEnd = intersectLineWithLine(
+                                const outsideEdgeEnd = intersectLineWithLine(
                                     currentPoint.add(currentDirection.clone().rotateAround(new Vector2(), outside90Rotation).multiplyScalar(halfWidth)),
                                     currentDirection.clone().multiplyScalar(-1),
                                     clipPoint,
-                                    clipDirection
+                                    clipDirection,
                                 )[0]?.point ?? currentPoint.clone();
                                 if (!isEqualApprox(outsideEdgeStart, outsidePath.currentPoint)) {
                                     outsidePath.lineTo(
@@ -384,7 +384,7 @@ export function createPathStrokeShapes(
                                 outsidePath.lineTo(
                                     outsidePoints[0].x,
                                     outsidePoints[0].y,
-                                )
+                                );
                             }
                             break;
                         case 'round':
@@ -681,8 +681,8 @@ function reversePath(path: Path): Path {
 
 // Intersects two path commands and joins them at their ends
 function intersectInsidePathCorner(previousPoints: Vector2[] | null, currentPoints: Vector2[]) {
-    var newPreviousPoints: Vector2[] | null = null;
-    var newCurrentPoints: Vector2[] | null = null;
+    let newPreviousPoints: Vector2[] | null = null;
+    let newCurrentPoints: Vector2[] | null = null;
     if (previousPoints == null) {
         newCurrentPoints = currentPoints;
     } else {
@@ -723,21 +723,21 @@ function intersectInsidePathCorner(previousPoints: Vector2[] | null, currentPoin
         if (intersections.length > 0) {
             let winningIntersection: IntersectionResult | null = null;
             let winningOtherT = Infinity;
-            for (let intersection of intersections) {
+            for (const intersection of intersections) {
                 if (intersection.t1 < winningOtherT) {
                     winningIntersection = intersection;
                     winningOtherT = intersection.t1;
                 }
             }
             newPreviousPoints = previousPoints.slice(0, -previousShape.length).concat(
-                slicePolynomial(previousShape, 0.0, winningIntersection!.t0)
+                slicePolynomial(previousShape, 0.0, winningIntersection!.t0),
             );
             newCurrentPoints = slicePolynomial(currentShape, winningIntersection!.t1, 1.0).concat(
-                currentPoints.slice(currentShape.length)
+                currentPoints.slice(currentShape.length),
             );
         } else {
-            newPreviousPoints = previousPoints
-            newCurrentPoints = currentPoints
+            newPreviousPoints = previousPoints;
+            newCurrentPoints = currentPoints;
         }
     }
     return {
@@ -757,25 +757,25 @@ function adaptiveOffsetCurve(curvePoints: Vector2[], offset: number, recursionCo
 
     const segment1 = offsetSegment(
         [curvePoints[1].clone().multiplyScalar(-1), curvePoints[0], curvePoints[1]],
-        curvePoints[0], curvePoints[1], curvePoints[2], curvePoints[3], hNormal, offset
+        curvePoints[0], curvePoints[1], curvePoints[2], curvePoints[3], hNormal, offset,
     );
     const segment2 = offsetSegment(
         [curvePoints[2], curvePoints[3], curvePoints[2].clone().multiplyScalar(-1)],
-        curvePoints[0], curvePoints[1], curvePoints[2], curvePoints[3], hNormal, offset
+        curvePoints[0], curvePoints[1], curvePoints[2], curvePoints[3], hNormal, offset,
     );
     if (recursionCount < 16 && findCubicBezierSelfIntersections(segment1[1], segment1[2], segment2[0], segment2[1]).length == 0) {
         const threshold = Math.min(Math.abs(offset) / 20.0, 1.0);
         const midOffset = cubicBezierAt(segment1[1], segment1[2], segment2[0], segment2[1], 0.5).distanceTo(
-            cubicBezierAt(curvePoints[0], curvePoints[1], curvePoints[2], curvePoints[3], 0.5)
+            cubicBezierAt(curvePoints[0], curvePoints[1], curvePoints[2], curvePoints[3], 0.5),
         );
         if (Math.abs(midOffset - Math.abs(offset)) > threshold) {
-            const curveSplit = splitCubicBezier(curvePoints[0], curvePoints[1], curvePoints[2], curvePoints[3], 0.5)
+            const curveSplit = splitCubicBezier(curvePoints[0], curvePoints[1], curvePoints[2], curvePoints[3], 0.5);
             let returnSplits: Vector2[] = [];
             returnSplits = returnSplits.concat(
-                adaptiveOffsetCurve([curveSplit[0], curveSplit[1], curveSplit[2], curveSplit[3]], offset, recursionCount + 1)
+                adaptiveOffsetCurve([curveSplit[0], curveSplit[1], curveSplit[2], curveSplit[3]], offset, recursionCount + 1),
             );
             returnSplits = returnSplits.concat(
-                adaptiveOffsetCurve([curveSplit[3], curveSplit[4], curveSplit[5], curveSplit[6]], offset, recursionCount + 1)
+                adaptiveOffsetCurve([curveSplit[3], curveSplit[4], curveSplit[5], curveSplit[6]], offset, recursionCount + 1),
             );
             return returnSplits;
         }
@@ -784,12 +784,12 @@ function adaptiveOffsetCurve(curvePoints: Vector2[], offset: number, recursionCo
 }
 
 function offsetSegment(segmentPoints: Vector2[], p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, handleNormal: Vector2, offset: number) {
-    var isFirst = segmentPoints[1] == p0;
-    var offsetVector = findCubicBezierDirectionAt(p0, p1, p2, p3, isFirst ? 0 : 1)
+    const isFirst = segmentPoints[1] == p0;
+    const offsetVector = findCubicBezierDirectionAt(p0, p1, p2, p3, isFirst ? 0 : 1)
         .rotateAround(new Vector2(), Math.PI / 2).multiplyScalar(offset);
-    var point = segmentPoints[1].clone().add(offsetVector);
-    var newSegment = [point, point, point];
-    var handleIndex = isFirst ? 2 : 0;
+    const point = segmentPoints[1].clone().add(offsetVector);
+    const newSegment = [point, point, point];
+    const handleIndex = isFirst ? 2 : 0;
     newSegment[handleIndex] = segmentPoints[handleIndex].clone().add((handleNormal.clone().add(offsetVector)).divideScalar(2.0));
     return newSegment;
 }
@@ -801,10 +801,10 @@ function circleSegmentToQuadraticBezier(
     startDirection: Vector2,
     endDirection: Vector2,
     pointWidth: number,
-    angle: number
+    angle: number,
 ) {
     const absAngle = Math.abs(angle);
-    const bezierSegments = (2.0 * Math.PI) / absAngle
+    const bezierSegments = (2.0 * Math.PI) / absAngle;
     const handleOffsetUnit = (4.0 / 3.0) * Math.tan(Math.PI / (2.0 * bezierSegments));
     path.bezierCurveTo(
         startPoint.x + (startDirection.x * handleOffsetUnit * (pointWidth / 2)),

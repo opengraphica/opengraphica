@@ -25,7 +25,7 @@ import type {
 } from '@/types';
 
 export class VideoLayerMeshController implements Webgl2RendererMeshController {
-    
+
     /** @deprecated use materials */
     material: InstanceType<typeof ShaderMaterial> | undefined;
     materials: InstanceType<typeof ShaderMaterial>[] = [];
@@ -125,7 +125,9 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
                         isHalfFloat: this.isHalfFloat,
                     });
                 }
-                this.plane && (this.plane.material = this.materials[this.materials.length - 1]);
+                if (this.plane) {
+                    this.plane.material = this.materials[this.materials.length - 1];
+                }
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
                     markRenderDirty();
@@ -173,7 +175,7 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
         backend.renderer.autoClear = true;
         backend.renderer.getViewport(originalViewport);
         backend.renderer.setViewport(0, 0, this.sourceTexture.width, this.sourceTexture.height);
-        for (let [materialIndex, currentMaterial] of this.materials.entries()) {
+        for (const [materialIndex, currentMaterial] of this.materials.entries()) {
             // if (materialIndex > 0 && currentMaterial.uniforms.dstTexture) {
             //     currentMaterial.uniforms.dstTexture.value = this.sourceTexture;
             // }
@@ -252,7 +254,7 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
         this.plane?.matrix.set(
             transform[0], transform[1], transform[2], transform[3],
             transform[4], transform[5], transform[6], transform[7],
-            transform[8], transform[9], transform[10], transform[11], 
+            transform[8], transform[9], transform[10], transform[11],
             transform[12], transform[13], transform[14], transform[15],
         );
         markRenderDirty();
@@ -260,8 +262,10 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
 
     updateVisible(visible: boolean) {
         this.visible = visible;
-        let oldVisibility = this.plane?.visible;
-        this.plane && (this.plane.visible = this.visibleOverride ?? this.visible);
+        const oldVisibility = this.plane?.visible;
+        if (this.plane) {
+            this.plane.visible = this.visibleOverride ?? this.visible;
+        }
         if (this.plane?.visible !== oldVisibility) {
             markRenderDirty();
         }
@@ -292,7 +296,7 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
     setDraftTexture(texture?: Texture<any>) {
         // TODO
     }
-    
+
     swapScene(scene: Scene) {
         if (!this.plane) return;
         this.scene?.remove(this.plane);
@@ -398,7 +402,7 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
         this.sourceTexture.needsUpdate = true;
         markRenderDirty();
     }
-    
+
     detach() {
         const backend = getWebgl2RendererBackend();
         backend.removeMeshController(this.id);
@@ -409,7 +413,9 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
         this.planeGeometry?.dispose();
         this.planeGeometry = undefined;
 
-        this.plane && this.scene?.remove(this.plane);
+        if (this.plane) {
+            this.scene?.remove(this.plane);
+        }
         this.plane = undefined;
 
         if (this.materials.length > 0) {

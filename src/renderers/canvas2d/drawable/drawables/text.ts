@@ -9,7 +9,7 @@
  */
 
 import bidiFactory from 'bidi-js';
-const bidi = bidiFactory()
+const bidi = bidiFactory();
 
 import { textMetaDefaults } from '@/lib/text-common';
 import { getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement } from '@/lib/text-render';
@@ -79,7 +79,7 @@ export default class Text implements Drawable<TextData> {
         if (!this.calculatedTextPlacement) return;
         const { isHorizontal, lines, wrapDirection, wrapDirectionSize } = this.calculatedTextPlacement;
         const wrapSign = ['ltr', 'ttb'].includes(wrapDirection) ? 1 : -1;
-        let wrapOffsetStart = wrapSign > 0 ? 0 : wrapDirectionSize;
+        const wrapOffsetStart = wrapSign > 0 ? 0 : wrapDirectionSize;
 
         if (isHorizontal) {
             for (const line of lines) {

@@ -64,11 +64,11 @@ export class TextDocumentEditor {
 
     /**
      * Returns the position of the end of the the word at the line/character provided
-     * @param line - The reference line number (0 indexed) 
+     * @param line - The reference line number (0 indexed)
      * @param character - The reference character position (0 indexed)
      * @param noJump - Don't jump to the next word if at the end of current one
      */
-    public getWordEndPosition(line: number, character: number, noJump?: boolean): { line: number, character: number } {
+    public getWordEndPosition(line: number, character: number, noJump?: boolean): { line: number; character: number; } {
         let newLine = line;
         let newCharacter = character;
         let fullText = this.getLineText(newLine);
@@ -95,13 +95,13 @@ export class TextDocumentEditor {
         }
         return {
             line: newLine,
-            character: newCharacter
-        }
+            character: newCharacter,
+        };
     }
 
     /**
      * Returns the position of the start of the the word at the line/character provided
-     * @param line - The reference line number (0 indexed) 
+     * @param line - The reference line number (0 indexed)
      * @param character - The reference character position (0 indexed)
      * @param noJump - Don't jump to the next word if at the end of current one
      */
@@ -135,8 +135,8 @@ export class TextDocumentEditor {
         }
         return {
             line: newLine,
-            character: newCharacter
-        }
+            character: newCharacter,
+        };
     }
 
     /**
@@ -166,39 +166,39 @@ export class TextDocumentEditor {
 
     /**
      * Inserts a span with empty text in the document at the specified line and character position
-     * @param line - The line number to insert at (0 indexed) 
+     * @param line - The line number to insert at (0 indexed)
      * @param character - The character position to insert at (0 indexed)
      * @param meta - Metadata to associate with span
      */
     private insertEmptySpan(line: number, character: number, meta: Partial<TextDocumentSpanMeta>): TextDocumentSpan | null {
         let insertedSpan: TextDocumentSpan | null = null;
         const lineDef = this.document.lines[line];
-        let newLineSpans: TextDocumentSpan[] = [];
+        const newLineSpans: TextDocumentSpan[] = [];
         let spanStartCharacter = 0;
         let wasInserted = false;
-        for (let span of lineDef.spans) {
+        for (const span of lineDef.spans) {
             if (!wasInserted && character >= spanStartCharacter && character <= spanStartCharacter + span.text.length) {
-                let textBefore = span.text.slice(0, character - spanStartCharacter);
-                let textAfter = span.text.slice(character - spanStartCharacter);
+                const textBefore = span.text.slice(0, character - spanStartCharacter);
+                const textAfter = span.text.slice(character - spanStartCharacter);
                 if (textBefore.length > 0) {
                     newLineSpans.push({
                         text: textBefore,
-                        meta: JSON.parse(JSON.stringify(span.meta))
+                        meta: JSON.parse(JSON.stringify(span.meta)),
                     });
                 }
                 const newMeta = JSON.parse(JSON.stringify(span.meta));
-                for (let metaKey in meta) {
+                for (const metaKey in meta) {
                     newMeta[metaKey] = meta[metaKey as keyof typeof meta];
                 }
                 insertedSpan = {
                     text: '',
-                    meta: newMeta
+                    meta: newMeta,
                 };
                 newLineSpans.push(insertedSpan);
                 if (textAfter.length > 0) {
                     newLineSpans.push({
                         text: textAfter,
-                        meta: JSON.parse(JSON.stringify(span.meta))
+                        meta: JSON.parse(JSON.stringify(span.meta)),
                     });
                 }
                 wasInserted = true;
@@ -214,10 +214,10 @@ export class TextDocumentEditor {
     /**
      * Inserts a text string in the document at the specified line and character position
      * @param text - The text string to insert
-     * @param line - The line number to insert at (0 indexed) 
+     * @param line - The line number to insert at (0 indexed)
      * @param character - The character position to insert at (0 indexed)
      */
-    public insertText(text: string, line: number, character: number): { line: number, character: number } {
+    public insertText(text: string, line: number, character: number): { line: number; character: number; } {
 
         let insertedSpan: TextDocumentSpan | null;
         if (this.queuedMetaChanges) {
@@ -229,8 +229,8 @@ export class TextDocumentEditor {
         const textHasNewline: boolean = text.includes('\n');
         let characterCount: number = 0;
         let modifyingSpan: TextDocumentSpan | null = null;
-        let previousSpans: TextDocumentSpan[] = [];
-        let nextSpans: TextDocumentSpan[] = [];
+        const previousSpans: TextDocumentSpan[] = [];
+        const nextSpans: TextDocumentSpan[] = [];
         let newLine: number = line;
         let newCharacter: number = character;
 
@@ -267,7 +267,7 @@ export class TextDocumentEditor {
             for (let i = 0; i < textLines.length; i++) {
                 modifiedSpans.push({
                     meta: JSON.parse(JSON.stringify(modifyingSpan.meta)),
-                    text: textLines[i]
+                    text: textLines[i],
                 });
             }
             const firstModifiedSpan = modifiedSpans.shift();
@@ -294,7 +294,7 @@ export class TextDocumentEditor {
         // Return end position
         return {
             line: newLine,
-            character: newCharacter
+            character: newCharacter,
         };
     }
 
@@ -305,7 +305,7 @@ export class TextDocumentEditor {
      * @param endLine - The ending line of the text range
      * @param endCharacter - The character position at the ending line of the text range
      */
-    public deleteRange(startLine: number, startCharacter: number, endLine: number, endCharacter: number): { line: number, character: number } {
+    public deleteRange(startLine: number, startCharacter: number, endLine: number, endCharacter: number): { line: number; character: number; } {
         // Check bounds
         startLine >= 0 || (startLine = 0);
         startCharacter >= 0 || (startCharacter = 0);
@@ -319,7 +319,7 @@ export class TextDocumentEditor {
         if (startLine === endLine && startCharacter === endCharacter) {
             return {
                 line: startLine,
-                character: startCharacter
+                character: startCharacter,
             };
         }
 
@@ -345,7 +345,7 @@ export class TextDocumentEditor {
 
         // Get spans in end line after range
         characterCount = 0;
-        let endSpan: TextDocumentSpan | null = null;    
+        let endSpan: TextDocumentSpan | null = null;
         let endSpanDeleteIndex: number = 0;
         for (let i = 0; i < this.document.lines[endLine].spans.length; i++) {
             const span: TextDocumentSpan = this.document.lines[endLine].spans[i];
@@ -383,7 +383,7 @@ export class TextDocumentEditor {
                     }
                 }
                 if (endSpan) {
-                    endSpan.text = endSpan.text.slice(endSpanDeleteIndex)
+                    endSpan.text = endSpan.text.slice(endSpanDeleteIndex);
                     if (endSpan.text || middleSpans.length === 0) {
                         middleSpans.push(endSpan);
                         isAddedEndSpan = true;
@@ -425,7 +425,7 @@ export class TextDocumentEditor {
         // Return new position
         return {
             line: startLine,
-            character: startCharacter
+            character: startCharacter,
         };
     }
 
@@ -435,10 +435,10 @@ export class TextDocumentEditor {
      * @param startLine - The line number to delete from
      * @param startCharacter - The character position to delete from
      */
-    public deleteCharacter(forward: boolean, startLine: number, startCharacter: number): { line: number, character: number } {
+    public deleteCharacter(forward: boolean, startLine: number, startCharacter: number): { line: number; character: number; } {
         let endLine: number = startLine;
         let endCharacter: number = startCharacter;
-        
+
         // Delete forwards
         if (forward) {
             // If there are characters after cursor on this line we remove one
@@ -468,13 +468,13 @@ export class TextDocumentEditor {
     }
 
     /**
-     * Retrieves a metadata summary object for the specified range of text. 
+     * Retrieves a metadata summary object for the specified range of text.
      * @param startLine - The starting line of the text range
      * @param startCharacter - The character position at the starting line of the text range
      * @param endLine - The ending line of the text range
      * @param endCharacter - The character position at the ending line of the text range
      */
-    public getMetaRange(startLine: number, startCharacter: number, endLine: number, endCharacter: number): { [key: string]: any[] } {
+    public getMetaRange(startLine: number, startCharacter: number, endLine: number, endCharacter: number): { [key: string]: any[]; } {
         // Check bounds
         startLine >= 0 || (startLine = 0);
         startCharacter >= 0 || (startCharacter = 0);
@@ -486,7 +486,7 @@ export class TextDocumentEditor {
         const isEmpty = startLine === endLine && startCharacter === endCharacter;
 
         // Loop through all spans in range and collect meta values
-        const metaCollection: { [key: string]: any[] } = {};
+        const metaCollection: { [key: string]: any[]; } = {};
         for (const metaKey in textMetaDefaults) {
             metaCollection[metaKey] = [];
         }
@@ -551,7 +551,7 @@ export class TextDocumentEditor {
     }
 
     /**
-     * Sets styling metadata for the specified range of text. 
+     * Sets styling metadata for the specified range of text.
      * @param startLine - The starting line of the text range
      * @param startCharacter - The character position at the starting line of the text range
      * @param endLine - The ending line of the text range
@@ -572,9 +572,9 @@ export class TextDocumentEditor {
         let isInsideRange = false;
         for (let lineIndex = startLine; lineIndex <= endLine; lineIndex++) {
             const line: TextDocumentLine = this.document.lines[lineIndex];
-            let newLine: TextDocumentSpan[] = [];
+            const newLine: TextDocumentSpan[] = [];
             let spanStartCharacter: number = 0;
-            for (let span of line.spans) {
+            for (const span of line.spans) {
                 const spanText = span.text;
                 const spanLength = spanText.length;
                 if (lineIndex === startLine) {
@@ -593,7 +593,7 @@ export class TextDocumentEditor {
                     choppedStartCharacters = startCharacter - spanStartCharacter;
                     newLine.push({
                         text: span.text.slice(0, startCharacter - spanStartCharacter),
-                        meta: JSON.parse(JSON.stringify(span.meta))
+                        meta: JSON.parse(JSON.stringify(span.meta)),
                     });
                     span.text = span.text.slice(startCharacter - spanStartCharacter);
                     isInsideRange = true;
@@ -603,7 +603,7 @@ export class TextDocumentEditor {
                 if (endCharacter > spanStartCharacter && endCharacter < spanStartCharacter + spanLength && lineIndex === endLine) {
                     newLine.push({
                         text: span.text.slice(endCharacter - spanStartCharacter - choppedStartCharacters),
-                        meta: JSON.parse(JSON.stringify(span.meta))
+                        meta: JSON.parse(JSON.stringify(span.meta)),
                     });
                     span.text = span.text.slice(0, endCharacter - spanStartCharacter - choppedStartCharacters);
                     isInsideRange = true;
@@ -636,7 +636,7 @@ export class TextDocumentEditor {
     }
 
     /**
-     * Merges sibling spans that have the same metadata, and removes empty spans. 
+     * Merges sibling spans that have the same metadata, and removes empty spans.
      * @param startLine - The starting line of the text range
      * @param endLine - The ending line of the text range
      */
@@ -650,7 +650,7 @@ export class TextDocumentEditor {
                 if (span1 && span2 && this.isSameSpanMeta(span1.meta, span2.meta)) {
                     line.spans[spanIndex] = {
                         text: span1.text + span2.text,
-                        meta: span1.meta
+                        meta: span1.meta,
                     };
                     line.spans.splice(spanIndex + 1, 1);
                     spanIndex--;
@@ -685,8 +685,8 @@ export class TextDocumentSelection {
 
     public isActiveSideEnd: boolean = true;
 
-    public start: { line: number, character: number };
-    public end: { line: number, character: number };
+    public start: { line: number; character: number; };
+    public end: { line: number; character: number; };
 
     private notifyChangeHandlers: Array<() => void> = [];
 
@@ -695,12 +695,12 @@ export class TextDocumentSelection {
 
         this.start = {
             line: 0,
-            character: 0
+            character: 0,
         };
-        
+
         this.end = {
             line: 0,
-            character: 0
+            character: 0,
         };
 
         this.setPosition(0, 0);
@@ -723,7 +723,7 @@ export class TextDocumentSelection {
             isActiveSideEnd: this.isActiveSideEnd,
             start: this.start,
             end: this.end,
-        }
+        };
     }
 
     /**
@@ -736,8 +736,8 @@ export class TextDocumentSelection {
     /**
      * Determines the relative position of two line/character sets.
      * @param line1
-     * @param character1 
-     * @param line2 
+     * @param character1
+     * @param line2
      * @param character2
      * @returns -1 if line1/character1 is less than line2/character2, 1 if greater, and 0 if equal
      */
@@ -759,9 +759,9 @@ export class TextDocumentSelection {
 
     /**
      * Sets the head position of the selection to the specified line/character, optionally extends to selection to that position.
-     * @param line - The line number to set the selection to 
+     * @param line - The line number to set the selection to
      * @param character - The character index to set the selection to
-     * @param [keepSelection] - If true, extends the current selection to the specified position. If false or undefined, sets an empty selection at that position. 
+     * @param [keepSelection] - If true, extends the current selection to the specified position. If false or undefined, sets an empty selection at that position.
      */
     public setPosition(line: number | null, character: number | null, keepSelection?: boolean) {
         if (line == null) {
@@ -787,7 +787,7 @@ export class TextDocumentSelection {
                 line,
                 character,
                 this.start.line,
-                this.start.character
+                this.start.character,
             );
 
             // Determine whether we should make the start side of the range active, selection moving left or up.
@@ -809,8 +809,8 @@ export class TextDocumentSelection {
                 this.isActiveSideEnd = !this.isActiveSideEnd;
                 const temp = {
                     line: this.start.line,
-                    character: this.start.character
-                }
+                    character: this.start.character,
+                };
                 this.start.line = this.end.line;
                 this.start.character = this.end.character;
                 this.end.line = temp.line;
@@ -830,16 +830,16 @@ export class TextDocumentSelection {
     /**
      * Retrieves the position of the head of the selection (could be the start or end of the selection based on previous operations)
      */
-    public getPosition(): { line: number, character: number } {
+    public getPosition(): { line: number; character: number; } {
         if (this.isActiveSideEnd) {
             return {
                 character: this.end.character,
-                line: this.end.line
+                line: this.end.line,
             };
         } else {
             return {
                 character: this.start.character,
-                line: this.start.line
+                line: this.start.line,
             };
         }
     }
@@ -853,7 +853,7 @@ export class TextDocumentSelection {
         const lastLine = positionCompare === 1 ? this.start.line : this.end.line;
         const firstCharacter = positionCompare === 1 ? this.end.character : this.start.character;
         const lastCharacter = positionCompare === 1 ? this.start.character : this.end.character;
-        let textLines: string[] = [];
+        const textLines: string[] = [];
         for (let i = firstLine; i <= lastLine; i++) {
             if (i === firstLine && i === lastLine) {
                 textLines.push(this.documentEditor.getLineText(i).slice(firstCharacter, lastCharacter));
@@ -870,7 +870,7 @@ export class TextDocumentSelection {
 
     /**
      * Moves the cursor to a previous line.
-     * @param length - The number of lines to move 
+     * @param length - The number of lines to move
      * @param keepSelection - Whether to move to an empty selection or extend the current selection
      */
     public moveLinePrevious(length: number, keepSelection?: boolean) {
@@ -881,7 +881,7 @@ export class TextDocumentSelection {
 
     /**
      * Moves the cursor to a next line.
-     * @param length - The number of lines to move 
+     * @param length - The number of lines to move
      * @param keepSelection - Whether to move to an empty selection or extend the current selection
      */
     public moveLineNext(length: number, keepSelection?: boolean) {
@@ -892,7 +892,7 @@ export class TextDocumentSelection {
 
     /**
      * Moves to the start of the current line.
-     * @param keepSelection - Whether to move to an empty selection or extend the current selection 
+     * @param keepSelection - Whether to move to an empty selection or extend the current selection
      */
     public moveLineStart(keepSelection?: boolean) {
         const position = this.getPosition();
@@ -901,7 +901,7 @@ export class TextDocumentSelection {
 
     /**
      * Moves to the end of the current line.
-     * @param keepSelection - Whether to move to an empty selection or extend the current selection 
+     * @param keepSelection - Whether to move to an empty selection or extend the current selection
      */
     public moveLineEnd(keepSelection?: boolean) {
         const position = this.getPosition();
@@ -910,8 +910,8 @@ export class TextDocumentSelection {
 
     /**
      * Moves the cursor to a character behind in the document, handles line wrapping.
-     * @param length - The number of characters to move 
-     * @param keepSelection - Whether to move to an empty selection or extend the current selection 
+     * @param length - The number of characters to move
+     * @param keepSelection - Whether to move to an empty selection or extend the current selection
      */
     public moveCharacterPrevious(length: number, keepSelection?: boolean) {
         length = length == null ? 1 : length;
@@ -927,8 +927,8 @@ export class TextDocumentSelection {
 
     /**
      * Moves the cursor to a character ahead in the document, handles line wrapping.
-     * @param length - The number of characters to move 
-     * @param keepSelection - Whether to move to an empty selection or extend the current selection 
+     * @param length - The number of characters to move
+     * @param keepSelection - Whether to move to an empty selection or extend the current selection
      */
     public moveCharacterNext(length: number, keepSelection?: boolean) {
         length = length == null ? 1 : length;
@@ -945,7 +945,7 @@ export class TextDocumentSelection {
 
     /**
      * Moves the cursor to the beginning of the current word or previous word, handles line wrapping.
-     * @param keepSelection - Whether to move to an empty selection or extend the current selection 
+     * @param keepSelection - Whether to move to an empty selection or extend the current selection
      */
     public moveWordPrevious(keepSelection?: boolean) {
         const position = this.getPosition();
@@ -955,7 +955,7 @@ export class TextDocumentSelection {
 
     /**
      * Moves the cursor to the end of the current word or next word, handles line wrapping.
-     * @param keepSelection - Whether to move to an empty selection or extend the current selection 
+     * @param keepSelection - Whether to move to an empty selection or extend the current selection
      */
     public moveWordNext(keepSelection?: boolean) {
         const position = this.getPosition();
@@ -966,7 +966,7 @@ export class TextDocumentSelection {
     /**
      * Calling this may help the browser with memory clean up.
      */
-     public dispose() {
+    public dispose() {
         (this.documentEditor as unknown) = undefined;
         (this.notifyChangeHandlers as unknown) = undefined;
     }
@@ -1005,7 +1005,7 @@ export class TextDocumentEditorWithSelection {
                 documentSelection.start.line,
                 documentSelection.start.character,
                 documentSelection.end.line,
-                documentSelection.end.character
+                documentSelection.end.character,
             );
         }
         documentSelection.setPosition(newPosition.line, newPosition.character);
@@ -1013,11 +1013,11 @@ export class TextDocumentEditorWithSelection {
 
     /** Deletes the range from the document specified by the selection. */
     static deleteSelection(documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection) {
-        let newPosition = documentEditor.deleteRange(
+        const newPosition = documentEditor.deleteRange(
             documentSelection.start.line,
             documentSelection.start.character,
             documentSelection.end.line,
-            documentSelection.end.character
+            documentSelection.end.character,
         );
         documentSelection.setPosition(newPosition.line, newPosition.character);
     }

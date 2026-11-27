@@ -27,29 +27,29 @@ export default class BrightnessCanvasFilter implements CanvasFilter<BrightnessCa
                     { key: 'luminance', value: BrightnessMode.LUMINANCE },
                     { key: 'gamma', value: BrightnessMode.GAMMA },
                     { key: 'shift', value: BrightnessMode.SHIFT },
-                ]
+                ],
             },
             brightness: {
                 type: 'percentage',
                 default: 0,
                 preview: 0.4,
                 min: -1,
-                max: 1
+                max: 1,
             },
             effectiveRange: {
                 type: 'percentageRange',
                 default: [0, 1],
                 preview: [0, 1],
                 min: 0,
-                max: 1
+                max: 1,
             },
             effectiveRangeFeather: {
                 type: 'percentageRange',
                 default: [0, 1],
                 preview: [0, 1],
                 min: 0,
-                max: 1
-            }
+                max: 1,
+            },
         } as CanvasFilterEditConfig;
     }
 }

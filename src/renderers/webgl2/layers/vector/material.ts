@@ -62,7 +62,7 @@ export async function createVectorMaterial(params: VectorMaterialUpdateParams) {
 
 export async function updateVectorMaterial(
     material: ShaderMaterial,
-    params: VectorMaterialUpdateParams
+    params: VectorMaterialUpdateParams,
 ) {
     if (material.uniforms.color.value !== params.color) {
         material.uniforms.color.value = params.color;

@@ -130,7 +130,7 @@ export class FontMetrics {
     /**
      * Creates a canvas for kerning testing.
      */
-    private getKerningTestCanvas(): { canvas: HTMLCanvasElement | null, ctx: CanvasRenderingContext2D | null } {
+    private getKerningTestCanvas(): { canvas: HTMLCanvasElement | null; ctx: CanvasRenderingContext2D | null; } {
         if (!FontMetrics.kerningTestCanvas) {
             FontMetrics.kerningTestCanvas = document.createElement('canvas');
             FontMetrics.kerningTestCanvas.width = 10;
@@ -142,8 +142,8 @@ export class FontMetrics {
         }
         return {
             canvas: FontMetrics.kerningTestCanvas,
-            ctx: FontMetrics.kerningTestCtx
-        }
+            ctx: FontMetrics.kerningTestCtx,
+        };
     }
 
     /**
@@ -189,16 +189,16 @@ export class FontMetrics {
         return {
             top: start,
             bottom: end,
-            height: end - start
-        }
+            height: end - start,
+        };
     }
 
     /**
      * Calculate the kerning offset between two letters.
-     * @param {string} letters - a two character string of the two letters to determine font kerning from. Returns the kerning offset that should be used to draw the 2nd letter. 
+     * @param {string} letters - a two character string of the two letters to determine font kerning from. Returns the kerning offset that should be used to draw the 2nd letter.
      * @param {object} flags - font style, such as bold or italic
      */
-    public getKerningOffset(letters: string, flags: { weight?: number, style?: string } = {}) {
+    public getKerningOffset(letters: string, flags: { weight?: number; style?: string; } = {}) {
         let offset = this.kerningMap.get(letters);
         if (offset == null) {
             const { ctx } = this.getKerningTestCanvas();
@@ -222,7 +222,7 @@ const fontMetricsMap = new Map<string, FontMetrics>();
  * Calculates font metrics for the given font name/size and returns it. Caches by default.
  * @param {string} fontFamily - Name of the font loaded on the page to calculate metrics for.
  * @param {number} fontSize - The font size in pixels to calculate metrics for.
- * @param {boolean} noCache - Skip caching if the metrics is expected to change in the future (e.g. font family not loaded yet.) 
+ * @param {boolean} noCache - Skip caching if the metrics is expected to change in the future (e.g. font family not loaded yet.)
  */
 export function getFontMetrics(fontFamily: string, fontSize: number, noCache: boolean = false) {
     let fontMetrics = fontMetricsMap.get(fontFamily + '_' + fontSize);

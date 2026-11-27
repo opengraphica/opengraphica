@@ -75,7 +75,9 @@
         "convertVectorShapesToPaths": "将形状转换为路径",
         "flipLayerX": "水平翻转图层",
         "flipLayerY": "垂直翻转图层",
-        "mergeEffects": "合并效果"
+        "mergeEffects": "合并效果",
+        "freeTransform": "自由变形",
+        "mergeLayerDown": "向下合并图层"
     },
     "app": {
         "colorPickerGradient": {
@@ -131,7 +133,9 @@
                 "vector": "矢量层",
                 "video": "视频层"
             },
-            "deleteSelection": "删除选择"
+            "deleteSelection": "删除选择",
+            "edit": "编辑",
+            "mergeDown": "向下合并"
         },
         "wait": {
             "applyLayerTransform": "应用图层变换",
@@ -196,7 +200,9 @@
         "updateApp": "更新 App",
         "add": "添加",
         "mergeEffects": "合并效果",
-        "selectFiles": "选择文件..."
+        "selectFiles": "选择文件...",
+        "deletePlugin": "删除插件",
+        "reload": "重新装入"
     },
     "canvas": {
         "toolbar": {
@@ -333,6 +339,10 @@
                     "checkForUpdates": "检查更新",
                     "updateAvailableTitle": "更新可用",
                     "updateAvailableMessage": "OpenGraphica的更新版本可供查阅. 你想安装它吗?"
+                },
+                "plugins": {
+                    "selectFile": "添加插件文件...",
+                    "uninstall": "卸载"
                 }
             }
         }
@@ -440,8 +450,11 @@
             "param": {
                 "size": "大小",
                 "xIntensity": "X 强度",
-                "yIntensity": "Y 强度"
-            }
+                "yIntensity": "Y 强度",
+                "xRadius": "X 半径",
+                "yRadius": "Y 半径"
+            },
+            "help": "用卡尔·弗里德里希·高斯发明的高斯函数模糊图像. 这种模糊性类似于通过半透明屏幕观看图像,它与焦外镜头所创造的bokeh效应明显不同."
         },
         "grayscale": {
             "name": "灰度",
@@ -473,7 +486,8 @@
                 "rotate": "旋转",
                 "targetColor": "目标颜色",
                 "targetRange": "范围"
-            }
+            },
+            "help": "旋转图像中的颜色色调,有效改变感知的颜色。\n\n**颜色空间**用于确定新颜色的亮度和饱和度. ** Oklab** 通常是最准确的选择。\n\n**目标颜色**可以用来选择性地修改图像中只有一个特定的颜色. ** Range**决定了类似于**目标颜色**的颜色受到影响."
         },
         "negative": {
             "name": "负数",
@@ -679,6 +693,67 @@
                 "centerX": "中点 X",
                 "centerY": "中点 Y"
             }
+        },
+        "cylinderBend": {
+            "name": "圆柱弯曲",
+            "help": "将图像围绕一个3D圆柱。 对诸如将纸牌附在杆子上等情景很有用.\n\n* **旋转** - 绕X轴旋转气瓶。 这可以与层的z轴旋转相结合,以实现任何显示角度.\n*** 展望** - 0%从无限距离来看,100%非常接近。\n* ** 查看位置** - 向上或向下移动视图,从而改变视角.",
+            "param": {
+                "rotation": "旋转",
+                "perspective": "视角",
+                "viewPosition": "查看位置"
+            }
+        },
+        "highlightBloom": {
+            "help": "又称闪光;这是一种柔软的光线,光线从图像的明亮区域流出至黑暗区域. 在摄像头中,它可由镜头中的光散射,扩散滤波器,或对胶片的乳胶进行光反射引起.\n*** 危险** - 一种颜色必须有多亮才能流出光芒的范围.\n拉迪乌斯会流血多远\n- 光的血流有多亮.",
+            "param": {
+                "threshold": "阈值",
+                "radius": "半径",
+                "strength": "强度"
+            }
+        },
+        "mechanicalVignette": {
+            "name": "机械维格内特",
+            "help": "模拟由中央圆筒导致的图像边缘的阴影,它阻断光线进入相机传感器.\n\n* ** Pupil距离** - 镜头的外圆开口距离传感器.\n*** Pupil半径** — 瞳孔圆形开口的半径。\n*** 巴雷尔距离** - 传感器旁镜头内开口的内部圆形的距离。\n***巴雷尔半径** - 枪管圆形开口的半径.",
+            "param": {
+                "mode": "模式",
+                "modeOption": {
+                    "simulate": "模拟",
+                    "remove": "删除"
+                },
+                "sensorWidth": "传感器宽度",
+                "sensorHeight": "传感器高度",
+                "exitPupilDistance": "学生距离",
+                "exitPupilRadius": "学生半径",
+                "barrelOpeningDistance": "枪管距离",
+                "barrelOpeningRadius": "半径"
+            }
+        },
+        "naturalVignette": {
+            "name": "自然维格内特",
+            "help": "也称为自然照明坠落,这模拟了镜头传感器边缘的影子,这是由于场景离轴部分的光线从一个角度到达传感器.\n\n这种效果在广角相机镜头上更为明显,这些镜头不是设计好的,因此光线会垂直地击中传感器.",
+            "param": {
+                "mode": "模式",
+                "modeOption": {
+                    "simulate": "模拟",
+                    "remove": "删除"
+                },
+                "sensorWidth": "传感器宽度",
+                "sensorHeight": "传感器高度",
+                "focalLength": "焦距"
+            }
+        },
+        "radialSpeedLines": {
+            "name": "辐射速线",
+            "help": "以光圈图案绘制运动线;常用于漫画. 大多数值是一个随机范围.\n* 拉迪乌斯** - 向中心线会划多远.\n* ** 间距** - 线条之间的间距。\n* ** 闪烁** - 每一闪烁处相邻将绘制多少行.\n* ** 厚度** - 最大线厚度。\n* ** 种子** - 随机排列线条.",
+            "param": {
+                "centerRadius": "半径",
+                "lineSpacing": "间距",
+                "lineClumping": "切换",
+                "lineThickness": "厚度",
+                "horizontalOffset": "水平",
+                "verticalOffset": "垂直",
+                "seed": "种子"
+            }
         }
     },
     "layerFilterGroup": {
@@ -702,6 +777,12 @@
         },
         "noise": {
             "name": "噪声"
+        },
+        "artistic": {
+            "name": "艺术"
+        },
+        "lightShadow": {
+            "name": "浅阴影( Shadow)"
         }
     },
     "layoutShortcutGroup": {
@@ -1212,6 +1293,20 @@
                 "title": "未选择图层",
                 "message": "选择要转换的至少一层。 某些层类型是不能改变的."
             }
+        },
+        "pluginInstallError": {
+            "title": "安装插件出错"
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "插件已安装",
+            "message": "编辑器需要在插件生效前重新装入. 如果您还在工作, 请先保存您的更改 ."
+        },
+        "pluginInstallZip": {
+            "title": "安装插件 ZIP",
+            "installError": {
+                "title": "安装插件出错",
+                "message": "选中的文件不是 OpenGraphica 编辑器插件, 或与当前版本的编辑器不兼容 ."
+            }
         }
     },
     "moduleGroup": {
@@ -1399,6 +1494,16 @@
                 "update": {
                     "name": "更新 App",
                     "description": "更新应用程序以接收新功能 ."
+                }
+            }
+        },
+        "plugin": {
+            "name": "插头",
+            "description": "插件管理.",
+            "modules": {
+                "installZip": {
+                    "name": "安装插件 ZIP",
+                    "description": "从 ZIP 文件安装编辑器插件 ."
                 }
             }
         }
@@ -1774,6 +1879,17 @@
         "layerOpacity": {
             "title": "不透明度",
             "opacity": "不透明度"
+        },
+        "cloneBrush": {
+            "brushOpacity": "不透明度",
+            "brushSize": "大小",
+            "brushHardness": "硬度",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "未选择图层",
+                    "message": "请在层对接处至少选择一个图像层 。 某些图层类型不能与克隆刷一起使用."
+                }
+            }
         }
     },
     "toolGroup": {
@@ -2063,6 +2179,20 @@
                     "进入一个区域以清除。 在按住时,可以拖动到左或右,以调整被擦除的面积."
                 ]
             }
+        },
+        "cloneBrushToolIntroduction": {
+            "title": "克隆笔刷工具",
+            "introduction": [
+                "克隆人复制了图像的一部分 这样你就可以在别的地方画出同样的区域。 它通常用于去除残骸,不想要的物体,或者填充损坏的斑点."
+            ],
+            "body": {
+                "mouse": [
+                    "克隆区域以克隆邮票图标的圆形显示. 您可以将其拖动或 ctrl + 点击以设定为当前鼠标位置 ."
+                ],
+                "touch": [
+                    "克隆区域以克隆邮票图标的圆形显示. 你可以把它拖起来."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -2103,7 +2233,8 @@
         "chroma": "颜色",
         "color": "颜色",
         "lightness": "光度",
-        "luminance": "光辉"
+        "luminance": "光辉",
+        "merge": "合并"
     },
     "defaultBrush": {
         "default": "默认",
@@ -2127,6 +2258,10 @@
                 "sharpen": {
                     "title": "锐化",
                     "description": "图像的锐化区域"
+                },
+                "cloneBrush": {
+                    "title": "克隆笔",
+                    "description": "图像的克隆区域"
                 }
             },
             "name": "变形"
@@ -2219,6 +2354,226 @@
                 }
             },
             "name": "Canvas 视图端口"
+        }
+    },
+    "mcp": {
+        "common": {
+            "response": {
+                "deleteSuccess": "删除成功 .",
+                "updateSuccess": "更新成功 ."
+            },
+            "error": {
+                "layerNotFound": "未找到指定的层 .",
+                "2dTransformLength": "变换阵列必须精确的6个数字."
+            }
+        },
+        "createCircleShape": {
+            "description": "将 SVG < circle > 形状添加到当前选中的图层中,如果当前选中的图层不是矢量图层,则添加到新图层中。 新的形状画在地层中所有其他形状的上方.",
+            "property": {
+                "cx": "圆中心在像素中的x位置.",
+                "cy": "圆中心在像素中的y位置.",
+                "r": "圆形像素的半径."
+            }
+        },
+        "createEllipseShape": {
+            "description": "将 SVG <ellipse> 形状添加到当前选定的图层中,如果当前选定的图层不是矢量图层,则添加到新图层中。 新的形状画在地层中所有其他形状的上方.",
+            "property": {
+                "cx": "椭圆中心在像素中的x位置.",
+                "cy": "椭圆中心在像素中的y位置.",
+                "rx": "沿x轴的椭圆半径以像素表示.",
+                "ry": "沿y轴的椭圆半径以像素表示."
+            }
+        },
+        "createLineShape": {
+            "description": "将 SVG <line> 形状添加到当前选定的图层中,如果当前选定的图层不是矢量图层,则添加到新图层中。 新的形状画在地层中所有其他形状的上方.",
+            "property": {
+                "x1": "以像素表示的开始线的x位置.",
+                "y1": "以像素表示的线条起始的y位置 .",
+                "x2": "线尾以像素表示的x位置.",
+                "y2": "以像素表示的线尾的y位置."
+            }
+        },
+        "createPathShape": {
+            "description": "将 SVG <path> 形状添加到当前选定的图层中,如果当前选定的图层不是矢量图层,则添加到新图层中。 新的形状画在地层中所有其他形状的上方.",
+            "property": {
+                "d": "SVG路径命令列表. 跟随SVG的规格. 示例:\"M 10 80 Q 52.5 10, 95 80 T 180 80\""
+            }
+        },
+        "createPolygonShape": {
+            "description": "将 SVG <polygon> 形状添加到当前选定的图层中,如果当前选定的图层不是矢量图层,则添加到新图层中。 新的形状画在地层中所有其他形状的上方.",
+            "property": {
+                "points": "定义形状外缘的点. 示例:“0,0 20,0 10,5”"
+            }
+        },
+        "createPolylineShape": {
+            "description": "将 SVG < polyline > 形状添加到当前选定的图层中,如果当前选定的图层不是矢量图层,则添加到新图层中。 新的形状画在地层中所有其他形状的上方.",
+            "property": {
+                "points": "定义连接线的点。 示例:“0,0 20,0 10,5”"
+            }
+        },
+        "createRectangleShape": {
+            "description": "将 SVG <rect> 形状添加到当前选定的图层中,如果当前选定的图层不是矢量图层,则添加到新图层中。 新的形状画在地层中所有其他形状的上方.",
+            "property": {
+                "x": "矩形左边缘的x位置以像素表示.",
+                "y": "矩形左边缘的y位置以像素表示.",
+                "rx": "矩形角的x半径以像素表示.",
+                "ry": "矩形角的y半径以像素表示.",
+                "width": "以像素表示的矩形宽度.",
+                "height": "以像素表示的矩形高度."
+            }
+        },
+        "createShapeCommon": {
+            "property": {
+                "fill": "填充颜色作为每个通道六进制的RGB 8位元. 别装了 示例: \"# 000000\"",
+                "fillOpacity": "填充色作为0到1的小数的不透明度.",
+                "stroke": "中风颜色作为每个通道六进制的RGB 8位元. 别中风 示例: \"# 000000\"",
+                "strokeLinecap": "如SVG spec中定义的线的末端如何渲染.",
+                "strokeLinejoin": "组合行的角是如何渲染的,定义在 SVG 规格中 .",
+                "strokeOpacity": "中风颜色作为0到1的小数不透明.",
+                "strokeWidth": "中风以像素表示的宽度.",
+                "transform": "变形属性在形状上. 必须是 SVG 2D 矩阵变换函数 。 示例:“矩阵(1,0,0,1,0)”"
+            },
+            "error": {
+                "fill": "无效的填充语法 。 提供每个通道六进制的 RGBA 8 位 。 示例: \"# 000000\"",
+                "stroke": "无效的中风语法 。 提供每个通道六进制的 RGBA 8 位 。 示例: \"# 000000\"",
+                "transform": "无效的变换语法 。 提供 SVG 2D 矩阵变换功能 。 示例:“矩阵(1,0,0,1,0)”"
+            }
+        },
+        "cropWorkingFile": {
+            "description": "裁剪工作文件中的全部图像布(所有图层)。 阴性作物可以用来增加帆布尺寸.",
+            "property": {
+                "left": "裁剪图像以像素表示的最左侧边界 。 这可能是负面的.",
+                "top": "裁剪成像素图像的最顶端边界 。 这可能是负面的.",
+                "width": "裁剪图像以像素表示的新宽度 。 这可以比原来的宽度更大.",
+                "height": "以像素表示的剪切图像的新高度 。 这可以比原来的高度更大."
+            },
+            "response": {
+                "success": "农作物成功."
+            }
+        },
+        "deleteLayers": {
+            "description": "删除带有指定ID的层.",
+            "property": {
+                "layerIds": "要删除的层的ID 。 从获取层列表工具中可以检索到层ID."
+            },
+            "error": {
+                "noIds": "提供至少1层ID."
+            },
+            "response": {
+                "success": "层已删除 ."
+            }
+        },
+        "deleteShape": {
+            "description": "从任何选定的矢量层中删除 SVG 形状.",
+            "property": {
+                "id": "要删除的形状的ID 。 此选项可以从“ 获取形状列表” 工具中检索 ."
+            }
+        },
+        "getAvailableFontList": {
+            "description": "列出可用文本层的所有字体框."
+        },
+        "getEditorGuide": {
+            "description": "提供OpenGraphica图像编辑器如何工作的自然语言摘要.",
+            "summary": "OpenGraphica是一个2D混合介质图像编辑器. 其核心可以同时编辑光栅图像和矢量形状,并导出到光栅和矢量图像格式.\n\nOpenGraphica中的工作文件是一个具有一个或多个层的图像文档. 它具有固定的长方形分辨率,以像素定义. 其他的测量单位如mm在UI中支持用于显示目的,但通过使用分辨率X和分辨率Y设置将其转换为像素进行编辑. 工作文件图像文档有一个坐标系统,其中+x正确,+y下,-z进入屏幕,远离查看器.\n\n工作文件由一叠单层组成. 所有层都有以像素定义的宽度/高度,以及决定其位置/旋转/比例的3x3 2D变换矩阵. 带有身份转换矩阵,其图层左上角与工作文件左上角对齐。\n\n层有不同的类型,它们推断它们包含的图像类型:\n* ** 梯度** - 覆盖整个工作文件的线性或射线梯度。\n**raster** - 每个频道以RGBA像素为基础的图像为8位.\n* **rasterSequence ** - 动画序列,每帧使用8位的频道RGBA像素图像.\n* ** 案文** - 横向或纵向绘制的丰富文本的一个或多个段落。\n* **victor** - SVG 1.x文档。\n***video** - 使用网络支持的代码的视频.\n\n层层从下到上堆叠,其中首先绘制底层,在所有其他层的前面绘制顶层. 层是存储的,这样,数组中的第一层是最底层的层,但显示在最上层列表的最终用户处. 层在线性RGB中默认与源比混合进行复合,并在完成所有堆肥操作后转换为sRGB."
+        },
+        "getLayerList": {
+            "description": "返回工作文件中所有层的 JSON 摘要定义,其中层按数组顺序绘制(最后在上方)."
+        },
+        "getRasterLayerImage": {
+            "description": "返回指定光栅层的图像数据.",
+            "property": {
+                "id": "光栅层的ID. 这可以从获取层列表工具中检索到 ."
+            }
+        },
+        "getShapeList": {
+            "description": "返回一个 JSON 定义,该定义按从下到上排列当前所选矢量层中的所有形状。 每当新形状被添加,删除,或重排时,形状ID都可以改变."
+        },
+        "getVectorLayerSvg": {
+            "description": "返回与指定矢量层相关的序列化 SVG 文档.",
+            "property": {
+                "id": "矢量层的ID 。 这可以从获取层列表工具中检索到 ."
+            }
+        },
+        "getWorkingFileDimensions": {
+            "description": "以像素返回当前工作文件的宽度和高度。 这是所有图层所覆盖的整体图像布的大小."
+        },
+        "insertRasterLayer": {
+            "description": "插入8位的 RGBA 图像作为层堆栈顶部的新光栅层.",
+            "property": {
+                "imageDataUri": "一个基础64编码的图像数据URI. 介质类型图像/png或图像/jpeg是可以接受的.",
+                "name": "新图层的名称; 通常是图像的文件名 .",
+                "transform": "代表2D变换矩阵的6个数组。 示例身份转换: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "插入鼠标层 ."
+            }
+        },
+        "insertTextLayer": {
+            "description": "插入文本层。 上/左是绘图源,其中上方是字体的上升线条.",
+            "property": {
+                "text": "插入的案文",
+                "name": "新文本层的名称 .",
+                "transform": "代表2D变换矩阵的6个数组。 通过身份转换,该层用其左上角与工作文件画布的左上角对齐绘制. 示例身份转换: [1, 0, 0, 1, 0, 1]",
+                "fontFamily": "要使用的字体家族名称 。 调用可获取的font列表工具以获取一个名称列表 .",
+                "fontSize": "字体大小 .",
+                "fill": "填充颜色为RGB或RGBA 8位/频道六进制. 示例:“# 000 000”或“# 000 000FF”"
+            }
+        },
+        "reorderLayers": {
+            "description": "更改图层顺序",
+            "property": {
+                "insertLayerIds": "在指定的插入层堆栈中插入的层的ID。 从获取层列表工具中可以检索到层ID.",
+                "referenceLayerId": "根据插入属性插入的层的标识 .",
+                "insertPosition": "以参考文献LayerId 引用的层周围插入位置。“上”或“下” ."
+            },
+            "error": {
+                "noInsertIds": "在插入的Layerids 属性中至少提供一个标识"
+            },
+            "response": {
+                "success": "层重排 ."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "在工作文件(所有层)中以不同分辨率重印整个图像画布。 又称缩放图像大小.",
+            "property": {
+                "width": "重印图像以像素显示的新宽度 .",
+                "height": "重印图像以像素显示的新高度 。 宽度与高度的比值必须匹配原始图像."
+            },
+            "response": {
+                "success": "复证成就."
+            }
+        },
+        "selectLayers": {
+            "description": "设定当前编辑器中通过提供其ID选择的图层",
+            "property": {
+                "ids": "层 ID 数组( 数值)"
+            },
+            "error": {
+                "noIds": "您必须在 IDs 属性中至少提供一层 ID ."
+            },
+            "response": {
+                "success": "成功选择了图层 ."
+            }
+        },
+        "setLayerTransform": {
+            "description": "设置当前选定的3x3 2D 转换矩阵,以控制其位置、旋转和比例.",
+            "property": {
+                "transform": "代表2D变换矩阵的6个数组。 示例身份转换: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "变形成功更新 ."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "更新当前所选任何矢量层中任意向量形状的 SVG 属性:<rect>,<circle>,<ellipse>,<line>,<polyline>,<polygon>,或<path>.",
+            "property": {
+                "id": "要更新的形状的ID 。 此选项可以从“ 获取形状列表” 工具中检索 .",
+                "cx": "圆或椭圆中心在像素中的x位置.",
+                "cy": "圆或椭圆中心在像素中的y位置.",
+                "rx": "矩形角的x半径或椭圆半径以像素表示.",
+                "ry": "矩形角的y半径或椭圆半径以像素表示.",
+                "points": "定义多边线或多边形外缘的点。 示例:“0,0 20,0 10,5”"
+            }
         }
     }
 }

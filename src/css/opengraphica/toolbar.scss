@@ -219,3 +219,13 @@
     white-space: nowrap;
     margin-bottom: 0.25rem;
 }
+
+.og-toolbar--effect__param-scrollbar {
+    max-height: 11.5rem;
+    margin-right: -1rem;
+    width: calc(100% + 1rem);
+
+    .el-scrollbar__view {
+        padding-right: 1rem;
+    }
+}

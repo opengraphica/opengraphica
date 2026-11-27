@@ -22,26 +22,26 @@ export function notifyPolyfill($notify: Notify): Notify {
         const notifications = document.querySelectorAll('body > .el-notification');
         if (notifications.length > 0) {
             document.getElementById('og-notification-container')?.appendChild(
-                notifications[notifications.length - 1]
+                notifications[notifications.length - 1],
             );
         }
         return notificationHandle;
     };
     notifyFn.closeAll = () => {
         return $notify.closeAll();
-    }
+    };
     notifyFn.success = function() {
         return $notify.success(...arguments);
-    }
+    };
     notifyFn.warning = function() {
         return $notify.warning(...arguments);
-    }
+    };
     notifyFn.error = function() {
         return $notify.error(...arguments);
-    }
+    };
     notifyFn.info = function() {
         return $notify.info(...arguments);
-    }
+    };
     return notifyFn;
 }
 

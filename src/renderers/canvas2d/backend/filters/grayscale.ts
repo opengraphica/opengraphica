@@ -12,9 +12,9 @@ export function fragment(
     const mode = filter.params.mode ?? 0;
     const percentage = filter.params.mix ?? 0;
 
-    let rgba: { r: number, g: number, b: number, alpha: number };
+    let rgba: { r: number; g: number; b: number; alpha: number; };
 
-    var intensity = 0;
+    let intensity = 0;
     if (mode === GrayscaleDesaturationMode.LUMINANCE) {
         rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
         intensity = linearSrgbChannelToSrgbChannel(rgba.r * 0.22 + rgba.g * 0.72 + rgba.b * 0.06);

@@ -76,8 +76,8 @@ export interface FontFamilyFetchDefinition {
 
 export interface TextDocumentSelectionState {
     isActiveSideEnd: boolean;
-    start: { line: number, character: number };
-    end: { line: number, character: number };
+    start: { line: number; character: number; };
+    end: { line: number; character: number; };
 }
 
 export interface TextDocument<T extends ColorModel = ColorModel> {

@@ -11431,6 +11431,14 @@ body.og-full-page .opengraphica {
   white-space: nowrap;
   margin-bottom: 0.25rem;
 }
+.opengraphica .og-toolbar--effect__param-scrollbar {
+  max-height: 11.5rem;
+  margin-right: -1rem;
+  width: calc(100% + 1rem);
+}
+.opengraphica .og-toolbar--effect__param-scrollbar .el-scrollbar__view {
+  padding-right: 1rem;
+}
 .opengraphica .og-brush-selector {
   display: flex;
   flex-direction: row;

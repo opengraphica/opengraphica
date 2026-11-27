@@ -27,7 +27,7 @@ function convertGradientLayerToRgba(data: WorkingFileGradientLayer['data']): Wor
 }
 
 export class GradientLayerMeshController implements Webgl2RendererMeshController {
-    
+
     material: InstanceType<typeof ShaderMaterial> | undefined;
     plane: InstanceType<typeof Mesh> | undefined;
     planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
@@ -109,9 +109,11 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
                         canvasWidth: backend.imageWidth,
                         canvasHeight: backend.imageHeight,
                         transform: this.transform,
-                    })
+                    });
                 }
-                this.plane && (this.plane.material = this.material);
+                if (this.plane) {
+                    this.plane.material = this.material;
+                }
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
                     markRenderDirty();
@@ -166,7 +168,7 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
         this.transform = new Matrix4(
             transform[0], transform[1], transform[2], transform[3],
             transform[4], transform[5], transform[6], transform[7],
-            transform[8], transform[9], transform[10], transform[11], 
+            transform[8], transform[9], transform[10], transform[11],
             transform[12], transform[13], transform[14], transform[15],
         );
         this.scheduleMaterialUpdate('update');
@@ -174,8 +176,10 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
 
     updateVisible(visible: boolean) {
         this.visible = visible;
-        let oldVisibility = this.plane?.visible;
-        this.plane && (this.plane.visible = this.visibleOverride ?? this.visible);
+        const oldVisibility = this.plane?.visible;
+        if (this.plane) {
+            this.plane.visible = this.visibleOverride ?? this.visible;
+        }
         if (this.plane?.visible !== oldVisibility) {
             markRenderDirty();
         }
@@ -206,7 +210,7 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
     setDraftTexture(texture?: Texture<any>) {
         // TODO
     }
-    
+
     swapScene(scene: Scene) {
         if (!this.plane) return;
         this.scene?.remove(this.plane);
@@ -296,7 +300,7 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
         this.visibleOverride = visible;
         this.updateVisible(this.visible);
     }
-    
+
     detach() {
         const backend = getWebgl2RendererBackend();
         backend.removeMeshController(this.id);
@@ -306,7 +310,9 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
         this.planeGeometry?.dispose();
         this.planeGeometry = undefined;
 
-        this.plane && this.scene?.remove(this.plane);
+        if (this.plane) {
+            this.scene?.remove(this.plane);
+        }
         this.plane = undefined;
 
         if (this.material) {

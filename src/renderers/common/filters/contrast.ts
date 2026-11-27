@@ -16,14 +16,14 @@ export default class ContrastCanvasFilter implements CanvasFilter<ContrastCanvas
                 default: 0,
                 preview: 0.3,
                 min: -1,
-                max: 1
+                max: 1,
             },
             middleGray: {
                 type: 'percentage',
                 default: 0.5,
                 min: 0,
-                max: 1
-            }
+                max: 1,
+            },
         } as CanvasFilterEditConfig;
     }
 }

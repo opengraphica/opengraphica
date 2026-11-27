@@ -69,7 +69,7 @@ export async function updateApp() {
                 try {
                     SplashScreen.show();
                     await CapacitorUpdater.set(data);
-                } catch(error) {
+                } catch (error) {
                     appEmitter.emit('app.notify', {
                         type: 'error',
                         title: t('module.appUpdate.notificationErrorTitle'),
@@ -114,16 +114,16 @@ async function verifyChecksumSignature(
     const checksumBytes = hexToUint8Array(checksum);
     const signatureBytes = base64ToUint8Array(signatureBase64);
     return crypto.subtle.verify(
-        { name: "Ed25519" },
+        { name: 'Ed25519' },
         publicKey,
         signatureBytes,
-        checksumBytes
+        checksumBytes,
     );
 }
 
 function hexToUint8Array(hex: string): Uint8Array<ArrayBuffer> {
     if (!/^[0-9a-fA-F]+$/.test(hex) || hex.length % 2 !== 0) {
-        throw new Error("Invalid hexadecimal checksum");
+        throw new Error('Invalid hexadecimal checksum');
     }
     const bytes = new Uint8Array(hex.length / 2);
     for (let i = 0; i < bytes.length; i++) {

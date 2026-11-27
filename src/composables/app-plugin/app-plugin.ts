@@ -14,6 +14,6 @@ export function usePlugin(plugin: Plugin) {
 
 export function getAppConfig(): AppConfig {
     return registeredApp?.config ?? {
-        globalProperties: {}
+        globalProperties: {},
     };
 }

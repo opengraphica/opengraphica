@@ -1,14 +1,14 @@
 
 export interface ThrottleOptions {
-    leading?: boolean,
-    trailing?: boolean
+    leading?: boolean;
+    trailing?: boolean;
 }
 
-const CUBIC_BEIZER_EASE = [.25, .1, .25, 1];
+const CUBIC_BEIZER_EASE = [0.25, 0.1, 0.25, 1];
 const CUBIC_BEIZER_LINEAR = [0, 0, 1, 1];
-const CUBIC_BEIZER_EASE_IN = [.42, 0, 1, 1];
-const CUBIC_BEIZER_EASE_OUT = [0, 0, .58, 1];
-const CUBIC_BEIZER_EASE_IN_OUT = [.42, 0, .58, 1];
+const CUBIC_BEIZER_EASE_IN = [0.42, 0, 1, 1];
+const CUBIC_BEIZER_EASE_OUT = [0, 0, 0.58, 1];
+const CUBIC_BEIZER_EASE_IN_OUT = [0.42, 0, 0.58, 1];
 
 /**
  * Throttles a callback with the specified wait time and callback options
@@ -16,26 +16,26 @@ const CUBIC_BEIZER_EASE_IN_OUT = [.42, 0, .58, 1];
  * @license CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
  */
 export function throttle<T = (...args: any) => void>(func: T, wait: number, options?: ThrottleOptions): T {
-    var context: any, args: any, result: any;
-    var timeout: number | null = null;
-    var previous = 0;
+    let context: any, args: any, result: any;
+    let timeout: number | null = null;
+    let previous = 0;
     if (!options) options = {};
-    var later = function() {
+    const later = function() {
         previous = (options as ThrottleOptions).leading === false ? 0 : Date.now();
         timeout = null;
         result = (func as unknown as Function).apply(context, args);
         if (!timeout) context = args = null;
     };
-    return function() {
-        var now = Date.now();
+    return function(this: any) {
+        const now = Date.now();
         if (!previous && (options as ThrottleOptions).leading === false) previous = now;
-        var remaining = wait - (now - previous);
-        // @ts-ignore
+        const remaining = wait - (now - previous);
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         context = this;
         args = arguments;
         if (remaining <= 0 || remaining > wait) {
             if (timeout) {
-            clearTimeout(timeout);
+                clearTimeout(timeout);
                 timeout = null;
             }
             previous = now;

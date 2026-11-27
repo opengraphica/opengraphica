@@ -75,7 +75,9 @@
         "convertVectorShapesToPaths": "Form nach Pfad umrechnen",
         "flipLayerX": "Ebene horizontal",
         "flipLayerY": "Flip Layer Vertikal",
-        "mergeEffects": "Fusionseffekte"
+        "mergeEffects": "Fusionseffekte",
+        "freeTransform": "Freie Transformation",
+        "mergeLayerDown": "Merge Layer Down"
     },
     "app": {
         "colorPickerGradient": {
@@ -131,7 +133,9 @@
                 "vector": "Vector Layer",
                 "video": "Video-Ebene"
             },
-            "deleteSelection": "Auswahl löschen"
+            "deleteSelection": "Auswahl löschen",
+            "edit": "Edit",
+            "mergeDown": "Merger Down"
         },
         "wait": {
             "applyLayerTransform": "Ebenentransformieren anwenden",
@@ -196,7 +200,9 @@
         "updateApp": "Update App",
         "add": "Hinzufügen",
         "mergeEffects": "Fusionseffekte",
-        "selectFiles": "Wählen Sie Dateien aus..."
+        "selectFiles": "Wählen Sie Dateien aus...",
+        "deletePlugin": "Plugin löschen",
+        "reload": "Beladung"
     },
     "canvas": {
         "toolbar": {
@@ -333,6 +339,10 @@
                     "checkForUpdates": "Überprüfen Sie Updates",
                     "updateAvailableTitle": "Update verfügbar",
                     "updateAvailableMessage": "Ein Update für OpenGraphica ist verfügbar. Möchten Sie es installieren?"
+                },
+                "plugins": {
+                    "selectFile": "Plugin Datei hinzufügen...",
+                    "uninstall": "Deinstallieren"
                 }
             }
         }
@@ -440,8 +450,11 @@
             "param": {
                 "size": "Größe",
                 "xIntensity": "X Intensität",
-                "yIntensity": "Y Intensität"
-            }
+                "yIntensity": "Y Intensität",
+                "xRadius": "X Radius",
+                "yRadius": "Y Radius"
+            },
+            "help": "Verwischt das Bild mit Gauß-Funktionen, die Carl Friedrich Gauss erfunden hat. Diese Unschärfe ähnelt der Betrachtung des Bildes durch einen lichtdurchlässigen Bildschirm, der sich deutlich vom Bokeh-Effekt unterscheidet, der durch ein unscharfes Kameraobjektiv erzeugt wird."
         },
         "grayscale": {
             "name": "Getreide",
@@ -473,7 +486,8 @@
                 "rotate": "Rotieren",
                 "targetColor": "Zielfarbe",
                 "targetRange": "Reichweite"
-            }
+            },
+            "help": "Rotiert den Farbton der Farben im Bild und verändert effektiv die wahrgenommene Farbe.\n\nDer **Farbraum** wird verwendet, um die Helligkeit und Sättigung der neuen Farbe zu bestimmen. **Oklab** ist im Allgemeinen die genaueste Option.\n\nDie **Zielfarbe** kann verwendet werden, um selektiv nur eine bestimmte Farbe im Bild zu ändern. Die **Range** bestimmt, welche Farben ähnlich der **Target Color** betroffen sind."
         },
         "negative": {
             "name": "Negativ",
@@ -679,6 +693,67 @@
                 "centerX": "Zentrum X",
                 "centerY": "Zentrum Y"
             }
+        },
+        "cylinderBend": {
+            "name": "Zylinderbogen",
+            "help": "Wickelt das Bild um einen 3D-Zylinder. Nützlich für Szenarien wie das Anbringen von Papierschildern an Stangen usw.\n\n* **Rotation** - Dreht den Zylinder um die X-Achse. Dies kann mit der z-Achsen-Rotation der Schicht kombiniert werden, um einen beliebigen Anzeigewinkel zu erreichen.\n* **Perspektive** - 0% wird aus unendlicher Entfernung betrachtet und 100% ist sehr nah.\n* **View Position** - Verschiebt den Ansichtspunkt nach oben oder unten, was die Perspektive ändert.",
+            "param": {
+                "rotation": "Rotation",
+                "perspective": "Perspektive",
+                "viewPosition": "Sichtposition"
+            }
+        },
+        "highlightBloom": {
+            "help": "Auch bekannt als Halation; Dies ist ein weiches Leuchten, bei dem Licht von hellen zu dunklen Bereichen des Bildes blutet. In Kameras kann es durch Lichtstreuung in der Linse, Diffusionsfilter oder Lichtreflexionen an der Emulsion eines Films verursacht werden.\n* **Schwelle** - Ein Bereich, wie hell eine Farbe sein muss, um Licht zu bluten.\n* **Radius** - Wie weit das Licht blutet.\n* **Stärke ** - Wie hell das Licht blutet.",
+            "param": {
+                "threshold": "Schwellenwert",
+                "radius": "Radius",
+                "strength": "Stärke"
+            }
+        },
+        "mechanicalVignette": {
+            "name": "Mechanische Vignette",
+            "help": "Simuliert die Abschattung am Rand eines Bildes, die durch einen zentrierten kreisförmigen Lauf verursacht wird, der das Eindringen von Licht in den Kamerasensor blockiert.\n\n* **Schülerabstand** - Der Abstand der äußeren kreisförmigen Öffnung der Linse vom Sensor.\n* ** Schülerradius** - Der Radius der kreisförmigen Öffnung der Pupille.\n* **Barrel Distance** - Der Abstand einer inneren kreisförmigen Öffnung in der Linse neben dem Sensor.\n* **Barrel Radius** - Der Radius der kreisförmigen Öffnung des Laufs.",
+            "param": {
+                "mode": "Modus",
+                "modeOption": {
+                    "simulate": "Simulator",
+                    "remove": "Entfernen"
+                },
+                "sensorWidth": "Sensorbreite",
+                "sensorHeight": "Sensorhöhe",
+                "exitPupilDistance": "Abstand des Schülers",
+                "exitPupilRadius": "Schülerradius",
+                "barrelOpeningDistance": "Barrelabstand",
+                "barrelOpeningRadius": "Barrelradius"
+            }
+        },
+        "naturalVignette": {
+            "name": "Natürliche Vignette",
+            "help": "Auch als natürlicher Beleuchtungsfall bezeichnet, simuliert dies eine Abschattung am Rand eines Kamerasensors durch Lichtstrahlen aus außeraxialen Teilen der Szene, die den Sensor in einem Winkel erreichen.\n\nDieser Effekt ist bei Weitwinkelkameraobjektiven ausgeprägter, die nicht so gestaltet sind, dass Licht senkrecht auf den Sensor trifft.",
+            "param": {
+                "mode": "Modus",
+                "modeOption": {
+                    "simulate": "Simulator",
+                    "remove": "Entfernen"
+                },
+                "sensorWidth": "Sensorbreite",
+                "sensorHeight": "Sensorhöhe",
+                "focalLength": "Fokallänge"
+            }
+        },
+        "radialSpeedLines": {
+            "name": "Radialgeschwindigkeitslinien",
+            "help": "Zeichnet Bewegungslinien in einem radialen Muster; Häufig in Manga verwendet. Die meisten Werte sind ein Zufallsbereich.\n* **Radius** - Wie weit die Linien in Richtung Zentrum gezogen werden.\n* ** Abstand ** - Der Raum zwischen den Klumpen von Linien.\n* **Klumpen** - Wie viele Linien werden in jedem Klumpen nebeneinander gezeichnet.\n* ** Dicke** - Maximale Liniendicke.\n* **Seed** - Randomisieren Sie die Linien.",
+            "param": {
+                "centerRadius": "Radius",
+                "lineSpacing": "Abstand",
+                "lineClumping": "Klumpen",
+                "lineThickness": "Dicke",
+                "horizontalOffset": "Horizontal",
+                "verticalOffset": "Vertikal",
+                "seed": "Samen"
+            }
         }
     },
     "layerFilterGroup": {
@@ -702,6 +777,12 @@
         },
         "noise": {
             "name": "Lärm"
+        },
+        "artistic": {
+            "name": "Künstlerisch"
+        },
+        "lightShadow": {
+            "name": "Licht und Schatten"
         }
     },
     "layoutShortcutGroup": {
@@ -1214,6 +1295,21 @@
                 "title": "Keine Ebenen ausgewählt",
                 "message": "Wählen Sie mindestens eine Schicht im Layer-Dock zur Transformation aus. Einige Schichttypen können nicht transformiert werden."
             }
+        },
+        "pluginInstallError": {
+            "title": "Fehler beim Installieren von Plugin",
+            "message": "Bei der Installation des Plugins \"{pluginName}\" ist ein Fehler aufgetreten. Dies kann behoben werden, wenn Sie den Editor neu starten."
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "Plugin installiert",
+            "message": "Der Editor muss neu geladen werden, bevor das Plugin in Kraft tritt. Wenn Sie noch arbeiten, speichern Sie zuerst Ihre Änderungen."
+        },
+        "pluginInstallZip": {
+            "title": "Installieren Sie Plugin ZIP",
+            "installError": {
+                "title": "Fehler beim Installieren von Plugin",
+                "message": "Entweder ist die ausgewählte Datei kein OpenGraphica-Editor-Plugin oder sie ist mit der aktuellen Version des Editors inkompatibel."
+            }
         }
     },
     "moduleGroup": {
@@ -1401,6 +1497,16 @@
                 "update": {
                     "name": "Update App",
                     "description": "Aktualisieren Sie die App, um neue Funktionalität zu erhalten."
+                }
+            }
+        },
+        "plugin": {
+            "name": "Plugin",
+            "description": "Plugin-Verwaltung.",
+            "modules": {
+                "installZip": {
+                    "name": "Installieren Sie Plugin ZIP",
+                    "description": "Installieren Sie ein Editor-Plugin aus einer ZIP-Datei."
                 }
             }
         }
@@ -1777,6 +1883,17 @@
         "layerOpacity": {
             "title": "Opazität",
             "opacity": "Opazität"
+        },
+        "cloneBrush": {
+            "brushOpacity": "Trübung",
+            "brushSize": "Größe",
+            "brushHardness": "Härte",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Keine Schichten ausgewählt",
+                    "message": "Bitte wählen Sie mindestens eine Bildschicht im Layer-Dock aus. Bestimmte Schichttypen können nicht mit der Klonbürste verwendet werden."
+                }
+            }
         }
     },
     "toolGroup": {
@@ -2066,6 +2183,20 @@
                     "Tippen Sie auf einen Bereich, um zu löschen. Während des Niederhaltens können Sie nach links oder rechts ziehen, um zu justieren, wie viel der Bereich gelöscht wird."
                 ]
             }
+        },
+        "cloneBrushToolIntroduction": {
+            "title": "Klonbürstenwerkzeug",
+            "introduction": [
+                "Der Klonpinsel kopiert einen Teil eines Bildes, so dass Sie denselben Bereich woanders malen können. Es wird typischerweise verwendet, um Flecken, unerwünschte Objekte zu entfernen oder eine beschädigte Stelle zu füllen."
+            ],
+            "body": {
+                "mouse": [
+                    "Der Klonbereich wird als Kreis mit dem Klonstempelsymbol angezeigt. Sie können es herumziehen oder ctrl + klicken, um es auf die aktuelle Mausposition zu setzen."
+                ],
+                "touch": [
+                    "Der Klonbereich wird als Kreis mit dem Klonstempelsymbol angezeigt. Sie können es herumschleppen."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -2106,7 +2237,8 @@
         "chroma": "Chrom",
         "color": "Farbe",
         "lightness": "Licht",
-        "luminance": "Leuchte"
+        "luminance": "Leuchte",
+        "merge": "Fusion"
     },
     "defaultBrush": {
         "default": "Fehler",
@@ -2130,6 +2262,10 @@
                 "sharpen": {
                     "title": "Garnelen",
                     "description": "Schärfenbereiche des Bildes"
+                },
+                "cloneBrush": {
+                    "title": "Klonbürste",
+                    "description": "Klonbereiche des Bildes"
                 }
             },
             "name": "Deformieren"
@@ -2222,6 +2358,233 @@
                 }
             },
             "name": "Leinwand und wand"
+        }
+    },
+    "mcp": {
+        "common": {
+            "response": {
+                "deleteSuccess": "Erfolg löschen.",
+                "updateSuccess": "Erfolg der Aktualisierung."
+            },
+            "error": {
+                "required": "Die Eigenschaft {propertyName} ist erforderlich.",
+                "notArray": "Die Eigenschaft {propertyName} muss ein Array sein.",
+                "notArrayNumber": "Die Eigenschaft {propertyName} muss Werte haben, die Zahlen sind.",
+                "notArrayString": "Die Eigenschaft {propertyName} muss Werte haben, die Strings sind.",
+                "notNumber": "Die Eigenschaft {propertyName} muss eine Nummer sein.",
+                "notString": "Die Eigenschaft {propertyName} muss ein String sein.",
+                "notInEnumList": "Die Eigenschaft {propertyName} gehört nicht zu den akzeptierten Enum-Werten.",
+                "layerNotFound": "Die angegebene Schicht wurde nicht gefunden.",
+                "2dTransformLength": "Das Transformations-Array muss genau 6 Zahlen haben."
+            }
+        },
+        "createCircleShape": {
+            "description": "Fügt eine SVG <circle>-Form zur aktuell ausgewählten Schicht oder zu einer neuen Schicht hinzu, wenn die aktuell ausgewählte Schicht keine Vektorschicht ist. Die neue Form wird über alle anderen Formen in der Schicht gezeichnet.",
+            "property": {
+                "cx": "Die x-Position des Kreiszentrums in Pixeln.",
+                "cy": "Die y-Position des Kreiszentrums in Pixeln.",
+                "r": "Der Radius der Kreispixel."
+            }
+        },
+        "createEllipseShape": {
+            "description": "Fügt eine SVG <ellipse>-Form zur aktuell ausgewählten Schicht oder zu einer neuen Schicht hinzu, wenn die aktuell ausgewählte Schicht keine Vektorschicht ist. Die neue Form wird über alle anderen Formen in der Schicht gezeichnet.",
+            "property": {
+                "cx": "Die x-Position des Zentrums der Ellipse in Pixeln.",
+                "cy": "Die y-Position des Zentrums der Ellipse in Pixeln.",
+                "rx": "Der Radius der Ellipse entlang der x-Achse in Pixeln.",
+                "ry": "Der Radius der Ellipse entlang der y-Achse in Pixeln."
+            }
+        },
+        "createLineShape": {
+            "description": "Fügt eine SVG <line>-Form zur aktuell ausgewählten Schicht oder zu einer neuen Schicht hinzu, wenn die aktuell ausgewählte Schicht keine Vektorschicht ist. Die neue Form wird über alle anderen Formen in der Schicht gezeichnet.",
+            "property": {
+                "x1": "Die x-Position des Anfangs der Zeile in Pixeln.",
+                "y1": "Die y-Position des Anfangs der Zeile in Pixeln.",
+                "x2": "Die x-Position des Endes der Zeile in Pixeln.",
+                "y2": "Die y-Position des Endes der Zeile in Pixeln."
+            }
+        },
+        "createPathShape": {
+            "description": "Fügt eine SVG <Pfad>-Form zur aktuell ausgewählten Schicht oder zu einer neuen Schicht hinzu, wenn die aktuell ausgewählte Schicht keine Vektorschicht ist. Die neue Form wird über alle anderen Formen in der Schicht gezeichnet.",
+            "property": {
+                "d": "Die Liste der SVG-Pfadbefehle. Folgen Sie der SVG-Spezifikation. Beispiel: \"M 10 80 Q 52,5 10, 95 80 T 180 80\""
+            }
+        },
+        "createPolygonShape": {
+            "description": "Fügt eine SVG <polygon>-Form zur aktuell ausgewählten Schicht oder zu einer neuen Schicht hinzu, wenn die aktuell ausgewählte Schicht keine Vektorschicht ist. Die neue Form wird über alle anderen Formen in der Schicht gezeichnet.",
+            "property": {
+                "points": "Die Punkte, die den äußeren Rand der Form definieren. Beispiel: \"0,0 20,0 10,5\""
+            }
+        },
+        "createPolylineShape": {
+            "description": "Fügt eine SVG <polyline>-Form zur aktuell ausgewählten Schicht oder zu einer neuen Schicht hinzu, wenn die aktuell ausgewählte Schicht keine Vektorschicht ist. Die neue Form wird über alle anderen Formen in der Schicht gezeichnet.",
+            "property": {
+                "points": "Die Punkte, die die verbundenen Linien definieren. Beispiel: \"0,0 20,0 10,5\""
+            }
+        },
+        "createRectangleShape": {
+            "description": "Fügt eine SVG <rect>-Form zur aktuell ausgewählten Schicht oder zu einer neuen Schicht hinzu, wenn die aktuell ausgewählte Schicht keine Vektorschicht ist. Die neue Form wird über alle anderen Formen in der Schicht gezeichnet.",
+            "property": {
+                "x": "Die x-Position der linken Kante des Rechtecks in Pixeln.",
+                "y": "Die y-Position der linken Kante des Rechtecks in Pixeln.",
+                "rx": "Der x-Radius der Rechteckecken in Pixeln.",
+                "ry": "Der y-Radius der Rechteckecken in Pixeln.",
+                "width": "Die Breite des Rechtecks in Pixeln.",
+                "height": "Die Höhe des Rechtecks in Pixeln."
+            }
+        },
+        "createShapeCommon": {
+            "property": {
+                "fill": "Die Füllfarbe als RGB 8-Bit pro Kanal Hex. Auslassen für keine Füllung. Beispiel: \"#000000\"",
+                "fillOpacity": "Die Trübung der Füllfarbe als Dezimalzahl von 0 bis 1.",
+                "stroke": "Die Strichfarbe als RGB 8-Bit pro Kanal hex. Ohne Strich auslassen. Beispiel: \"#000000\"",
+                "strokeLinecap": "Wie die Enden der Zeilen dargestellt werden, wie in der SVG-Spezifikation definiert.",
+                "strokeLinejoin": "Wie die Ecken der verbundenen Linien dargestellt werden, wie in der SVG-Spezifikation definiert.",
+                "strokeOpacity": "Die Deckkraft der Strichfarbe als Dezimalzahl von 0 bis 1.",
+                "strokeWidth": "Die Breite des Strichs in Pixeln.",
+                "transform": "Die Transformation wird der Form zugeschrieben. Muss eine SVG 2D-Matrixtransformationsfunktion sein. Beispiel: \"Matrix (1,0,0,1,0,0)\""
+            },
+            "error": {
+                "fill": "Ungültige Füllsyntax. Stellen Sie einen RGBA 8-Bit pro Kanal Hex. Beispiel: \"#000000\"",
+                "stroke": "Syntax des ungültigen Schlaganfalls. Stellen Sie einen RGBA 8-Bit pro Kanal Hex. Beispiel: \"#000000\"",
+                "transform": "Ungültige Transformationssyntax. Stellen Sie eine SVG 2D-Matrixtransformationsfunktion bereit. Beispiel: \"Matrix (1,0,0,1,0,0)\""
+            }
+        },
+        "cropWorkingFile": {
+            "description": "Crops die gesamte Bildfläche in der Arbeitsdatei (alle Schichten). Eine negative Ernte kann verwendet werden, um die Leinwandgröße zu erhöhen.",
+            "property": {
+                "left": "Die linke Grenze des beschnittenen Bildes in Pixeln. Das kann negativ sein.",
+                "top": "Die oberste Grenze des beschnittenen Bildes in Pixeln. Das kann negativ sein.",
+                "width": "Die neue Breite des beschnittenen Bildes in Pixeln. Dies kann größer sein als die ursprüngliche Breite.",
+                "height": "Die neue Höhe des beschnittenen Bildes in Pixeln. Dies kann größer sein als die ursprüngliche Höhe."
+            },
+            "response": {
+                "success": "Ernteerfolg."
+            }
+        },
+        "deleteLayers": {
+            "description": "Löscht Layer mit den angegebenen IDs.",
+            "property": {
+                "layerIds": "Die IDs der zu löschenden Schichten. Die Layer-IDs können aus dem Get-Layer-List-Tool abgerufen werden."
+            },
+            "error": {
+                "noIds": "Geben Sie mindestens eine Schicht ID an."
+            },
+            "response": {
+                "success": "Kartenebenen gestrichen."
+            }
+        },
+        "deleteShape": {
+            "description": "Löscht eine SVG-Form aus ausgewählten Vektorschichten.",
+            "property": {
+                "id": "Die ID des zu löschenden Formulars. Dies kann aus dem get-shape-list-tool abgerufen werden."
+            }
+        },
+        "getAvailableFontList": {
+            "description": "Listen Sie alle Schriftfamilien auf, die mit Textebenen verwendet werden können."
+        },
+        "getEditorGuide": {
+            "description": "Bietet eine Zusammenfassung in natürlicher Sprache, wie der OpenGraphica-Bildeditor funktioniert.",
+            "summary": "OpenGraphica ist ein 2D Mixed-Media-Bildeditor. Im Kern kann es sowohl Rasterbilder als auch Vektorformen bearbeiten und in Raster- und Vektorbildformate exportieren.\n\nDie Arbeitsdatei in OpenGraphica ist ein Bilddokument mit einer oder mehreren Schichten. Es hat eine feste rechteckige Auflösung, definiert in Pixeln. Andere Messeinheiten wie mm werden in der Benutzeroberfläche für Anzeigezwecke unterstützt, aber sie werden mit den Einstellungen resolutionX und resolutionY in Pixel für die Bearbeitung konvertiert. Das Arbeitsdatei-Bilddokument hat ein Koordinatensystem, in dem +x rechts, +y unten und -z in den Bildschirm geht, weg vom Betrachter.\n\nDie Arbeitsdatei besteht aus einem Stapel von einzelnen Schichten. Alle Schichten haben eine in Pixeln definierte Breite / Höhe und eine 3x3 2D-Transformationsmatrix, die ihre Position / Rotation / Skala bestimmt. Bei einer Identitätstransformationsmatrix wird eine Schicht gezeichnet, deren obere linke Ecke mit der oberen linken Ecke der Arbeitsdatei ausgerichtet ist.\n\nSchichten haben verschiedene Typen, die auf die Art des Bildes schließen, das sie enthalten:\n* **Gradient** - Ein linearer oder radialer Gradient, der die gesamte Arbeitsdatei abdeckt.\n**raster** - Ein 8-Bit pro Kanal RGBA Pixel-basiertes Bild.\n* **rasterSequence** - Eine Animationssequenz mit 8-Bit pro Kanal RGBA-pixelbasierten Bildern für jeden Frame.\n* **text** - Ein oder mehrere Absätze von Rich Text horizontal oder vertikal gezeichnet.\n* **Vektor** - Ein SVG 1.x Dokument.\n* **video** - Ein Video mit einem webgestützten Codec.\n\nSchichten werden von unten nach oben gestapelt, wobei zuerst die untere Schicht und vor allen anderen Schichten die obere Schicht gezogen wird. Schichten werden so gespeichert, dass die erste Schicht im Array die unterste Schicht ist, aber sie werden dem Endbenutzer angezeigt, in dem die Liste der obersten Schichten aufgeführt ist. Schichten werden standardmäßig mit Source over Blending in linearem RGB zusammengesetzt und nach Abschluss aller Compositing-Operationen in sRGB konvertiert."
+        },
+        "getLayerList": {
+            "description": "Gibt eine JSON-Zusammenfassung aller Layer in der Arbeitsdatei zurück, wobei Layer in der Array-Reihenfolge (zuletzt oben) gezeichnet werden."
+        },
+        "getRasterLayerImage": {
+            "description": "Gibt die Bilddaten für die angegebene Rasterschicht zurück.",
+            "property": {
+                "id": "Die ID der Rasterschicht. Dies kann aus dem get-layer-list-tool abgerufen werden."
+            }
+        },
+        "getShapeList": {
+            "description": "Gibt eine JSON-Definition zurück, die alle Formen in den aktuell ausgewählten Vektorschichten in der Reihenfolge von unten nach oben auflistet. Die Shape-IDs können sich ändern, wenn ein neues Shape hinzugefügt, gelöscht oder neu geordnet wird."
+        },
+        "getVectorLayerSvg": {
+            "description": "Gibt das serialisierte SVG-Dokument zurück, das der angegebenen Vektorschicht zugeordnet ist.",
+            "property": {
+                "id": "Die ID der Vektorschicht. Dies kann aus dem get-layer-list-tool abgerufen werden."
+            }
+        },
+        "getWorkingFileDimensions": {
+            "description": "Gibt die Breite und Höhe der aktuellen Arbeitsdatei in Pixeln zurück. Dies ist die Größe der gesamten Bildfläche, auf der alle Schichten sitzen."
+        },
+        "insertRasterLayer": {
+            "description": "Legt ein 8-Bit-RGBA-Bild als neue Rasterschicht auf der Oberseite des Schichtstapels ein.",
+            "property": {
+                "imageDataUri": "Eine Base64 codierte Bilddaten-URI. Medientypen image/png oder image/jpeg sind akzeptabel.",
+                "name": "Der Name der neuen Ebene; in der Regel der Dateiname des Bildes.",
+                "transform": "Ein Array von 6 Zahlen, das die 2D-Transformationsmatrix darstellt. Beispiel Identitätstransformation: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Eingelegte Rasterschicht."
+            }
+        },
+        "insertTextLayer": {
+            "description": "Einfügen einer Textschicht. Oben/links ist der Draw-Ursprung, wobei die Oberseite die Aufstiegslinie der Schriftart ist.",
+            "property": {
+                "text": "Der einzufügende Text",
+                "name": "Der Name der neuen Textschicht.",
+                "transform": "Ein Array von 6 Zahlen, das die 2D-Transformationsmatrix darstellt. Bei einer Identitätstransformation wird die Schicht mit ihrer oberen linken Ecke gezeichnet, die mit der oberen linken Ecke der Arbeitsdatei-Canvas ausgerichtet ist. Beispiel Identitätstransformation: [1, 0, 0, 1, 0, 1]",
+                "fontFamily": "Der Name der zu verwendenden Schriftfamilie. Rufen Sie das get-available-font-list-Tool auf, um eine Liste von Namen zu erhalten.",
+                "fontSize": "Schriftgröße.",
+                "fill": "Die Füllfarbe als RGB oder RGBA 8-Bit pro Kanal hex. Beispiel: \"#000000\" oder \"#000000FF\""
+            }
+        },
+        "reorderLayers": {
+            "description": "Ändert die Reihenfolge der Schichten",
+            "property": {
+                "insertLayerIds": "Die IDs von Schichten, die an der angegebenen insertPosition im Schichtstapel eingefügt werden sollen. Die Layer-IDs können aus dem Get-Layer-List-Tool abgerufen werden.",
+                "referenceLayerId": "Die ID der einzufügenden Schicht, basierend auf der insertPosition-Eigenschaft.",
+                "insertPosition": "Die Position zum Einfügen um die mit referenceLayerId. \"oben\" oder \"unten\" bezeichnete Schicht."
+            },
+            "error": {
+                "noInsertIds": "Geben Sie mindestens eine ID in der insertLayerIds-Eigenschaft an"
+            },
+            "response": {
+                "success": "Layers neu geordnet."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "Abtastt die gesamte Bildfläche in der Arbeitsdatei (alle Schichten) mit einer anderen Auflösung neu. Auch bekannt als Skalierung der Bildgröße.",
+            "property": {
+                "width": "Die neue Breite des resampled Bildes in Pixeln.",
+                "height": "Die neue Höhe des neu abgetasteten Bildes in Pixeln. Das Seitenverhältnis von Breite zu Höhe muss mit dem Originalbild übereinstimmen."
+            },
+            "response": {
+                "success": "Resample Erfolg."
+            }
+        },
+        "selectLayers": {
+            "description": "Legt fest, welche Layer derzeit im Editor ausgewählt werden, indem sie ihre IDs angeben",
+            "property": {
+                "ids": "Ein Array von Schicht-IDs (Zahlenwerte)"
+            },
+            "error": {
+                "noIds": "Sie müssen mindestens eine Layer-ID in der IDs-Eigenschaft angeben."
+            },
+            "response": {
+                "success": "Schichten erfolgreich ausgewählt."
+            }
+        },
+        "setLayerTransform": {
+            "description": "Legt die 3x3 2D-Transformationsmatrix der derzeit ausgewählten Schichten fest, die ihre Position, Rotation und Skalierung steuert.",
+            "property": {
+                "transform": "Ein Array von 6 Zahlen, das die 2D-Transformationsmatrix darstellt. Beispiel Identitätstransformation: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Transform erfolgreich aktualisiert."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "Aktualisiert die SVG-Attribute einer beliebigen Vektorform in einer der aktuell ausgewählten Vektorschichten: <rect>, <circle>, <ellipse>, <line>, <polyline>, <polygon> oder <path>.",
+            "property": {
+                "id": "Die ID des zu aktualisierenden Formulars. Dies kann aus dem get-shape-list-tool abgerufen werden.",
+                "cx": "Die x-Position des Zentrums eines Kreises oder einer Ellipse in Pixeln.",
+                "cy": "Die y-Position des Zentrums eines Kreises oder einer Ellipse in Pixeln.",
+                "rx": "Der x-Radius der Ecken eines Rechtecks oder der Radius einer Ellipse in Pixeln.",
+                "ry": "Der y-Radius der Ecken eines Rechtecks oder der Radius einer Ellipse in Pixeln.",
+                "points": "Die Punkte, die den äußeren Rand einer Polylinie oder Polygonform definieren. Beispiel: \"0,0 20,0 10,5\""
+            }
         }
     }
 }

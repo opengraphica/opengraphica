@@ -25,7 +25,7 @@ import type {
 } from '@/types';
 
 export class RasterSequenceLayerMeshController implements Webgl2RendererMeshController {
-    
+
     /** @deprecated use materials */
     material: InstanceType<typeof ShaderMaterial> | undefined;
     materials: InstanceType<typeof ShaderMaterial>[] = [];
@@ -141,7 +141,9 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
                         isHalfFloat: this.isHalfFloat,
                     });
                 }
-                this.plane && (this.plane.material = this.materials[this.materials.length - 1]);
+                if (this.plane) {
+                    this.plane.material = this.materials[this.materials.length - 1];
+                }
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
                     markRenderDirty();
@@ -217,7 +219,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         this.plane?.matrix.set(
             transform[0], transform[1], transform[2], transform[3],
             transform[4], transform[5], transform[6], transform[7],
-            transform[8], transform[9], transform[10], transform[11], 
+            transform[8], transform[9], transform[10], transform[11],
             transform[12], transform[13], transform[14], transform[15],
         );
         markRenderDirty();
@@ -225,8 +227,10 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
 
     updateVisible(visible: boolean) {
         this.visible = visible;
-        let oldVisibility = this.plane?.visible;
-        this.plane && (this.plane.visible = this.visibleOverride ?? this.visible);
+        const oldVisibility = this.plane?.visible;
+        if (this.plane) {
+            this.plane.visible = this.visibleOverride ?? this.visible;
+        }
         if (this.plane?.visible !== oldVisibility) {
             markRenderDirty();
         }
@@ -237,7 +241,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
 
         // TODO - find the current frame in a way that doesn't potentially loop through all frames.
         let currentFrame: WorkingFileRasterSequenceLayerFrame | undefined;
-        for (let frame of this.data.sequence) {
+        for (const frame of this.data.sequence) {
             if (timelineCursor >= frame.start && timelineCursor < frame.end) {
                 currentFrame = frame;
                 break;
@@ -293,7 +297,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         backend.renderer.autoClear = true;
         backend.renderer.getViewport(originalViewport);
         backend.renderer.setViewport(0, 0, this.sourceTexture.width, this.sourceTexture.height);
-        for (let [materialIndex, currentMaterial] of this.materials.entries()) {
+        for (const [materialIndex, currentMaterial] of this.materials.entries()) {
             if (materialIndex < this.materials.length - 1) {
                 const nextMaterial = this.materials[materialIndex + 1];
                 backend.renderer.setRenderTarget(nextMaterial.userData.srcRenderTarget);
@@ -327,7 +331,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
     getTransform() {
         return this.plane?.matrix ?? new Matrix4();
     }
-    
+
     setDraftTexture(texture?: Texture<any>) {
         // TODO
     }
@@ -430,7 +434,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         this.materials[this.materials.length - 1].uniforms.dstTexture.value = texture;
         this.materials[this.materials.length - 1].uniformsNeedUpdate = true;
     }
-    
+
     detach() {
         const backend = getWebgl2RendererBackend();
         backend.removeMeshController(this.id);
@@ -448,7 +452,9 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         this.planeGeometry?.dispose();
         this.planeGeometry = undefined;
 
-        this.plane && this.scene?.remove(this.plane);
+        if (this.plane) {
+            this.scene?.remove(this.plane);
+        }
         this.plane = undefined;
 
         if (this.materials.length > 0) {

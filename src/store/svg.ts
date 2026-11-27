@@ -97,7 +97,7 @@ export async function deleteStoredSvg(uuid: string | undefined) {
  * @param uuid - ID of the database entry for the svg
  */
 export function reserveStoredSvg(uuid: string, userId: string) {
-    let users = svgUserUuidMap.get(uuid) ?? new Set<string>();
+    const users = svgUserUuidMap.get(uuid) ?? new Set<string>();
     users.add(userId);
     svgUserUuidMap.set(uuid, users);
 }
@@ -107,7 +107,7 @@ export function reserveStoredSvg(uuid: string, userId: string) {
  * @param uuid - ID of the database entry for the svg
  */
 export function unreserveStoredSvg(uuid: string, userId: string) {
-    let users = svgUserUuidMap.get(uuid) ?? new Set<string>();
+    const users = svgUserUuidMap.get(uuid) ?? new Set<string>();
     users.delete(userId);
     svgUserUuidMap.set(uuid, users);
     if (users.size === 0) {

@@ -1,7 +1,7 @@
 
 export async function createVideoFromBlob(blob: Blob) {
-    let videoObjectUrl = URL.createObjectURL(blob);
-    let video = document.createElement('video');
+    const videoObjectUrl = URL.createObjectURL(blob);
+    const video = document.createElement('video');
     await new Promise<void>((resolve, reject) => {
         video.addEventListener('loadedmetadata', function() {
             resolve();

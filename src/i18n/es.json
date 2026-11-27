@@ -75,7 +75,9 @@
         "convertVectorShapesToPaths": "Convertir Forma en Camino",
         "flipLayerX": "Flip Layer Horizontal",
         "flipLayerY": "Flip Layer Vertical",
-        "mergeEffects": "Efectos de fusión"
+        "mergeEffects": "Efectos de fusión",
+        "freeTransform": "Transformación gratuita",
+        "mergeLayerDown": "Merge Layer Down"
     },
     "app": {
         "colorPickerGradient": {
@@ -131,7 +133,9 @@
                 "vector": "Vector Layer",
                 "video": "Video capa"
             },
-            "deleteSelection": "Eliminar la selección"
+            "deleteSelection": "Eliminar la selección",
+            "edit": "Editar",
+            "mergeDown": "Merge Down"
         },
         "wait": {
             "applyLayerTransform": "Transformación de capas",
@@ -196,7 +200,9 @@
         "updateApp": "Actualizar la aplicación",
         "add": "Añadir",
         "mergeEffects": "Efectos de fusión",
-        "selectFiles": "Seleccione archivos..."
+        "selectFiles": "Seleccione archivos...",
+        "deletePlugin": "Eliminar Plugin",
+        "reload": "Recarga"
     },
     "canvas": {
         "toolbar": {
@@ -333,6 +339,10 @@
                     "checkForUpdates": "Check For Updates",
                     "updateAvailableTitle": "Actualización disponible",
                     "updateAvailableMessage": "Está disponible una actualización para OpenGraphica. ¿Te gustaría instalarlo?"
+                },
+                "plugins": {
+                    "selectFile": "Añadir Plugin File...",
+                    "uninstall": "Desinstalación"
                 }
             }
         }
@@ -440,8 +450,11 @@
             "param": {
                 "size": "Tamaño",
                 "xIntensity": "X Intensidad",
-                "yIntensity": "Y intensidad"
-            }
+                "yIntensity": "Y intensidad",
+                "xRadius": "X Radius",
+                "yRadius": "Y Radius"
+            },
+            "help": "Desenfoque la imagen usando funciones gausianas inventadas por Carl Friedrich Gauss. Este borrón se asemeja a ver la imagen a través de una pantalla translúcida, que es diferente del efecto bokeh creado por una lente de cámara fuera de foco."
         },
         "grayscale": {
             "name": "Grayscale",
@@ -473,7 +486,8 @@
                 "rotate": "Rotación",
                 "targetColor": "Color de destino",
                 "targetRange": "Rango"
-            }
+            },
+            "help": "Rota el tono de los colores en la imagen, cambiando efectivamente el color percibido.\n\nEl ** Espacio Color** se utiliza para determinar el brillo y la saturación del nuevo color. **Oklab** es generalmente la opción más precisa.\n\nEl **Target Color** se puede utilizar para modificar selectivamente sólo un color específico en la imagen. El **Range** determina cuáles son los colores similares al **Target Color** afectados."
         },
         "negative": {
             "name": "Negativo",
@@ -679,6 +693,67 @@
                 "centerX": "Centro X",
                 "centerY": "Center Y"
             }
+        },
+        "cylinderBend": {
+            "name": "Cylinder Bend",
+            "help": "Envuelve la imagen alrededor de un cilindro 3D. Útil para escenarios como adjuntar señales de papel a polos, etc.\n\n* **Rotación** - Rota el cilindro alrededor del eje x. Esto se puede combinar con la rotación del eje z de la capa para lograr cualquier ángulo de visualización.\n* **Perspectiva** - el 0% se ve desde una distancia infinita y el 100% está muy cerca.\n* **Ver Posición** - Se cambia el punto de vista hacia arriba o hacia abajo, que cambia la perspectiva.",
+            "param": {
+                "rotation": "Rotación",
+                "perspective": "Perspectiva",
+                "viewPosition": "Vista Posición"
+            }
+        },
+        "highlightBloom": {
+            "help": "También conocido como halatación; este es un resplandor suave donde la luz sangra de zonas brillantes a oscuras de la imagen. En las cámaras, puede ser causada por la dispersión de luz en la lente, filtros de difusión o reflejos ligeros en la emulsión de una película.\n* **Threshold** - Una gama de lo brillante que tiene que ser un color para sangrar la luz.\n*Radius** - ¿Cuánta luz sangrará?\nQué brillante es la sangre de la luz.",
+            "param": {
+                "threshold": "Umbral",
+                "radius": "Radius",
+                "strength": "Fuerza"
+            }
+        },
+        "mechanicalVignette": {
+            "name": "Vignette mecánico",
+            "help": "Simula la sombra en el borde de una imagen causada por un cañón circular centrado que impide que la luz entre en el sensor de la cámara.\n\n* ** Distancia de la pila** - La distancia de la abertura circular exterior de la lente del sensor.\n*Pupil Radius** - El radio de la apertura circular del alumno.\n* ** Distancia de barrera** - La distancia de una abertura circular interior dentro de la lente junto al sensor.\nEl radio de la abertura circular del cañón.",
+            "param": {
+                "mode": "Modo",
+                "modeOption": {
+                    "simulate": "Simular",
+                    "remove": "Retirar"
+                },
+                "sensorWidth": "Sensor de ancho",
+                "sensorHeight": "Altura del sensor",
+                "exitPupilDistance": "Distancia del alumno",
+                "exitPupilRadius": "Pupil Radius",
+                "barrelOpeningDistance": "Distancia de barrera",
+                "barrelOpeningRadius": "Barrel Radius"
+            }
+        },
+        "naturalVignette": {
+            "name": "Vignette natural",
+            "help": "También conocido como caída de iluminación natural, esto simula sombras en el borde de un sensor de cámara debido a rayos de luz de partes fuera del eje de la escena alcanzando el sensor en un ángulo.\n\nEste efecto es más pronunciado en lentes de cámara de gran angular que no están diseñados para que la luz golpee el sensor perpendicularmente.",
+            "param": {
+                "mode": "Modo",
+                "modeOption": {
+                    "simulate": "Simular",
+                    "remove": "Retirar"
+                },
+                "sensorWidth": "Sensor de ancho",
+                "sensorHeight": "Altura del sensor",
+                "focalLength": "Longitud del focal"
+            }
+        },
+        "radialSpeedLines": {
+            "name": "Líneas de velocidad radial",
+            "help": "Dibuja líneas de movimiento en un patrón radial; comúnmente utilizado en el manga. La mayoría de los valores son un rango aleatorio.\n* **Radius** - Cuán lejos se dibujarán las líneas hacia el centro.\nEl espacio entre las ramas de las líneas.\n* **Clumping** - ¿Cuántas líneas se dibujarán al lado del otro en cada grupo.\n* Espesor máximo de la línea.\n* **Seed** - Randomizar las líneas.",
+            "param": {
+                "centerRadius": "Radius",
+                "lineSpacing": "Spacing",
+                "lineClumping": "Clumping",
+                "lineThickness": "Espesor",
+                "horizontalOffset": "Horizontal",
+                "verticalOffset": "Vertical",
+                "seed": "Semillas"
+            }
         }
     },
     "layerFilterGroup": {
@@ -702,6 +777,12 @@
         },
         "noise": {
             "name": "Noise"
+        },
+        "artistic": {
+            "name": "Artístico"
+        },
+        "lightShadow": {
+            "name": "Luz y sombra"
         }
     },
     "layoutShortcutGroup": {
@@ -1214,6 +1295,21 @@
                 "title": "No hay capas seleccionadas",
                 "message": "Seleccione al menos una capa en el muelle de capas para transformar. Algunos tipos de capas no se pueden transformar."
             }
+        },
+        "pluginInstallError": {
+            "title": "Instalación de errores",
+            "message": "Se produjo un error al instalar el plugin \"{pluginName}\". Esto podría resolverse si reinicias al editor."
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "Plugin Installed",
+            "message": "El editor necesita ser recargado antes de que el plugin surta efecto. Si sigues trabajando, guarda tus cambios primero."
+        },
+        "pluginInstallZip": {
+            "title": "Instalar Plugin ZIP",
+            "installError": {
+                "title": "Instalación de errores",
+                "message": "O el archivo seleccionado no es un plugin de editor OpenGraphica, o es incompatible con la versión actual del editor."
+            }
         }
     },
     "moduleGroup": {
@@ -1401,6 +1497,16 @@
                 "update": {
                     "name": "Actualizar la aplicación",
                     "description": "Actualice la aplicación para recibir nueva funcionalidad."
+                }
+            }
+        },
+        "plugin": {
+            "name": "Plugin",
+            "description": "Gestión de plugins.",
+            "modules": {
+                "installZip": {
+                    "name": "Instalar Plugin ZIP",
+                    "description": "Instale un plugin de editor de un archivo ZIP."
                 }
             }
         }
@@ -1777,6 +1883,17 @@
         "layerOpacity": {
             "title": "Opacity",
             "opacity": "Opacity"
+        },
+        "cloneBrush": {
+            "brushOpacity": "Opacity",
+            "brushSize": "Tamaño",
+            "brushHardness": "Hardness",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No hay capas seleccionadas",
+                    "message": "Por favor seleccione al menos una capa de imagen en el muelle de capas. Ciertos tipos de capas no se pueden utilizar con el cepillo de clones."
+                }
+            }
         }
     },
     "toolGroup": {
@@ -2066,6 +2183,20 @@
                     "Pulsa en un área para borrar. Mientras se sostiene, se puede arrastrar a la izquierda o derecha para ajustar la cantidad de la zona se borra."
                 ]
             }
+        },
+        "cloneBrushToolIntroduction": {
+            "title": "Clone Brush Tool",
+            "introduction": [
+                "El cepillo de clones copia parte de una imagen para que pueda pintar esa misma zona en otro lugar. Normalmente se utiliza para eliminar manchas, objetos no deseados o rellenar un lugar dañado."
+            ],
+            "body": {
+                "mouse": [
+                    "El área de clones se muestra como un círculo con el icono de sello clon. Puede arrastrarlo alrededor o ctrl + haga clic para configurarlo a la posición actual del ratón."
+                ],
+                "touch": [
+                    "El área de clones se muestra como un círculo con el icono de sello clon. Puedes arrastrarlo."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -2106,7 +2237,8 @@
         "chroma": "Chroma",
         "color": "Color",
         "lightness": "Luz",
-        "luminance": "Luminance"
+        "luminance": "Luminance",
+        "merge": "Merge"
     },
     "defaultBrush": {
         "default": "Default",
@@ -2130,6 +2262,10 @@
                 "sharpen": {
                     "title": "Sharpen",
                     "description": "Espacios de afilado de la imagen"
+                },
+                "cloneBrush": {
+                    "title": "Clone Brush",
+                    "description": "Áreas de cierre de la imagen"
                 }
             },
             "name": "Deforme"
@@ -2222,6 +2358,233 @@
                 }
             },
             "name": "Canvas Viewport"
+        }
+    },
+    "mcp": {
+        "common": {
+            "response": {
+                "deleteSuccess": "Eliminar el éxito.",
+                "updateSuccess": "Actualizar el éxito."
+            },
+            "error": {
+                "required": "La propiedad {propertyName} es necesaria.",
+                "notArray": "La propiedad {propertyName} debe ser un array.",
+                "notArrayNumber": "La propiedad {propertyName} debe tener valores que son números.",
+                "notArrayString": "La propiedad {propertyName} debe tener valores que son cadenas.",
+                "notNumber": "La propiedad {propertyName} debe ser un número.",
+                "notString": "La propiedad {propertyName} debe ser una cadena.",
+                "notInEnumList": "La propiedad {propertyName} no es uno de los valores enum aceptados.",
+                "layerNotFound": "No se encontró la capa especificada.",
+                "2dTransformLength": "La matriz de transformación debe tener exactamente 6 números."
+            }
+        },
+        "createCircleShape": {
+            "description": "Agrega una forma SVG (SVG) a la capa seleccionada actual, o a una nueva capa si la capa seleccionada actual no es una capa vectorial. La nueva forma se dibuja sobre todas las otras formas en la capa.",
+            "property": {
+                "cx": "La posición x del centro del círculo en píxeles.",
+                "cy": "La posición del centro del círculo en píxeles.",
+                "r": "El radio del círculo píxeles."
+            }
+        },
+        "createEllipseShape": {
+            "description": "Añade una forma de SVG (SVG) a la capa seleccionada actual, o a una nueva capa si la capa seleccionada actual no es una capa vectorial. La nueva forma se dibuja sobre todas las otras formas en la capa.",
+            "property": {
+                "cx": "La posición x del centro del elipse en píxeles.",
+                "cy": "La posición y del centro del elipse en píxeles.",
+                "rx": "El radio del elipse a lo largo del eje x en píxeles.",
+                "ry": "El radio del elipse a lo largo del eje y en píxeles."
+            }
+        },
+        "createLineShape": {
+            "description": "Agrega una forma SVG > > a la capa seleccionada actual, o a una nueva capa si la capa seleccionada actual no es una capa vectorial. La nueva forma se dibuja sobre todas las otras formas en la capa.",
+            "property": {
+                "x1": "La posición x del inicio de la línea en píxeles.",
+                "y1": "La posición y del inicio de la línea en píxeles.",
+                "x2": "La posición x del final de la línea en píxeles.",
+                "y2": "La posición y del final de la línea en píxeles."
+            }
+        },
+        "createPathShape": {
+            "description": "Agrega una forma SVG (SVG)TMpatio a la capa seleccionada actual, o a una nueva capa si la capa seleccionada actual no es una capa vectorial. La nueva forma se dibuja sobre todas las otras formas en la capa.",
+            "property": {
+                "d": "La lista de comandos de ruta SVG. Siga la espectro SVG. Ejemplo: \"M 10 80 Q 52.5 10, 95 80 T 180 80\""
+            }
+        },
+        "createPolygonShape": {
+            "description": "Añade una forma de SVG (SVG) a la capa seleccionada actual, o a una nueva capa si la capa seleccionada actual no es una capa vectorial. La nueva forma se dibuja sobre todas las otras formas en la capa.",
+            "property": {
+                "points": "Los puntos que definen el borde exterior de la forma. Ejemplo: \"0,0 20,0 10,5\""
+            }
+        },
+        "createPolylineShape": {
+            "description": "Añade una forma de SVG (SVG) a la capa seleccionada actual, o a una nueva capa si la capa seleccionada actual no es una capa vectorial. La nueva forma se dibuja sobre todas las otras formas en la capa.",
+            "property": {
+                "points": "Los puntos que definen las líneas conectadas. Ejemplo: \"0,0 20,0 10,5\""
+            }
+        },
+        "createRectangleShape": {
+            "description": "Añade una forma de SVG (SVG) a la capa seleccionada actual, o a una nueva capa si la capa seleccionada actual no es una capa vectorial. La nueva forma se dibuja sobre todas las otras formas en la capa.",
+            "property": {
+                "x": "La posición x del borde izquierdo del rectángulo en píxeles.",
+                "y": "La posición del rectángulo izquierdo en píxeles.",
+                "rx": "El radio x de las esquinas del rectángulo en píxeles.",
+                "ry": "El radio de las esquinas del rectángulo en píxeles.",
+                "width": "El ancho del rectángulo en píxeles.",
+                "height": "La altura del rectángulo en píxeles."
+            }
+        },
+        "createShapeCommon": {
+            "property": {
+                "fill": "El color de relleno como un RGB 8-bit por canal hex. Omit sin relleno. Ejemplo: \"#000000\"",
+                "fillOpacity": "La opacidad del color de relleno como un número decimal de 0 a 1.",
+                "stroke": "El color de trazo como un RGB 8-bit por canal hex. Omit sin golpe. Ejemplo: \"#000000\"",
+                "strokeLinecap": "Cómo se producen los extremos de las líneas, como se define en la especificaciones SVG.",
+                "strokeLinejoin": "Cómo se hacen los ángulos de las líneas unidas, como se define en la especificaciones SVG.",
+                "strokeOpacity": "La opacidad del color de trazo como un número decimal de 0 a 1.",
+                "strokeWidth": "El ancho del trazo en píxeles.",
+                "transform": "El atributo transformador en la forma. Debe ser una función transformadora de matriz SVG 2D. Ejemplo: \"matrix(1,0,0,0,0)\""
+            },
+            "error": {
+                "fill": "Sintaxis de relleno inválido. Proporcione un RGBA 8-bit por canal hex. Ejemplo: \"#000000\"",
+                "stroke": "Sintaxis de trazo inválido. Proporcione un RGBA 8-bit por canal hex. Ejemplo: \"#000000\"",
+                "transform": "Sintaxis de transformación inválida. Proporcionar una función transformadora de matriz SVG 2D. Ejemplo: \"matrix(1,0,0,0,0)\""
+            }
+        },
+        "cropWorkingFile": {
+            "description": "Cultiva todo el lienzo de imagen en el archivo de trabajo (todas las capas). Un cultivo negativo se puede utilizar para aumentar el tamaño de la tela.",
+            "property": {
+                "left": "El límite más izquierdo de la imagen recortada en píxeles. Esto puede ser negativo.",
+                "top": "El límite más alto de la imagen recortada en píxeles. Esto puede ser negativo.",
+                "width": "El nuevo ancho de la imagen recortada en píxeles. Esto puede ser más grande que el ancho original.",
+                "height": "La nueva altura de la imagen recortada en píxeles. Esto puede ser más grande que la altura original."
+            },
+            "response": {
+                "success": "Éxito de cosecha."
+            }
+        },
+        "deleteLayers": {
+            "description": "Elimina capas con los IDs especificados.",
+            "property": {
+                "layerIds": "Los IDs de las capas para borrar. Los ID de capa se pueden recuperar de la herramienta de lista de capas."
+            },
+            "error": {
+                "noIds": "Proporcionar al menos 1 identificación de capas."
+            },
+            "response": {
+                "success": "Capas eliminadas."
+            }
+        },
+        "deleteShape": {
+            "description": "Elimina una forma SVG de cualquier capa vectorial seleccionada.",
+            "property": {
+                "id": "El ID de la forma para borrar. Esto se puede recuperar de la herramienta de la lista de get."
+            }
+        },
+        "getAvailableFontList": {
+            "description": "Listar todas las familias de fuentes que están disponibles para usar con capas de texto."
+        },
+        "getEditorGuide": {
+            "description": "Proporciona un resumen de lenguaje natural de cómo funciona el editor de imágenes de OpenGraphica.",
+            "summary": "OpenGraphica es un editor de imágenes de 2D multimedia. En su núcleo, puede editar imágenes de raster y formas vectoriales, y exportar a formatos de imagen de raster y vector.\n\nEl archivo de trabajo en OpenGraphica es un documento de imagen con una o más capas. Tiene una resolución rectangular fija, definida en píxeles. Otras unidades de medición, como mm, son compatibles en la interfaz de usuario con fines de visualización, pero se convierten en píxeles para editar utilizando la configuración de resoluciónX y resoluciónY. El documento de imagen de archivo de trabajo tiene un sistema de coordenadas donde +x es correcto, +y está abajo, y -z entra en la pantalla, lejos del espectador.\n\nEl archivo de trabajo se compone de una pila de capas individuales. Todas las capas tienen una anchura/altura definida en píxeles, y una matriz de transformación 3x3 2D que determina su posición / rotación / escala. Con una matriz de transformación de identidad, se dibuja una capa con su esquina superior izquierda alineada con la parte superior izquierda del archivo de trabajo.\n\nLas capas tienen diferentes tipos, que confieren el tipo de imagen que contienen:\n* **gradiente** - Un gradiente lineal o radial que cubre la totalidad del archivo de trabajo.\n**raster** - Una imagen basada en píxeles de 8 bits por canal RGBA.\n* **rasterSequence** - Una secuencia de animación utilizando imágenes basadas en píxeles de 8 bits por canal RGBA para cada marco.\n* **text** - Uno o más párrafos de texto rico dibujados horizontal o verticalmente.\n* **vector** - Un documento SVG 1.x.\n* **video** - Un vídeo usando un codec compatible con la web.\n\nLas capas se apilan de abajo a arriba, donde la capa inferior se dibuja primero, y la capa superior se dibuja en frente de todas las otras capas. Las capas se almacenan para que la primera capa en el array sea la capa más inferior, pero se muestran al usuario final donde se listan las capas más altas. Las capas se componen por defecto con fuente sobre la mezcla en RGB lineal, y se convierten a sRGB después de que todas las operaciones de componer se completen."
+        },
+        "getLayerList": {
+            "description": "Devuelve una definición sumaria JSON de todas las capas en el archivo de trabajo, donde las capas se dibujan en orden de matriz (último arriba)."
+        },
+        "getRasterLayerImage": {
+            "description": "Devuelve los datos de imagen para la capa de raster especificada.",
+            "property": {
+                "id": "La identificación de la capa de raster. Esto se puede recuperar de la herramienta de la lista de capas."
+            }
+        },
+        "getShapeList": {
+            "description": "Devuelve una definición JSON que enumera todas las formas en cualquier capas vectoriales actualmente seleccionadas, en orden de abajo a arriba. Los IDs de forma pueden cambiar cada vez que se añade, elimina o reordena una nueva forma."
+        },
+        "getVectorLayerSvg": {
+            "description": "Devuelve el documento SVG serializado asociado con la capa vectorial especificada.",
+            "property": {
+                "id": "La identificación de la capa vectorial. Esto se puede recuperar de la herramienta de la lista de capas."
+            }
+        },
+        "getWorkingFileDimensions": {
+            "description": "Devuelve la anchura y la altura del archivo de trabajo actual en píxeles. Esto es el tamaño del lienzo de imagen general que todas las capas se sientan."
+        },
+        "insertRasterLayer": {
+            "description": "Inserta una imagen RGBA de 8 bits como una nueva capa de raster en la parte superior de la pila de capas.",
+            "property": {
+                "imageDataUri": "Datos de imagen codificados de base64 URI. Tipos de medios imagen/png o imagen/jpeg son aceptables.",
+                "name": "El nombre de la nueva capa; generalmente el nombre de archivo de la imagen.",
+                "transform": "Una matriz de 6 números que representa la matriz de transformación 2D. Transformación de identidad de ejemplo: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "La capa de mapa insertada."
+            }
+        },
+        "insertTextLayer": {
+            "description": "Inserta una capa de texto. La parte superior/izquierda es el origen del sorteo, donde la parte superior es la línea de ascenso de la fuente.",
+            "property": {
+                "text": "El texto para insertar",
+                "name": "Nombre de la nueva capa de texto.",
+                "transform": "Una matriz de 6 números que representa la matriz transformadora 2D. Con un cambio de identidad, la capa se dibuja con su top izquierda-corner alineado con la parte superior izquierda del lienzo de archivos de trabajo. Transformación de identidad por ejemplo: [1, 0, 0, 1, 0, 1]",
+                "fontFamily": "El nombre de la familia fuente a utilizar. Llame a la herramienta get-available-font-list para obtener una lista de nombres.",
+                "fontSize": "El tamaño de la fuente.",
+                "fill": "El color de relleno como RGB o RGBA 8-bit por canal hex. Ejemplo: \"#000000\" o \"#000000FF\""
+            }
+        },
+        "reorderLayers": {
+            "description": "Cambia el orden de capas",
+            "property": {
+                "insertLayerIds": "Los IDs de capas para insertar en la inserción especificadaPosición en la pila de capas. Los ID de capa se pueden recuperar de la herramienta de lista de capas.",
+                "referenceLayerId": "El ID de la capa para insertar alrededor, basado en la propiedad insertPosition.",
+                "insertPosition": "La posición de insertar alrededor de la capa referenciada por referenceLayerId. \"arriba\" o \"bajo\"."
+            },
+            "error": {
+                "noInsertIds": "Proporcione al menos un ID en la propiedad insertLayerIds"
+            },
+            "response": {
+                "success": "Las capas reordenaron."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "Muestra todo el lienzo de imagen en el archivo de trabajo (todas las capas) en una resolución diferente. También conocido como escalar el tamaño de la imagen.",
+            "property": {
+                "width": "El nuevo ancho de la imagen reampled en píxeles.",
+                "height": "La nueva altura de la imagen resampada en píxeles. La relación de aspecto de ancho a altura debe coincidir con la imagen original."
+            },
+            "response": {
+                "success": "Resample el éxito."
+            }
+        },
+        "selectLayers": {
+            "description": "Establece qué capas se seleccionan actualmente en el editor proporcionando sus IDs",
+            "property": {
+                "ids": "Una gama de ID de capa (valores de números)"
+            },
+            "error": {
+                "noIds": "Usted debe proporcionar al menos una identificación de capa en la propiedad de los ids."
+            },
+            "response": {
+                "success": "Capas seleccionadas con éxito."
+            }
+        },
+        "setLayerTransform": {
+            "description": "Establece la matriz de transformación 3x3 2D de las capas seleccionadas que controla su posición, rotación y escala.",
+            "property": {
+                "transform": "Una matriz de 6 números que representa la matriz de transformación 2D. Transformación de identidad de ejemplo: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Transformar actualizado con éxito."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "Actualiza los atributos SVG de cualquier forma vectorial en cualquiera de las capas vectoriales actualmente seleccionadas: < < > > > > > > > > > >.",
+            "property": {
+                "id": "El ID de la forma para actualizar. Esto se puede recuperar de la herramienta de la lista de get.",
+                "cx": "La posición x del centro de un círculo o elipse en píxeles.",
+                "cy": "La posición y del centro de un círculo o elipse en píxeles.",
+                "rx": "El radio x de las esquinas de un rectángulo o el radio de un elipse en píxeles.",
+                "ry": "El radio de un rectángulo o el radio de un elipse en píxeles.",
+                "points": "Los puntos que definen el borde exterior de una forma polilínea o poligonal. Ejemplo: \"0,0 20,0 10,5\""
+            }
         }
     }
 }

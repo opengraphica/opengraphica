@@ -8,31 +8,31 @@ import { pointDistance2d } from '@/lib/math';
 const devicePixelRatio = window.devicePixelRatio || 1;
 
 export interface PointerTracker {
-    id: number,
-    type: 'mouse' | 'pen' | 'touch',
-    primary: boolean,
-    isDragging: boolean,
-    down: PointerEvent,
-    downTimestamp: number,
-    move?: PointerEvent,
-    movePrev?: PointerEvent,
-    up?: PointerEvent
+    id: number;
+    type: 'mouse' | 'pen' | 'touch';
+    primary: boolean;
+    isDragging: boolean;
+    down: PointerEvent;
+    downTimestamp: number;
+    move?: PointerEvent;
+    movePrev?: PointerEvent;
+    up?: PointerEvent;
 }
 
 /**
  * Handles basic pointer inputs.
- * 
+ *
  * Multi-touch
  * When the user touches the canvas with one or more fingers at the same time. Multi-touch does not fire again until all fingers are released.
  * Event order: onMultiTouchDown, onMultiTouchUp, onMultiTouchTap (tap only fires upon quick release)
- * 
+ *
  * Pointer
  * When any mouse, pen, or touch input touches the screen. Fires once for each.
  * Event order: onPointerDown, onPointerMove, onPointerUp
- * 
+ *
  * Wheel
  * When a mouse scroll wheel or other trackpad scroll is used.
- * 
+ *
  */
 export default class BaseCanvasController {
 
@@ -41,7 +41,7 @@ export default class BaseCanvasController {
     protected touches: PointerTracker[] = []; // Populated at onMultiTouchDown(), once the multi-touch tap timeout extinquishes.
     protected multiTouchDownCount: number = 0;
     protected multiTouchDownTouches: PointerTracker[] = [];
-    
+
     private multiTouchDownTimeoutHandle: number | undefined;
     private multiTouchTapTimeoutHandle: number | undefined;
     private dragStartRadius = preferencesStore.get('dragStartRadius');
@@ -141,7 +141,7 @@ export default class BaseCanvasController {
             && now - this.previousPointerDown.downTimestamp < preferencesStore.get('pointerDoubleTapTimeout')
             && pointDistance2d(
                 pointer.down.pageX, pointer.down.pageY,
-                this.previousPointerDown.down.pageX, this.previousPointerDown.down.pageY
+                this.previousPointerDown.down.pageX, this.previousPointerDown.down.pageY,
             ) <= this.dragStartRadius * devicePixelRatio
         ) {
             this.previousPointerDown = null;
@@ -172,7 +172,7 @@ export default class BaseCanvasController {
             pointer.move = e;
             if (
                 pointDistance2d(
-                    pointer.down.pageX, pointer.down.pageY, pointer.move.pageX, pointer.move.pageY
+                    pointer.down.pageX, pointer.down.pageY, pointer.move.pageX, pointer.move.pageY,
                 ) > this.dragStartRadius * devicePixelRatio
             ) {
                 if (!pointer.isDragging) {

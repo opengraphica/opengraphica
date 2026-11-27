@@ -84,8 +84,8 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
                 height: newHeight,
                 transform: newLayerTransform,
                 data: {
-                    sourceUuid: await createStoredImage(workingCanvas)
-                }
+                    sourceUuid: await createStoredImage(workingCanvas),
+                },
             });
             await this.updateLayerAction.do();
 
@@ -144,7 +144,7 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
                 };
                 image.onerror = () => {
                     resolve(image);
-                }
+                };
                 image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
             });
 
@@ -180,7 +180,7 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
 
         if (this.updateLayerAction) {
             this.updateLayerAction.free();
-            this.updateLayerAction = null
+            this.updateLayerAction = null;
         }
     }
 

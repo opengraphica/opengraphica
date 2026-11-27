@@ -32,7 +32,7 @@ import {
     textToolbarEmitter, isEditorTextareaFocused, editingTextLayerId, editingTextLayer,
     editingRenderTextPlacement, editingTextDocumentSelection,
     dragHandleHighlight, createNewTextLayerSize, toolbarTextMeta, toolbarTextDefaults,
-    overlaySelectionCursorPosition, overlaySelectionCursorSize, editingLayerCssTransform,
+    overlaySelectionCursorPosition, overlaySelectionCursorSize, editingLayerCssTransform
 } from '../store/text-state';
 
 import { runModule } from '@/modules';
@@ -74,7 +74,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private editorTextareaQueueSaveTimeoutHandle: number | undefined = undefined;
     private editorTextareaSelectWordTimestamp: number = 0;
 
-    private layerEditors: Map<number, { documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection }> = new Map();
+    private layerEditors: Map<number, { documentEditor: TextDocumentEditor; documentSelection: TextDocumentSelection; }> = new Map();
     private isHoveringLayerHorizontal: boolean = true;
     private justFocusedLayerVirtualKeyboardTransform: DOMMatrix | null = null;
     private justFocusedLayerVirtualKeyboardDndAreaHeight: number = window.innerHeight;
@@ -110,7 +110,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 } catch (error) { /* Ignore */ }
             }
             const checkNewIds = newIds ?? [];
-            let newTextLayerIds: number[] = [];
+            const newTextLayerIds: number[] = [];
             for (const newId of checkNewIds) {
                 const layer = getLayerById(newId);
                 if (layer?.type === 'text') {
@@ -118,7 +118,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     const documentEditor = new TextDocumentEditor(layer.data);
                     documentEditor.onNotifyChange(() => {
                         if (editingTextLayerId.value === newId) {
-                            let isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
+                            const isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
                             editingRenderTextPlacement.value = calculateTextPlacement(layer.data, {
                                 wrapSize: isHorizontal ? layer.width : layer.height,
                             });
@@ -146,7 +146,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 startLine: editingTextDocumentSelection.value?.start?.line as number,
                 startCharacter: editingTextDocumentSelection.value?.start?.character as number,
                 endLine: editingTextDocumentSelection.value?.end?.line as number,
-                endCharacter: editingTextDocumentSelection.value?.end?.character as number
+                endCharacter: editingTextDocumentSelection.value?.end?.character as number,
             }),
             (selection, oldSelection) => {
                 if (!selection) return;
@@ -157,7 +157,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     selection.endCharacter === oldSelection?.endCharacter
                 ) return;
                 this.updateToolbarMetaFromActiveSelection();
-            }
+            },
         );
 
         this.editingTextLayerIdUnwatch = watch(
@@ -173,7 +173,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     return;
                 }
                 editingTextLayer.value = layer;
-            }, { immediate: true }
+            }, { immediate: true },
         );
 
         this.editingTextLayerDimensionsUnwatch = watch(() => ({
@@ -188,7 +188,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     action: new BundleAction('updateTextLayerProperties', `action.updateTextLayerProperties`, [
                         new UpdateLayerAction<UpdateTextLayerOptions>({
                             id: editingTextLayerId.value,
-                            transform: new DOMMatrix().translate(oldWidth - width).multiply(editingTextLayer.value.transform)
+                            transform: new DOMMatrix().translate(oldWidth - width).multiply(editingTextLayer.value.transform),
                         }),
                     ]),
                     mergeWithHistory: ['typeInTextLayer'],
@@ -201,7 +201,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             editingTextLayer.value?.data.wrapDirection,
         ]), ([lineDirection]) => {
             if (!editingTextLayer.value || !lineDirection) return;
-            let isHorizontal = ['ltr', 'rtl'].includes(lineDirection);
+            const isHorizontal = ['ltr', 'rtl'].includes(lineDirection);
             editingRenderTextPlacement.value = calculateTextPlacement(editingTextLayer.value.data, {
                 wrapSize: isHorizontal ? editingTextLayer.value.width : editingTextLayer.value.height,
             });
@@ -220,7 +220,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
         this.onHistoryStep = this.onHistoryStep.bind(this);
         appEmitter.on('editor.history.step', this.onHistoryStep);
-        
+
     }
 
     onLeave(): void {
@@ -247,7 +247,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         appEmitter.off('editor.tool.fontsLoaded', this.onFontsLoaded);
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
         appEmitter.off('editor.history.step', this.onHistoryStep);
-        
+
         this.lastDragStartPickLayer = null;
     }
 
@@ -297,7 +297,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private onFontsLoaded() {
         if (editingTextLayerId.value != null) {
             if (!editingTextLayer.value) return;
-            let isHorizontal = ['ltr', 'rtl'].includes(editingTextLayer.value.data.lineDirection);
+            const isHorizontal = ['ltr', 'rtl'].includes(editingTextLayer.value.data.lineDirection);
             editingRenderTextPlacement.value = calculateTextPlacement(editingTextLayer.value.data, {
                 wrapSize: isHorizontal ? editingTextLayer.value.width : editingTextLayer.value.height,
             });
@@ -306,7 +306,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     private onToolbarDocumentChanged(event: any) {
         if (!editingTextLayer.value) return;
-        const { name, value } = event as { name: keyof TextDocument, value: any };
+        const { name, value } = event as { name: keyof TextDocument; value: any; };
         editingTextLayer.value.data[name] = value as never;
         this.editingLayerDocumentOnFocusId = editingTextLayerId.value;
         this.editingLayerDocumentOnFocus = JSON.parse(JSON.stringify(editingTextLayer.value.data));
@@ -319,7 +319,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         const editors = this.layerEditors.get(editingTextLayerId.value);
         if (!editors) return;
         const { documentEditor, documentSelection } = editors;
-        const { name, value } = event as { name: string, value: any };
+        const { name, value } = event as { name: string; value: any; };
         if (!documentSelection.isEmpty()) {
             documentEditor.setMetaRange(
                 documentSelection.start.line,
@@ -402,7 +402,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 if (layer && layer.type === 'text') {
                     this.editingLayerDocumentOnFocusId = layer.id;
                     this.editingLayerDocumentOnFocus = JSON.parse(JSON.stringify(layer.data));
-                    let isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
+                    const isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
                     editingRenderTextPlacement.value = calculateTextPlacement(layer.data, {
                         wrapSize: isHorizontal ? layer.width : layer.height,
                     });
@@ -537,7 +537,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             case 'Up': case 'ArrowUp':
             case 'Down': case 'ArrowDown':
                 event.preventDefault();
-                let mappedKey = {
+                const mappedKey = {
                     'Left': 'ArrowLeft',
                     'Right': 'ArrowRight',
                     'Up': 'ArrowUp',
@@ -702,7 +702,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         if (this.touches.length === 1) {
             if (this.dragStartPickLayer == null) {
                 const e = this.touches[0].down;
-                let { viewTransformPoint } = this.getTransformedCursorInfo(e.pageX, e.pageY);
+                const { viewTransformPoint } = this.getTransformedCursorInfo(e.pageX, e.pageY);
                 const dragStartPickLayer = this.pickLayer(viewTransformPoint);
                 if (dragStartPickLayer != null && dragStartPickLayer === editingTextLayerId.value) {
                     const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
@@ -728,7 +728,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         if (editingTextLayerId.value == null) return;
         const editors = this.layerEditors.get(editingTextLayerId.value);
         if (!editors || !this.editorTextarea) return;
-        let { viewTransformPoint } = this.getTransformedCursorInfo(e.pageX, e.pageY);
+        const { viewTransformPoint } = this.getTransformedCursorInfo(e.pageX, e.pageY);
         const { documentEditor, documentSelection } = editors;
         const cursorPosition = this.getEditorCursorAtPoint(viewTransformPoint);
         const wordStart = documentEditor.getWordStartPosition(cursorPosition.line, cursorPosition.character);
@@ -768,7 +768,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     }
 
     private onDragStart(pointer: PointerTracker) {
-        let { viewTransformPoint, transformBoundsPoint } = this.getTransformedCursorInfo(pointer.down.pageX, pointer.down.pageY);
+        const { viewTransformPoint, transformBoundsPoint } = this.getTransformedCursorInfo(pointer.down.pageX, pointer.down.pageY);
         const dragStartPickLayer = this.pickLayer(viewTransformPoint);
         this.dragStartPickLayer = dragStartPickLayer;
         this.dragStartPosition = viewTransformPoint;
@@ -804,7 +804,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 if (dragStartPickLayer != null && dragStartPickLayer !== this.lastDragStartPickLayer) {
                     this.justFocusedLayerVirtualKeyboardTransform = this.calculateVirtualKeyboardJumpTransform(new DOMPoint(
                         pointer.down.pageX,
-                        pointer.down.pageY
+                        pointer.down.pageY,
                     ));
                     this.justFocusedLayerVirtualKeyboardDndAreaHeight = canvasStore.get('dndAreaHeight');
                 }
@@ -835,7 +835,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             this.isCreatingLayer = true;
             this.justFocusedLayerVirtualKeyboardTransform = this.calculateVirtualKeyboardJumpTransform(new DOMPoint(
                 pointer.down.pageX,
-                pointer.down.pageY
+                pointer.down.pageY,
             ));
             this.justFocusedLayerVirtualKeyboardDndAreaHeight = canvasStore.get('dndAreaHeight');
         }
@@ -849,7 +849,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         // Creating new text layer
         if (this.isCreatingLayer) {
             const { viewTransformPoint: pointerDownPoint } = this.getTransformedCursorInfo(
-                pointer.down.pageX, pointer.down.pageY
+                pointer.down.pageX, pointer.down.pageY,
             );
             if (this.createdLayerId == null) {
                 // User just started dragging mouse; create a new text layer
@@ -890,7 +890,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             // Resizing text boundaries
             if (this.transformIsDragging) {
                 if (!this.editingLayerTransformStart || this.editingLayerWidthStart == null || this.editingLayerHeightStart == null || editingTextLayer.value == null || this.dragStartPosition == null) return;
-                let dragHandle = this.dragStartDragType;
+                const dragHandle = this.dragStartDragType;
                 const decomposedViewTransform = canvasStore.get('decomposedTransform');
                 const textLayerTransform = getLayerGlobalTransform(editingTextLayer.value);
                 const textLayerDecomposedTransform = decomposeMatrix(textLayerTransform);
@@ -908,16 +908,16 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     editingTextLayer.value.width = Math.max(1, this.editingLayerWidthStart + rotatedDragVector.x);
                 } else if (dragHandle === DRAG_TYPE_LEFT) {
                     const translationVector = rotateDirectionVector2d(
-                        rotatedDragVector.x, 0.0, rotationDirection
-                    )
+                        rotatedDragVector.x, 0.0, rotationDirection,
+                    );
                     editingTextLayer.value.transform = new DOMMatrix().translateSelf(translationVector.x, translationVector.y).multiplySelf(this.editingLayerTransformStart);
                     editingTextLayer.value.width = Math.max(1, this.editingLayerWidthStart - rotatedDragVector.x);
                 } else if (dragHandle === DRAG_TYPE_BOTTOM) {
                     editingTextLayer.value.height = Math.max(1, this.editingLayerHeightStart + rotatedDragVector.x);
                 } else if (dragHandle === DRAG_TYPE_TOP) {
                     const translationVector = rotateDirectionVector2d(
-                        rotatedDragVector.x, 0.0, rotationDirection
-                    )
+                        rotatedDragVector.x, 0.0, rotationDirection,
+                    );
                     editingTextLayer.value.transform = new DOMMatrix().translateSelf(translationVector.x, translationVector.y).multiplySelf(this.editingLayerTransformStart);
                     editingTextLayer.value.height = Math.max(1, this.editingLayerHeightStart - rotatedDragVector.x);
                 }
@@ -928,7 +928,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 if (editingTextDocumentSelection.value) {
                     const { start, end } = editingTextDocumentSelection.value;
                     if (!(start.line == end.line && start.character == end.character)) {
-                        let isHorizontal = ['ltr', 'rtl'].includes(editingTextLayer.value.data.lineDirection);
+                        const isHorizontal = ['ltr', 'rtl'].includes(editingTextLayer.value.data.lineDirection);
                         editingRenderTextPlacement.value = calculateTextPlacement(editingTextLayer.value.data, {
                             wrapSize: isHorizontal ? editingTextLayer.value.width : editingTextLayer.value.height,
                         });
@@ -962,9 +962,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                             id: createdLayerId,
                             transform: createdLayer.transform,
                             width: createdLayer.width,
-                            height: createdLayer.height
+                            height: createdLayer.height,
                         }),
-                        mergeWithHistory: 'createTextLayer'
+                        mergeWithHistory: 'createTextLayer',
                     });
                 }
                 setTimeout(() => {
@@ -1003,8 +1003,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 historyStore.dispatch('runAction', {
                     action: new BundleAction(
                         'textTransform', isResize ? 'action.textTransformResize' : 'action.textTransformTranslate',
-                        updateLayerActions
-                    )
+                        updateLayerActions,
+                    ),
                 });
             }
         }
@@ -1043,14 +1043,14 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             const hoveringLayer = getLayerById(hoveringPickLayer) as WorkingFileTextLayer;
             const hoveringLayerGlobalTransform = getLayerGlobalTransform(hoveringLayer);
             const decomposedHoveringLayerGlobalTransform = decomposeMatrix(hoveringLayerGlobalTransform);
-            let layerDirection = (['ttb', 'btt'].includes(hoveringLayer?.data.lineDirection) ? 0 : Math.PI / 2.0) + decomposedHoveringLayerGlobalTransform.rotation + viewDecomposedTransform.rotation;
+            const layerDirection = (['ttb', 'btt'].includes(hoveringLayer?.data.lineDirection) ? 0 : Math.PI / 2.0) + decomposedHoveringLayerGlobalTransform.rotation + viewDecomposedTransform.rotation;
             const layerDirectionBearing = rotateDirectionVector2d(1.0, 0.0, layerDirection);
             this.isHoveringLayerHorizontal = Math.abs(layerDirectionBearing.x) < Math.abs(layerDirectionBearing.y);
         } else {
             this.isHoveringLayerHorizontal = true;
         }
 
-        let transformDragType = this.getTransformDragType(transformBoundsPoint);
+        const transformDragType = this.getTransformDragType(transformBoundsPoint);
         if (transformDragType != null) {
             dragHandleHighlight.value = transformDragType;
         } else {
@@ -1082,7 +1082,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         const newTextDocument: TextDocument = {
             boundary: isDynamic ? 'dynamic' : 'box',
             lineAlignment: toolbarTextDefaults.lineAlignment,
-            lineDirection, 
+            lineDirection,
             wrapDirection: toolbarTextDefaults.wrapDirection,
             wrapAt: toolbarTextDefaults.wrapAt,
             lines: [
@@ -1213,7 +1213,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private queueSaveEditorTextarea() {
         this.editorTextareaQueueSaveTimeoutHandle = window.setTimeout(
             this.saveEditorTextarea.bind(this),
-            preferencesStore.get('textLayerSaveDelay')
+            preferencesStore.get('textLayerSaveDelay'),
         );
     }
 
@@ -1236,9 +1236,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                             id: editingTextLayerId.value,
                             data: editingTextLayer.value.data,
                         }, {
-                            data: oldTextDocument
+                            data: oldTextDocument,
                         }),
-                    ])
+                    ]),
                 });
             } else {
                 console.error('[src/tools/controllers/text.ts] Attempted to save text layer changes, but some data was out of sync.');
@@ -1274,7 +1274,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private determineDragType(transformBoundsPoint: DOMPoint) {
         this.transformIsDragging = false;
         // Determine which dimensions to drag on
-        let transformDragType = this.getTransformDragType(transformBoundsPoint);
+        const transformDragType = this.getTransformDragType(transformBoundsPoint);
         if (transformDragType != null) {
             this.transformIsDragging = true;
         }
@@ -1317,8 +1317,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         return transformDragType;
     }
 
-    private getEditorCursorAtPoint(viewTransformPoint: DOMPoint): { line: number, character: number } {
-        let cursor = { line: 0, character: 0 };
+    private getEditorCursorAtPoint(viewTransformPoint: DOMPoint): { line: number; character: number; } {
+        const cursor = { line: 0, character: 0 };
         if (editingRenderTextPlacement.value && editingTextLayerId.value != null) {
             const layerTransform = getLayerGlobalTransform(editingTextLayerId.value).inverse();
             const layerTransformPoint = viewTransformPoint.matrixTransform(layerTransform);
@@ -1347,7 +1347,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                             if (layerTransformPoint.x >= left && layerTransformPoint.x <= right) {
                                 let glyphCharacterIndex = Math.round(
                                     ((layerTransformPoint.x - left) / (right - left))
-                                    * glyph.documentCharacterCount
+                                    * glyph.documentCharacterCount,
                                 );
                                 if (glyph.bidiDirection === 'rtl') {
                                     glyphCharacterIndex = glyph.documentCharacterCount - glyphCharacterIndex;
@@ -1377,7 +1377,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
                 findVerticalCursor:
                 for (const line of textPlacement.lines) {
-                    
+
                     const left = Math.min(line.wrapOffset, line.wrapOffset + line.largestCharacterWidth);
                     const right = Math.max(line.wrapOffset, line.wrapOffset + line.largestCharacterWidth);
                     if (layerTransformPoint.x >= left && layerTransformPoint.x <= right) {
@@ -1392,7 +1392,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                             if (layerTransformPoint.y >= top && layerTransformPoint.y <= bottom) {
                                 const glyphCharacterIndex = Math.round(
                                     ((layerTransformPoint.y - top) / (bottom - top))
-                                    * glyph.documentCharacterCount
+                                    * glyph.documentCharacterCount,
                                 );
                                 cursor.character = glyph.documentCharacterIndex + glyphCharacterIndex;
                                 break findVerticalCursor;
@@ -1417,13 +1417,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         return cursor;
     }
 
-    private getTransformedCursorInfo(pageX: number, pageY: number): { viewTransformPoint: DOMPoint, transformBoundsPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix } {
+    private getTransformedCursorInfo(pageX: number, pageY: number): { viewTransformPoint: DOMPoint; transformBoundsPoint: DOMPoint; viewDecomposedTransform: DecomposedMatrix; } {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewDecomposedTransform = canvasStore.get('decomposedTransform');
         const viewTransformPoint = new DOMPoint(
             (-canvasStore.state.viewportCanvasOffsetLeft + pageX) * devicePixelRatio,
-            (-canvasStore.state.viewportCanvasOffsetTop + pageY) * devicePixelRatio
+            (-canvasStore.state.viewportCanvasOffsetTop + pageY) * devicePixelRatio,
         )
             .matrixTransform(viewTransform.inverse());
 
@@ -1439,15 +1439,15 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             if (editingTextLayer.value) {
                 transformBoundsPoint =
                     new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
-                    .matrixTransform(viewTransform.inverse())
-                    .matrixTransform(editingTextLayer.value.transform.inverse());
+                        .matrixTransform(viewTransform.inverse())
+                        .matrixTransform(editingTextLayer.value.transform.inverse());
             }
         }
-    
+
         return {
             viewTransformPoint,
             transformBoundsPoint: transformBoundsPoint ?? new DOMPoint(),
-            viewDecomposedTransform
+            viewDecomposedTransform,
         };
     }
 
@@ -1471,7 +1471,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             }
             if (layerIdsToDelete.length > 0) {
                 historyStore.dispatch('runAction', {
-                    action: new DeleteLayersAction(layerIdsToDelete)
+                    action: new DeleteLayersAction(layerIdsToDelete),
                 });
             }
         }

@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import packageJson from "../../package.json";
+import packageJson from '../../package.json';
 
 import { checkWebUpdates } from '@/check-updates';
 
@@ -22,14 +22,14 @@ import type {
     LiveUpdateBuildInfo, MenuBarToolGroupButton, ClassType,
     ToolGroupDefinition, WorkingFileLayer, WorkingFileAnyLayer,
     WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel,
-    VectorPathCommandMove, VectorPathCommandLine,
+    VectorPathCommandMove, VectorPathCommandLine
 } from '@/types';
 
 interface EditorDeferredTask {
-    name: string,
-    priority?: 'clearQueue' | 'filter' | 'last',
+    name: string;
+    priority?: 'clearQueue' | 'filter' | 'last';
     isCanceled?: boolean;
-    handler: (bridge: { isCanceled: () => boolean }) => void;
+    handler: (bridge: { isCanceled: () => boolean; }) => void;
 }
 
 interface TutorialFlags {
@@ -49,7 +49,7 @@ interface TutorialFlags {
     zoomToolIntroduction?: boolean;
 }
 
-const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as never;
+const toolGroups: { [key: string]: ToolGroupDefinition; } = toolGroupsConfig as never;
 
 export interface FloatingDockRect {
     id: string;
@@ -94,11 +94,11 @@ export interface PluginSettingsDockMenuItemDefinition {
     item: {
         icon?: string;
         name: string;
-    },
+    };
     action: {
         type: 'dock' | 'toolGroup' | 'tool' | 'runModule' | 'appEmit';
         target: string;
-    },
+    };
     placeAround?: {
         otherItemName: string;
         position: 'before' | 'after';
@@ -118,8 +118,8 @@ export interface PluginToolDefinition {
 
 interface EditorState {
     activeMenuDrawerComponentName: string | null;
-    activePopoverIds: number[],
-    activeTheme: { name: string, linkElement: HTMLLinkElement } | null;
+    activePopoverIds: number[];
+    activeTheme: { name: string; linkElement: HTMLLinkElement; } | null;
     activeTool: string | null;
     activeToolGroup: string | null;
     activeToolGroupPrevious: string | null;
@@ -168,15 +168,15 @@ interface EditorState {
     toolCanvasController: BaseCanvasController;
     toolGroupLastActivatedTool: {
         [toolGroup: string]: string;
-    }
+    };
     tutorialFlags: TutorialFlags;
     waiting: boolean;
 }
 
 interface EditorDispatch {
-    addTutorialFlag: keyof EditorState['tutorialFlags'],
+    addTutorialFlag: keyof EditorState['tutorialFlags'];
     removeActiveTheme: undefined;
-    scheduleTask: EditorDeferredTask,
+    scheduleTask: EditorDeferredTask;
     setActiveTheme: string;
     setActiveTool: {
         tool?: string | null;
@@ -266,7 +266,7 @@ const store = new PerformantStore<EditorStore>({
                     set('tutorialFlags', tutorialFlags);
                 }
                 break;
-            
+
             case 'removeActiveTheme':
                 let oldLinkElement;
                 if (store.state.activeTheme) {
@@ -284,7 +284,7 @@ const store = new PerformantStore<EditorStore>({
                 if (newTask) {
                     let tasks = store.get('tasks');
                     if (newTask.priority === 'clearQueue') {
-                        for (let task of tasks) {
+                        for (const task of tasks) {
                             task.isCanceled = true;
                         }
                         set('isTaskRunning', false);
@@ -318,7 +318,7 @@ const store = new PerformantStore<EditorStore>({
                 break;
 
             case 'setActiveTool':
-                let { tool, group } = value as EditorDispatch['setActiveTool'];
+                const { tool, group } = value as EditorDispatch['setActiveTool'];
                 let activeTool = tool || null;
                 const activeGroup = store.get('activeToolGroup');
                 const toolGroupLastActivatedTool = store.get('toolGroupLastActivatedTool');
@@ -326,7 +326,7 @@ const store = new PerformantStore<EditorStore>({
                     let firstToolInGroup = Object.keys(toolGroups[group]?.tools || [])[0];
                     if (firstToolInGroup == null) {
                         const pluginToolDefinition = store.get('pluginTools').find(
-                            (pluginTool) => pluginTool.group === group
+                            (pluginTool) => pluginTool.group === group,
                         ) as PluginToolDefinition ?? null;
                         if (pluginToolDefinition) {
                             firstToolInGroup = pluginToolDefinition.name;
@@ -346,7 +346,7 @@ const store = new PerformantStore<EditorStore>({
                     let pluginToolDefinition: PluginToolDefinition | null = null;
                     if (!toolDefinition && group && activeTool) {
                         pluginToolDefinition = store.get('pluginTools').find(
-                            (pluginTool) => pluginTool.name === activeTool && pluginTool.group === group
+                            (pluginTool) => pluginTool.name === activeTool && pluginTool.group === group,
                         ) as PluginToolDefinition ?? null;
                         if (pluginToolDefinition != null) {
                             const toolAndGroupId = 'plugin-' + camelCaseToKebabCase(group) + '-' + camelCaseToKebabCase(activeTool);
@@ -383,7 +383,7 @@ const store = new PerformantStore<EditorStore>({
                         const CanvasControllerGenericClass: typeof BaseCanvasController = (
                             await import(/* webpackChunkName: 'tool-controller-[request]' */ `@/tools/controllers/${controllerName}.ts`)
                                 .catch((error) => {
-                                    checkWebUpdates()
+                                    checkWebUpdates();
                                     console.error(error);
                                 })
                         ).default;
@@ -429,6 +429,7 @@ const store = new PerformantStore<EditorStore>({
                         store.get('toolCanvasController').onEnter();
                     } catch (error: unknown) {}
                 }
+                updateSystemBars();
                 break;
 
             case 'setThemes':
@@ -462,11 +463,11 @@ async function runTasks(runId: number, set: PerformantStore<EditorStore>['direct
         set('isTaskRunning', true);
         let tasks = store.get('tasks');
         while (tasks.length > 0) {
-            let runningTask = tasks[0];
+            const runningTask = tasks[0];
             await runningTask.handler({
                 isCanceled() {
                     return tasks[0].isCanceled || false;
-                }
+                },
             });
             if (runId !== currentTaskRunId) {
                 return;
@@ -483,7 +484,7 @@ async function runTasks(runId: number, set: PerformantStore<EditorStore>['direct
 
 function updateLayersWithTimeline(parentLayers?: WorkingFileLayer<ColorModel>[]) {
     parentLayers = parentLayers || workingFileStore.get('layers');
-    for (let layer of parentLayers) {
+    for (const layer of parentLayers) {
         if (layer.type === 'rasterSequence') {
             updateRasterSequenceLayerWithTimeline(layer as WorkingFileRasterSequenceLayer<ColorModel>);
         } else if (layer.type === 'group') {
@@ -494,10 +495,25 @@ function updateLayersWithTimeline(parentLayers?: WorkingFileLayer<ColorModel>[])
 
 function updateRasterSequenceLayerWithTimeline(layer: WorkingFileRasterSequenceLayer<ColorModel>) {
     const timelineCursor = store.get('timelineCursor');
-    for (let frame of layer.data.sequence) {
+    for (const frame of layer.data.sequence) {
         if (frame.start <= timelineCursor && frame.end > timelineCursor) {
             layer.data.currentFrame = frame.image;
             break;
+        }
+    }
+}
+
+async function updateSystemBars() {
+    if (window.Capacitor?.isNativePlatform()) {
+        const { SystemBars, SystemBarsStyle } = await import('@capacitor/core');
+        if (store.get('isActiveToolbarExclusive')) {
+            if (store.get('activeTheme')?.name === 'dark') {
+                SystemBars.setStyle({ style: SystemBarsStyle.Dark });
+            } else {
+                SystemBars.setStyle({ style: SystemBarsStyle.Light });
+            }
+        } else {
+            SystemBars.setStyle({ style: SystemBarsStyle.Light });
         }
     }
 }

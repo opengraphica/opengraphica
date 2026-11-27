@@ -7,12 +7,12 @@ export as namespace opentype;
  ******************************************/
 
 export class Font {
-    names: FontNames & { windows?: FontNames, macintosh?: FontNames, unicode?: FontNames };
+    names: FontNames & { windows?: FontNames; macintosh?: FontNames; unicode?: FontNames; };
     unitsPerEm: number;
     ascender: number;
     descender: number;
     createdTimestamp: number;
-    tables: { [tableName: string]: Table };
+    tables: { [tableName: string]: Table; };
     supported: boolean;
     glyphs: GlyphSet;
     encoding: Encoding;
@@ -72,7 +72,7 @@ export class Font {
     numGlyphs: number;
     outlinesFormat: string;
     stringToGlyphIndexes(s: string): number[];
-    stringToGlyphMapping(s: string): Array<{ glyph: Glyph, replaced: number[] }>;
+    stringToGlyphMapping(s: string): Array<{ glyph: Glyph; replaced: number[]; }>;
     stringToGlyphs(s: string): Glyph[];
     toArrayBuffer(): ArrayBuffer;
     toBuffer(): ArrayBuffer;
@@ -318,17 +318,17 @@ export class Path {
 
 export type PathCommand =
     | {
-        type: "M";
+        type: 'M';
         x: number;
         y: number;
     }
     | {
-        type: "L";
+        type: 'L';
         x: number;
         y: number;
     }
     | {
-        type: "C";
+        type: 'C';
         x1: number;
         y1: number;
         x2: number;
@@ -337,14 +337,14 @@ export type PathCommand =
         y: number;
     }
     | {
-        type: "Q";
+        type: 'Q';
         x1: number;
         y1: number;
         x: number;
         y: number;
     }
     | {
-        type: "Z";
+        type: 'Z';
     };
 
 /******************************************

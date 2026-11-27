@@ -73,7 +73,7 @@ export async function deleteStoredVideo(uuid: string) {
  * @param uuid - ID of the database entry for the video
  */
 export function reserveStoredVideo(uuid: string, userId: string) {
-    let users = videoUserUuidMap.get(uuid) ?? new Set<string>();
+    const users = videoUserUuidMap.get(uuid) ?? new Set<string>();
     users.add(userId);
     videoUserUuidMap.set(uuid, users);
 }
@@ -83,7 +83,7 @@ export function reserveStoredVideo(uuid: string, userId: string) {
  * @param uuid - ID of the database entry for the video
  */
 export function unreserveStoredVideo(uuid: string, userId: string) {
-    let users = videoUserUuidMap.get(uuid) ?? new Set<string>();
+    const users = videoUserUuidMap.get(uuid) ?? new Set<string>();
     users.delete(userId);
     videoUserUuidMap.set(uuid, users);
     if (users.size === 0) {

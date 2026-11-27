@@ -75,7 +75,9 @@
         "convertVectorShapesToPaths": "Convertir la forme en chemin",
         "flipLayerX": "Couche de glissement horizontale",
         "flipLayerY": "Flip couche verticale",
-        "mergeEffects": "Effets de fusion"
+        "mergeEffects": "Effets de fusion",
+        "freeTransform": "Transformation libre",
+        "mergeLayerDown": "Fusionner le calque"
     },
     "app": {
         "colorPickerGradient": {
@@ -131,7 +133,9 @@
                 "vector": "Couche vectorielle",
                 "video": "Couche vidéo"
             },
-            "deleteSelection": "Supprimer la sélection"
+            "deleteSelection": "Supprimer la sélection",
+            "edit": "Modifier",
+            "mergeDown": "Fusionner vers le bas"
         },
         "wait": {
             "applyLayerTransform": "Appliquer la transformation du calque",
@@ -196,7 +200,9 @@
         "updateApp": "Mettre à jour l'application",
         "add": "Ajouter",
         "mergeEffects": "Effets de fusion",
-        "selectFiles": "Sélectionner des fichiers..."
+        "selectFiles": "Sélectionner des fichiers...",
+        "deletePlugin": "Supprimer le plugin",
+        "reload": "Recharger"
     },
     "canvas": {
         "toolbar": {
@@ -333,6 +339,10 @@
                     "checkForUpdates": "Vérifier les mises à jour",
                     "updateAvailableTitle": "Mise à jour disponible",
                     "updateAvailableMessage": "Une mise à jour pour OpenGraphica est disponible. Voulez-vous l'installer ?"
+                },
+                "plugins": {
+                    "selectFile": "Ajouter un fichier de plugin...",
+                    "uninstall": "Désinstaller"
                 }
             }
         }
@@ -440,8 +450,11 @@
             "param": {
                 "size": "Taille",
                 "xIntensity": "X Intensité",
-                "yIntensity": "Y Intensité"
-            }
+                "yIntensity": "Y Intensité",
+                "xRadius": "X Rayon",
+                "yRadius": "Y Rayon"
+            },
+            "help": "Flous l'image en utilisant des fonctions gaussiennes inventées par Carl Friedrich Gauss. Ce flou ressemble à la vision de l'image à travers un écran translucide, qui est distinctement différent de l'effet bokeh créé par une lentille de caméra hors foyer."
         },
         "grayscale": {
             "name": "Échelle grise",
@@ -473,7 +486,8 @@
                 "rotate": "Rotation",
                 "targetColor": "Couleur de la cible",
                 "targetRange": "Portée"
-            }
+            },
+            "help": "Rotation de la teinte des couleurs dans l'image, changer efficacement la couleur perçue.\n\nLe **Color Space** est utilisé pour déterminer la luminosité et la saturation de la nouvelle couleur. **Oklab** est généralement l'option la plus précise.\n\nLe **Target Color** peut être utilisé pour modifier sélectivement une seule couleur spécifique de l'image. Le **Range** détermine quelles couleurs similaires au **Target Color** sont affectées."
         },
         "negative": {
             "name": "Négatif",
@@ -679,6 +693,67 @@
                 "centerX": "Centre X",
                 "centerY": "Centre Y"
             }
+        },
+        "cylinderBend": {
+            "name": "Bend de cylindre",
+            "help": "Enveloppe l'image autour d'un cylindre 3D. Utile pour des scénarios comme l'attachement de panneaux de papier aux poteaux, etc.\n\n* **Rotation** - Rotation du cylindre autour de l'axe des x. Ceci peut être combiné avec la rotation de l'axe z du calque pour atteindre n'importe quel angle d'affichage.\n* **Perspective** - 0% est vu à une distance infinie et 100% est très proche.\n* **Voir la position** - Déplace le point de vue vers le haut ou vers le bas, ce qui change la perspective.",
+            "param": {
+                "rotation": "Rotation",
+                "perspective": "Aperçu",
+                "viewPosition": "Position de la vue"
+            }
+        },
+        "highlightBloom": {
+            "help": "Aussi connu sous le nom d'halation ; c'est une lueur douce où saignent de lumière des zones lumineuses à sombres de l'image. Dans les caméras, elle peut être causée par la diffusion de la lumière dans l'objectif, les filtres de diffusion ou les réflexions de lumière sur l'émulsion d'un film.\n* **Threshold** - Une gamme de la luminosité d'une couleur doit être pour saigner la lumière.\n* **Radius** - Jusqu'où la lumière saignera.\n* **Strength** - Comme la lumière saigne.",
+            "param": {
+                "threshold": "Seuil",
+                "radius": "Rayon",
+                "strength": "Résistance"
+            }
+        },
+        "mechanicalVignette": {
+            "name": "Vignette mécanique",
+            "help": "Simule l'ombre sur le bord d'une image causée par un canon circulaire centré qui empêche la lumière d'entrer dans le capteur de la caméra.\n\n* ** Distance du pupil** - Distance de l'ouverture circulaire extérieure de l'objectif par rapport au capteur.\n* **Pupil Radius** - Le rayon de l'ouverture circulaire de l'élève.\n* ** Distance de baril** - Distance d'une ouverture circulaire intérieure à l'intérieur de l'objectif à côté du capteur.\n* **Barrel Radius** - Le rayon de l'ouverture circulaire du canon.",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "simulate": "Simulez",
+                    "remove": "Supprimer"
+                },
+                "sensorWidth": "Largeur du capteur",
+                "sensorHeight": "Hauteur du capteur",
+                "exitPupilDistance": "Distance des élèves",
+                "exitPupilRadius": "Rayon d'élèves",
+                "barrelOpeningDistance": "Distance des barres",
+                "barrelOpeningRadius": "Rayon de barils"
+            }
+        },
+        "naturalVignette": {
+            "name": "Vignette naturelle",
+            "help": "Aussi connu sous le nom de chute d'éclairage naturel, cela simule l'ombre sur le bord d'un capteur de caméra en raison des rayons lumineux provenant de parties hors axe de la scène atteignant le capteur à un angle.\n\nCet effet est plus prononcé sur les objectifs de la caméra grand angle qui ne sont pas conçus pour que la lumière frappe le capteur perpendiculairement.",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "simulate": "Simulez",
+                    "remove": "Supprimer"
+                },
+                "sensorWidth": "Largeur du capteur",
+                "sensorHeight": "Hauteur du capteur",
+                "focalLength": "Longueur focale"
+            }
+        },
+        "radialSpeedLines": {
+            "name": "Lignes de vitesse radiales",
+            "help": "Dessine des lignes de mouvement dans un motif radial; couramment utilisé dans le manga. La plupart des valeurs sont aléatoires.\n* **Radius** - Jusqu'où les lignes seront tracées vers le centre.\n* **Spacing** - L'espace entre les touffes de lignes.\n* **Clumping** - Combien de lignes seront tracées l'une à côté de l'autre dans chaque touffe.\n* **Épaisseur** - Épaisseur maximale de la ligne.\n* **Seed** - Randomiser les lignes.",
+            "param": {
+                "centerRadius": "Rayon",
+                "lineSpacing": "Espacement",
+                "lineClumping": "Accumulation",
+                "lineThickness": "Épaisseur",
+                "horizontalOffset": "Horizontale",
+                "verticalOffset": "Vertical",
+                "seed": "Semences"
+            }
         }
     },
     "layerFilterGroup": {
@@ -702,6 +777,12 @@
         },
         "noise": {
             "name": "Bruit"
+        },
+        "artistic": {
+            "name": "Artistique"
+        },
+        "lightShadow": {
+            "name": "Lumière & Ombre"
         }
     },
     "layoutShortcutGroup": {
@@ -1214,6 +1295,21 @@
                 "title": "Aucun calque sélectionné",
                 "message": "Sélectionnez au moins un calque dans le quai des calques à transformer. Certains types de couches ne peuvent pas être transformés."
             }
+        },
+        "pluginInstallError": {
+            "title": "Erreur lors de l'installation du plugin",
+            "message": "Une erreur s'est produite lors de l'installation du plugin \"{pluginName}\". Cela pourrait être résolu si vous redémarrez l'éditeur."
+        },
+        "pluginInstallReloadConfirm": {
+            "title": "Plugin installé",
+            "message": "L'éditeur doit être rechargé avant que le plugin ne prenne effet. Si vous travaillez encore, enregistrez d'abord vos modifications."
+        },
+        "pluginInstallZip": {
+            "title": "Installer le plugin ZIP",
+            "installError": {
+                "title": "Erreur lors de l'installation du plugin",
+                "message": "Soit le fichier sélectionné n'est pas un plugin d'éditeur OpenGraphica, soit il est incompatible avec la version actuelle de l'éditeur."
+            }
         }
     },
     "moduleGroup": {
@@ -1401,6 +1497,16 @@
                 "update": {
                     "name": "Mettre à jour l'application",
                     "description": "Mettre à jour l'application pour recevoir de nouvelles fonctionnalités."
+                }
+            }
+        },
+        "plugin": {
+            "name": "Greffon",
+            "description": "Gestion des greffons.",
+            "modules": {
+                "installZip": {
+                    "name": "Installer le plugin ZIP",
+                    "description": "Installez un plugin éditeur à partir d'un fichier ZIP."
                 }
             }
         }
@@ -1777,6 +1883,17 @@
         "layerOpacity": {
             "title": "Opacité",
             "opacity": "Opacité"
+        },
+        "cloneBrush": {
+            "brushOpacity": "Opacité",
+            "brushSize": "Taille",
+            "brushHardness": "Dureté",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Aucun calque sélectionné",
+                    "message": "Veuillez sélectionner au moins un calque d'image dans le dock des calques. Certains types de couches ne peuvent pas être utilisés avec le pinceau clone."
+                }
+            }
         }
     },
     "toolGroup": {
@@ -2066,6 +2183,20 @@
                     "Appuyez sur une zone pour effacer. En maintenant en bas, vous pouvez glisser à gauche ou à droite pour ajuster la quantité de la zone est effacée."
                 ]
             }
+        },
+        "cloneBrushToolIntroduction": {
+            "title": "Outil de pinceau à clone",
+            "introduction": [
+                "La brosse clone copie une partie d'une image pour que vous puissiez peindre cette même zone ailleurs. Il est généralement utilisé pour enlever les défauts, les objets indésirables, ou remplir un endroit endommagé."
+            ],
+            "body": {
+                "mouse": [
+                    "La zone clone s'affiche en cercle avec l'icône du timbre clone. Vous pouvez le glisser autour ou ctrl + cliquez pour le définir à la position actuelle de la souris."
+                ],
+                "touch": [
+                    "La zone clone s'affiche comme un cercle avec l'icône du timbre clone. Tu peux le traîner."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -2106,7 +2237,8 @@
         "chroma": "Chroma",
         "color": "Couleur",
         "lightness": "Légèreté",
-        "luminance": "Luminance"
+        "luminance": "Luminance",
+        "merge": "Fusionner"
     },
     "defaultBrush": {
         "default": "Par défaut",
@@ -2130,6 +2262,10 @@
                 "sharpen": {
                     "title": "Aiguille",
                     "description": "Aiguiser les zones de l'image"
+                },
+                "cloneBrush": {
+                    "title": "Brosse à clone",
+                    "description": "Zones clonées de l'image"
                 }
             },
             "name": "Déformation"
@@ -2222,6 +2358,233 @@
                 }
             },
             "name": "Vue sur toile"
+        }
+    },
+    "mcp": {
+        "common": {
+            "response": {
+                "deleteSuccess": "Supprimer le succès.",
+                "updateSuccess": "Mettre à jour le succès."
+            },
+            "error": {
+                "required": "La propriété {propertyName} est requise.",
+                "notArray": "La propriété {propertyName} doit être un tableau.",
+                "notArrayNumber": "La propriété {propertyName} doit avoir des valeurs qui sont des chiffres.",
+                "notArrayString": "La propriété {propertyName} doit avoir des valeurs qui sont des chaînes.",
+                "notNumber": "La propriété {propertyName} doit être un numéro.",
+                "notString": "La propriété {propertyName} doit être une chaîne de caractères.",
+                "notInEnumList": "La propriété {propertyName} n'est pas une des valeurs enum acceptées.",
+                "layerNotFound": "La couche spécifiée n'a pas été trouvée.",
+                "2dTransformLength": "Le tableau de transformation doit avoir exactement 6 numéros."
+            }
+        },
+        "createCircleShape": {
+            "description": "Ajoute une forme SVG <circle> au calque sélectionné courant, ou à un nouveau calque si le calque sélectionné courant n'est pas un calque vectoriel. La nouvelle forme est dessinée sur toutes les autres formes de la couche.",
+            "property": {
+                "cx": "La position x du centre du cercle en pixels.",
+                "cy": "La position y du centre du cercle en pixels.",
+                "r": "Le rayon des pixels du cercle."
+            }
+        },
+        "createEllipseShape": {
+            "description": "Ajoute une forme SVG <ellipse> au calque sélectionné courant, ou à un nouveau calque si le calque sélectionné courant n'est pas un calque vectoriel. La nouvelle forme est dessinée sur toutes les autres formes de la couche.",
+            "property": {
+                "cx": "La position x du centre de l'ellipse en pixels.",
+                "cy": "La position y du centre de l'ellipse en pixels.",
+                "rx": "Le rayon de l'ellipse le long de l'axe x en pixels.",
+                "ry": "Le rayon de l'ellipse le long de l'axe y en pixels."
+            }
+        },
+        "createLineShape": {
+            "description": "Ajoute une forme SVG <line> au calque sélectionné ou à un nouveau calque si le calque sélectionné n'est pas un calque vectoriel. La nouvelle forme est dessinée sur toutes les autres formes de la couche.",
+            "property": {
+                "x1": "La position x du début de la ligne en pixels.",
+                "y1": "La position y du début de la ligne en pixels.",
+                "x2": "La position x de la fin de la ligne en pixels.",
+                "y2": "La position y de la fin de la ligne en pixels."
+            }
+        },
+        "createPathShape": {
+            "description": "Ajoute une forme SVG <path> au calque sélectionné ou à un nouveau calque si le calque sélectionné n'est pas un calque vectoriel. La nouvelle forme est dessinée sur toutes les autres formes de la couche.",
+            "property": {
+                "d": "La liste des commandes de chemin SVG. Suivez les spécifications SVG. Exemple: \"M 10 80 Q 52.5 10, 95 80 T 180 80\""
+            }
+        },
+        "createPolygonShape": {
+            "description": "Ajoute une forme SVG <polygon> au calque sélectionné courant, ou à un nouveau calque si le calque sélectionné courant n'est pas un calque vectoriel. La nouvelle forme est dessinée sur toutes les autres formes de la couche.",
+            "property": {
+                "points": "Les points qui définissent le bord extérieur de la forme. Exemple: \"0,0 20,0 10,5\""
+            }
+        },
+        "createPolylineShape": {
+            "description": "Ajoute une forme SVG <polyline> au calque sélectionné ou à un nouveau calque si le calque sélectionné n'est pas un calque vectoriel. La nouvelle forme est dessinée sur toutes les autres formes de la couche.",
+            "property": {
+                "points": "Les points qui définissent les lignes connectées. Exemple: \"0,0 20,0 10,5\""
+            }
+        },
+        "createRectangleShape": {
+            "description": "Ajoute une forme SVG <rect> au calque sélectionné ou à un nouveau calque si le calque sélectionné n'est pas un calque vectoriel. La nouvelle forme est dessinée sur toutes les autres formes de la couche.",
+            "property": {
+                "x": "La position x du bord gauche du rectangle en pixels.",
+                "y": "La position y du bord gauche du rectangle en pixels.",
+                "rx": "Le rayon x des coins du rectangle en pixels.",
+                "ry": "Le rayon y des coins du rectangle en pixels.",
+                "width": "La largeur du rectangle en pixels.",
+                "height": "La hauteur du rectangle en pixels."
+            }
+        },
+        "createShapeCommon": {
+            "property": {
+                "fill": "La couleur de remplissage comme un RGB 8-bit par hexagone canal. Omettre de ne pas remplir. Exemple: \"#000000\"",
+                "fillOpacity": "L'opacité de la couleur de remplissage en nombre décimal de 0 à 1.",
+                "stroke": "La couleur de course comme un RGB 8-bit par hexagone canal. Omettre sans attaque. Exemple: \"#000000\"",
+                "strokeLinecap": "Comment les extrémités des lignes sont rendues, comme défini dans la spécification SVG.",
+                "strokeLinejoin": "Comment les coins des lignes jointes sont rendus, tel que défini dans la spécification SVG.",
+                "strokeOpacity": "L'opacité de la couleur de course en nombre décimal de 0 à 1.",
+                "strokeWidth": "La largeur de la course en pixels.",
+                "transform": "L'attribut de transformation sur la forme. Doit être une fonction de transformation de matrice SVG 2D. Exemple: \"matrice(1,0,0,1,0,0)\""
+            },
+            "error": {
+                "fill": "Syntaxe de remplissage non valide. Fournir un RGBA 8 bits par canal hexagonal. Exemple: \"#000000\"",
+                "stroke": "Syntaxe de course non valide. Fournir un RGBA 8 bits par canal hexagonal. Exemple: \"#000000\"",
+                "transform": "Syntaxe de transformation non valide. Fournir une fonction de transformation de matrice SVG 2D. Exemple: \"matrice(1,0,0,1,0,0)\""
+            }
+        },
+        "cropWorkingFile": {
+            "description": "Relève toute la toile d'image dans le fichier de travail (toutes les couches). Une récolte négative peut être utilisée pour augmenter la taille de la toile.",
+            "property": {
+                "left": "La limite la plus gauche de l'image recadrée en pixels. Cela peut être négatif.",
+                "top": "La limite supérieure de l'image recadrée en pixels. Cela peut être négatif.",
+                "width": "La nouvelle largeur de l'image recadrée en pixels. Cela peut être plus grand que la largeur d'origine.",
+                "height": "La nouvelle hauteur de l'image recadrée en pixels. Cela peut être plus grand que la hauteur originale."
+            },
+            "response": {
+                "success": "Le succès des cultures."
+            }
+        },
+        "deleteLayers": {
+            "description": "Supprime les calques avec les ID spécifiés.",
+            "property": {
+                "layerIds": "Les ID des calques à supprimer. Les identifiants de calque peuvent être récupérés à partir de l'outil get-layer-list."
+            },
+            "error": {
+                "noIds": "Fournir au moins 1 code d'identification de couche."
+            },
+            "response": {
+                "success": "Calque supprimée."
+            }
+        },
+        "deleteShape": {
+            "description": "Supprime une forme SVG de toutes les couches vectorielles sélectionnées.",
+            "property": {
+                "id": "L'ID de la forme à supprimer. Cela peut être récupéré de l'outil get-shape-list."
+            }
+        },
+        "getAvailableFontList": {
+            "description": "Lister toutes les familles de polices disponibles avec les calques de texte."
+        },
+        "getEditorGuide": {
+            "description": "Fournit un résumé en langage naturel du fonctionnement de l'éditeur d'images OpenGraphica.",
+            "summary": "OpenGraphica est un éditeur d'images multimédias mixtes 2D. À son cœur, il peut éditer à la fois des images raster et des formes vectorielles, et exporter vers les formats d'images raster et vectorielle.\n\nLe fichier de travail dans OpenGraphica est un document image avec un ou plusieurs calques. Il a une résolution rectangulaire fixe, définie en pixels. D'autres unités de mesure telles que mm sont prises en charge dans l'interface utilisateur à des fins d'affichage, mais elles sont converties en pixels pour l'édition en utilisant les paramètres résolutionX et résolutionY. Le document d'image du fichier de travail a un système de coordonnées où +x est correct, +y est en bas, et -z va dans l'écran, loin du spectateur.\n\nLe fichier de travail est composé d'une pile de couches individuelles. Toutes les couches ont une largeur/hauteur définie en pixels, et une matrice de transformation 2D 3x3 qui détermine leur position / rotation / échelle. Avec une matrice de transformation d'identité, un calque est dessiné avec son coin supérieur gauche aligné sur le haut gauche du fichier de travail.\n\nLes calques ont différents types, qui inferent le type d'image qu'ils contiennent:\n* **gradient** - Un gradient linéaire ou radial qui couvre l'ensemble du fichier de travail.\n**Raster** - Une image à base de pixel RGBA de 8 bits par canal.\n* **rasterSequence** - Une séquence d'animation utilisant des images à base de pixel RGBA 8 bits par canal pour chaque cadre.\n* **text** - Un ou plusieurs paragraphes de texte riche tirés horizontalement ou verticalement.\n* **vecteur** - document SVG 1.x.\n* **video** - Une vidéo utilisant un codec supporté par le web.\n\nLes couches sont empilées de bas en haut, où la couche inférieure est tirée en premier, et la couche supérieure est tirée devant toutes les autres couches. Les calques sont stockés de sorte que le premier calque du tableau soit le calque le plus bas, mais ils sont affichés à l'utilisateur final où la liste des calques le plus haut. Les calques sont composites par défaut avec la source sur le mélange en RGB linéaire, et convertis en sRGB après toutes les opérations de compilation sont terminées."
+        },
+        "getLayerList": {
+            "description": "Retourne une définition sommaire JSON de tous les calques dans le fichier de travail, où les calques sont dessinés en ordre de tableau (dernier en haut)."
+        },
+        "getRasterLayerImage": {
+            "description": "Renvoie les données d'image pour le calque master spécifié.",
+            "property": {
+                "id": "L'identification de la couche raster. Cela peut être récupéré à partir de l'outil get-layer-list."
+            }
+        },
+        "getShapeList": {
+            "description": "Retourne une définition JSON qui énumère toutes les formes dans n'importe quelle couche vectorielle actuellement sélectionnée, dans l'ordre de bas en haut. Les ID de forme peuvent changer chaque fois qu'une nouvelle forme est ajoutée, supprimée ou réordonnée."
+        },
+        "getVectorLayerSvg": {
+            "description": "Retourne le document SVG sérialisé associé au calque vectoriel spécifié.",
+            "property": {
+                "id": "L'ID de la couche vectorielle. Cela peut être récupéré à partir de l'outil get-layer-list."
+            }
+        },
+        "getWorkingFileDimensions": {
+            "description": "Renvoie la largeur et la hauteur du fichier de travail actuel en pixels. Ce qui est la taille de la toile d'image globale sur laquelle toutes les couches s'assoient."
+        },
+        "insertRasterLayer": {
+            "description": "Insère une image RGBA 8 bits comme un nouveau calque raster sur le dessus de la pile de calque.",
+            "property": {
+                "imageDataUri": "Une image de base64 codée URI. Les types de médias image/png ou image/jpeg sont acceptables.",
+                "name": "Le nom du nouveau calque; habituellement le nom du fichier de l'image.",
+                "transform": "Un tableau de 6 nombres représentant la matrice de transformation 2D. Exemple de transformation de l'identité : [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Couche de grille insérée."
+            }
+        },
+        "insertTextLayer": {
+            "description": "Insère un calque texte. Le haut/gauche est l'origine du dessin, où le haut est la ligne d'ascension de la police.",
+            "property": {
+                "text": "Texte à insérer",
+                "name": "Le nom du nouveau calque de texte.",
+                "transform": "Un tableau de 6 nombres représentant la matrice de transformation 2D. Avec une transformation d'identité, le calque est dessiné avec son haut à gauche aligné sur le haut à gauche de la toile du fichier de travail. Exemple de transformation de l'identité : [1, 0, 0, 1, 0, 1]",
+                "fontFamily": "Le nom de la famille de polices à utiliser. Appelez l'outil get-available-font-list pour obtenir une liste de noms.",
+                "fontSize": "La taille de la police.",
+                "fill": "La couleur de remplissage comme un RGB ou RGBA 8-bit par canal hexagonal. Exemple: \"#000000\" ou \"#000000FF\""
+            }
+        },
+        "reorderLayers": {
+            "description": "Modifie l'ordre des calques",
+            "property": {
+                "insertLayerIds": "Les ID des calques à insérer à l'insertion spécifiéePosition dans la pile de calque. Les identifiants de calque peuvent être récupérés à partir de l'outil get-layer-list.",
+                "referenceLayerId": "L'ID du calque à insérer autour, basé sur la propriété insertPosition.",
+                "insertPosition": "La position à insérer autour du calque référencé par référenceLayerId. « ci-dessus » ou « ci-dessous »."
+            },
+            "error": {
+                "noInsertIds": "Fournir au moins un ID dans la propriété insertLayerIds"
+            },
+            "response": {
+                "success": "Calque réorganisée."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "Résemple l'ensemble de la toile image dans le fichier de travail (toutes les couches) à une résolution différente. Aussi connu comme l'échelle de la taille de l'image.",
+            "property": {
+                "width": "La nouvelle largeur de l'image rééchantillonnée en pixels.",
+                "height": "La nouvelle hauteur de l'image rééchantillonnée en pixels. Le rapport largeur/hauteur doit correspondre à l'image originale."
+            },
+            "response": {
+                "success": "Résample succès."
+            }
+        },
+        "selectLayers": {
+            "description": "Définit les calques actuellement sélectionnés dans l'éditeur en fournissant leurs identifiants",
+            "property": {
+                "ids": "Un tableau d'ID des calques (valeurs numériques)"
+            },
+            "error": {
+                "noIds": "Vous devez fournir au moins un identifiant de calque dans la propriété ids."
+            },
+            "response": {
+                "success": "Les calques sélectionnés avec succès."
+            }
+        },
+        "setLayerTransform": {
+            "description": "Définit la matrice de transformation 2D 3x3 des couches actuellement sélectionnées qui contrôle sa position, sa rotation et son échelle.",
+            "property": {
+                "transform": "Un tableau de 6 nombres représentant la matrice de transformation 2D. Exemple de transformation de l'identité : [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Transformer avec succès."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "Mettre à jour les attributs SVG de toute forme vectorielle dans toute couche vectorielle actuellement sélectionnée : <rect>, <circle>, <ellipse>, <line>, <polyline>, <polygon> ou <path>.",
+            "property": {
+                "id": "L'ID de la forme à mettre à jour. Cela peut être récupéré de l'outil get-shape-list.",
+                "cx": "Position x du centre d'un cercle ou d'une ellipse en pixels.",
+                "cy": "Position y du centre d'un cercle ou d'une ellipse en pixels.",
+                "rx": "Le rayon x des coins d'un rectangle ou du rayon d'une ellipse en pixels.",
+                "ry": "Le rayon y des coins du rectangle ou du rayon d'une ellipse en pixels.",
+                "points": "Les points qui définissent le bord extérieur d'une forme polyline ou polygone. Exemple: \"0,0 20,0 10,5\""
+            }
         }
     }
 }

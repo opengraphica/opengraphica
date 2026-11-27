@@ -9,7 +9,7 @@ export async function isCanvasBitmapTransferSupported() {
 
     const width = 1;
     const height = 1;
-    var imageBuffer = new Uint8Array([5, 255, 74, 201]);
+    const imageBuffer = new Uint8Array([5, 255, 74, 201]);
     const imageData = new ImageData(new Uint8ClampedArray(imageBuffer), width, height);
 
     const bitmap = await createImageBitmap(imageData);
@@ -33,7 +33,7 @@ export async function isCanvasBitmapTransferSupported() {
             };
             img.onerror = () => {
                 resolve(undefined);
-            }
+            };
             img.src = URL.createObjectURL(blob);
         });
     });
@@ -54,6 +54,6 @@ export async function isCanvasBitmapTransferSupported() {
         && imageData.data[1] === actualImageData.data[1]
         && imageData.data[2] === actualImageData.data[2]
         && imageData.data[3] === actualImageData.data[3]
-    )
+    );
     return isSupported;
 }

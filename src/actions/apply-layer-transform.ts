@@ -31,7 +31,7 @@ export class ApplyLayerTransformAction extends BaseAction {
 
         const layerCanvas = await prepareStoredImageForEditing(layer.data.sourceUuid);
         if (!layerCanvas) throw new Error('[src/actions/apply-layer-transform.ts] Unable to edit existing layer image.');
-        let emptyBounds = getImageDataEmptyBounds(getImageDataFromCanvas(layerCanvas));
+        const emptyBounds = getImageDataEmptyBounds(getImageDataFromCanvas(layerCanvas));
 
         const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
 
@@ -44,11 +44,11 @@ export class ApplyLayerTransformAction extends BaseAction {
         ]);
         const originalTextureWidth = Math.ceil(afterEmptyCropBounds.right - afterEmptyCropBounds.left);
         const originalTextureHeight = Math.ceil(afterEmptyCropBounds.bottom - afterEmptyCropBounds.top);
-        let { width: textureWidth, height: textureHeight } = limitMaxDimension(
+        const { width: textureWidth, height: textureHeight } = limitMaxDimension(
             originalTextureWidth,
             originalTextureHeight,
             maxTextureSize,
-        )
+        );
 
         if (textureWidth < 1 || textureHeight < 1) return;
 
@@ -62,10 +62,10 @@ export class ApplyLayerTransformAction extends BaseAction {
             imageResizeCanvas = await resizeImage(layerCanvas, scaledWidth, scaledHeight);
         }
 
-        let workingCanvas = document.createElement('canvas');
+        const workingCanvas = document.createElement('canvas');
         workingCanvas.width = textureWidth;
         workingCanvas.height = textureHeight;
-        let workingCanvasCtx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+        const workingCanvasCtx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
         if (!workingCanvasCtx) throw new Error('[src/actions/apply-layer-transform.ts] Unable to create a new canvas for transform.');
         workingCanvasCtx.save();
         workingCanvasCtx.globalCompositeOperation = 'copy';
@@ -76,7 +76,7 @@ export class ApplyLayerTransformAction extends BaseAction {
         }
         workingCanvasCtx.drawImage(imageResizeCanvas ?? layerCanvas, 0, 0);
         workingCanvasCtx.restore();
-        let newLayerTransform = new DOMMatrix().translateSelf(
+        const newLayerTransform = new DOMMatrix().translateSelf(
             afterEmptyCropBounds.left,
             afterEmptyCropBounds.top,
         ).scaleSelf(
@@ -92,8 +92,8 @@ export class ApplyLayerTransformAction extends BaseAction {
             height: textureHeight,
             transform: newLayerTransform,
             data: {
-                sourceUuid: await createStoredImage(workingCanvas)
-            }
+                sourceUuid: await createStoredImage(workingCanvas),
+            },
         });
         await this.updateLayerAction.do();
 
@@ -135,7 +135,7 @@ export class ApplyLayerTransformAction extends BaseAction {
         }
         if (this.updateLayerAction) {
             this.updateLayerAction.free();
-            this.updateLayerAction = null
+            this.updateLayerAction = null;
         }
     }
 

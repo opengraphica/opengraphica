@@ -11,13 +11,13 @@ vec4 processHighlightBloom(vec4 color, vec2 uv) {
     float hardThresholdCutoff = 1.0 - pThreshold.y;
     float softThresholdEnd = 1.0 - pThreshold.x;
 
-    float offset = random(vec3(12.9898, 78.233, 151.7182), 0.0);
+    float jitterOffset = random(vec3(12.9898, 78.233, 151.7182), 0.0);
 
     vec3 sum = vec3(0.0);
     float weightSum = 0.0;
 
     for (int i = -64; i <= 64; ++i) {
-        float t = (float(i) + offset) / 64.0;
+        float t = (float(i) + jitterOffset) / 64.0;
         float weight = exp(-4.5 * t * t);
         float distancePixels = 3.0 * sigma * t;
         vec2 offset = vec2(distancePixels / layerResolution.x, 0.0);
@@ -35,5 +35,5 @@ vec4 processHighlightBloom(vec4 color, vec2 uv) {
         weightSum += weight;
     }
 
-    return vec4(sum / weightSum, 1.0);
+    return vec4(sum / max(weightSum, 1e-5), 1.0);
 }

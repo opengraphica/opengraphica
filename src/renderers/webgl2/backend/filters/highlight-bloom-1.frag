@@ -8,11 +8,13 @@ vec4 processHighlightBloom(vec4 color, vec2 uv) {
     float sigma = pRadius * maxDimension / 6.0;
     vec2 halfTexel = 0.5 / layerResolution;
 
+    float jitterOffset = random(vec3(12.9898, 78.233, 151.7182), 0.0);
+
     vec3 sum = sampleBackbuffer(uv).rgb;
     float weightSum = 1.0;
 
     for (int i = 1; i <= 64; ++i) {
-        float t = float(i) / 64.0;
+        float t = (float(i) + jitterOffset) / 64.0;
         float weight = exp(-4.5 * t * t);
         float distancePixels = 3.0 * sigma * t;
         vec2 offset = vec2(0.0, distancePixels / layerResolution.y);
@@ -25,7 +27,7 @@ vec4 processHighlightBloom(vec4 color, vec2 uv) {
     }
 
     vec4 original = texture2D(srcTexture, uv);
-    vec3 bloom = sum / weightSum;
+    vec3 bloom = sum / max(weightSum, 1e-5);
 
     return vec4(original.rgb + bloom, original.a);
 }

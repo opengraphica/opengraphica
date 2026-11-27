@@ -18,7 +18,7 @@ interface PermanentStorageState {
     brushStrength: number;
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'deformBlurStateStore',
     state: {
         brushDensity: 1,
@@ -31,7 +31,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
         brushSmoothing: 0.45078125, // 25%
         brushStrength: 0.25,
     },
-    restore: ['brushSize']
+    restore: ['brushSize'],
 });
 
 export const brushDensity = permanentStorage.getWritableRef('brushDensity');

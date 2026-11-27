@@ -1,5 +1,5 @@
 
-vec4 materialMain(vec2 uv) {
+vec4 materialMain(vec2 uv, float lod) {
     return color;
 }
 

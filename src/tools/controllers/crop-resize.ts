@@ -33,7 +33,7 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
 
     private remToPx: number = 16;
     private cropTranslateStart: DOMPoint | null = null;
-    private cropStartDimensions: { top: number, left: number, width: number, height: number } = { top: 0, left: 0, width: 0, height: 0};
+    private cropStartDimensions: { top: number; left: number; width: number; height: number; } = { top: 0, left: 0, width: 0, height: 0 };
     private cropDragType: number = 0;
     private xAxisSnap: number[] = [];
     private yAxisSnap: number[] = [];
@@ -127,7 +127,7 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
         this.snapSensitivity = preferencesStore.get('snapSensitivity') / decomposedTransform.scaleX * devicePixelRatio;
 
         // Determine which dimensions to drag on
-        let cropDragType = this.getCropDragType(point, decomposedTransform);
+        const cropDragType = this.getCropDragType(point, decomposedTransform);
         if (cropDragType != null) {
             this.cropDragType = cropDragType;
             dragHandleHighlight.value = cropDragType;
@@ -218,19 +218,19 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
                         if (enableSnappingToSelectionEdges.value) {
                             xSnap = this.snapPointX(left);
                         }
-                        let difference = (xSnap != null ? xSnap : left) - left;
+                        const difference = (xSnap != null ? xSnap : left) - left;
                         left += difference;
                         if (isDragAll) {
                             if (enableSnappingToSelectionCenter.value) {
                                 const halfWidth = Math.floor(width / 2);
-                                let halfWidthXSnap = this.snapPointX(left + halfWidth);
+                                const halfWidthXSnap = this.snapPointX(left + halfWidth);
                                 if (halfWidthXSnap != null) {
                                     xSnap = halfWidthXSnap;
                                     left = (xSnap != null ? xSnap : (left + halfWidth)) - halfWidth;
                                 }
                             }
                             if (enableSnappingToSelectionEdges.value) {
-                                let widthXSnap = this.snapPointX(left + width);
+                                const widthXSnap = this.snapPointX(left + width);
                                 if (widthXSnap != null) {
                                     xSnap = widthXSnap;
                                     left = (xSnap != null ? xSnap : (left + width)) - width;
@@ -250,26 +250,26 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
                     if (enableSnappingToSelectionEdges.value) {
                         ySnap = this.snapPointY(top);
                     }
-                    let difference = (ySnap != null ? ySnap : top) - top;
+                    const difference = (ySnap != null ? ySnap : top) - top;
                     top += difference;
                     if (isDragAll) {
                         if (enableSnappingToSelectionCenter.value) {
                             const halfHeight = Math.floor(height / 2);
-                            let halfHeightYSnap = this.snapPointY(top + halfHeight);
+                            const halfHeightYSnap = this.snapPointY(top + halfHeight);
                             if (halfHeightYSnap != null) {
                                 ySnap = halfHeightYSnap;
                                 top = (ySnap != null ? ySnap : (top + halfHeight)) - halfHeight;
                             }
                         }
                         if (enableSnappingToSelectionEdges.value) {
-                            let heightYSnap = this.snapPointY(top + height);
+                            const heightYSnap = this.snapPointY(top + height);
                             if (heightYSnap != null) {
                                 ySnap = heightYSnap;
                                 top = (ySnap != null ? ySnap : (top + height)) - height;
                             }
                         }
                     } else {
-                        height -= difference;                        
+                        height -= difference;
                     }
                 } else if (isDragBottom) {
                     if (enableSnappingToSelectionEdges.value) {
@@ -286,7 +286,7 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
                 if (!(isDragTop || isDragBottom)) {
                     height = Math.round(width / dimensionLockRatio.value);
                 } else {
-                    let originalWidth = width;
+                    const originalWidth = width;
                     width = Math.round(height * dimensionLockRatio.value);
                     if (isDragLeft) {
                         left += originalWidth - width;
@@ -295,14 +295,14 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
             }
 
             cropResizeEmitter.emit('setCrop', {
-                top, left, width, height
+                top, left, width, height,
             });
         }
         if (!this.cropTranslateStart && e.isPrimary && ['mouse', 'pen'].includes(e.pointerType)) {
             const transform = canvasStore.get('transform');
             const decomposedTransform = canvasStore.get('decomposedTransform');
             const point = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio).matrixTransform(transform.inverse());
-            let cropDragType = this.getCropDragType(point, decomposedTransform);
+            const cropDragType = this.getCropDragType(point, decomposedTransform);
             if (cropDragType != null) {
                 dragHandleHighlight.value = cropDragType;
             } else {
@@ -355,7 +355,7 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
 
     snapPointX(point: number): number | null {
         const snapSensitivity = this.snapSensitivity;
-        for (let snapPoint of this.xAxisSnap) {
+        for (const snapPoint of this.xAxisSnap) {
             if (point - snapSensitivity < snapPoint && point + snapSensitivity > snapPoint) {
                 return snapPoint;
             }
@@ -368,7 +368,7 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
 
     snapPointY(point: number): number | null {
         const snapSensitivity = this.snapSensitivity;
-        for (let snapPoint of this.yAxisSnap) {
+        for (const snapPoint of this.yAxisSnap) {
             if (point - snapSensitivity < snapPoint && point + snapSensitivity > snapPoint) {
                 return snapPoint;
             }

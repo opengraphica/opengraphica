@@ -3,7 +3,7 @@ import { BaseAction } from './base';
 import {
     activeSelectionMask, appliedSelectionMask,
     activeSelectionPath, appliedSelectionPaths,
-    type SelectionCombineMode,
+    type SelectionCombineMode
 } from '@/tools/store/selection-state';
 import canvasStore from '@/store/canvas';
 import { getStoredImageOrCanvas } from '@/store/image';
@@ -22,7 +22,7 @@ import { findPointListBounds, findRectListBounds } from '@/lib/math';
 import {
     calculateShapeAabb, getViewBox, serializeVectorPathCommands,
     parseCommonNodeAttributes, parseNodeTransform, parsePathNodeAttributes,
-    generateSvgElementIds,
+    generateSvgElementIds
 } from '@/lib/svg';
 import { pathContainsPath, pathToPolylines, polylineToSimplifiedPath } from '@/lib/vector-process';
 
@@ -34,7 +34,7 @@ import { VectorPathCommandType } from '@/types/vector';
 import type {
     UpdateRasterLayerOptions,
     VectorPathCommand, VectorPathCommandMove, VectorPathCommandLine,
-    WorkingFileAnyLayer,
+    WorkingFileAnyLayer
 } from '@/types';
 
 const SVG_SHAPES = ['rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'path'];
@@ -57,11 +57,11 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
 
     constructor(
         layerIds: number[] = workingFileStore.state.selectedLayerIds,
-        options?: DeleteLayerSelectionAreaOptions
+        options?: DeleteLayerSelectionAreaOptions,
     ) {
         super('deleteLayerSelectionArea', 'action.deleteLayerSelectionArea');
         this.layerIds = layerIds;
-        
+
         this.clearSelection = (options?.clearSelection === false) ? false : true;
         this.appliedSelectionPaths = options?.appliedSelectionPaths ?? null;
         this.selectionCombineMode = options?.selectionCombineMode ?? 'subtract';
@@ -139,11 +139,11 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                     this.updateLayerActions.push(applyActiveSelectionAction);
                 }
 
-                let appliedSelectionBoundsRects: DOMRect[] = [];
+                const appliedSelectionBoundsRects: DOMRect[] = [];
                 for (const path of (this.appliedSelectionPaths || appliedSelectionPaths.value)) {
                     const { left, right, top, bottom } = findPointListBounds(path);
                     appliedSelectionBoundsRects.push(
-                        new DOMRect(left, top, right - left, bottom - top)
+                        new DOMRect(left, top, right - left, bottom - top),
                     );
                 }
                 const appliedSelectionBounds = findRectListBounds(appliedSelectionBoundsRects);
@@ -162,7 +162,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                 const clipSubjectShapeIndices: number[] = [];
                 for (const [shapeIndex, shape] of allShapes.entries()) {
                     if (!SVG_SHAPES.includes(shape.tagName)) continue;
-                    
+
                     const { transform, stroke, strokeWidth } = parseCommonNodeAttributes(shape);
                     const nodeXf = viewboxXf.multiply(
                         transform,
@@ -259,7 +259,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                             newPathCommandGroups.push(await polylineToSimplifiedPath(newPathCommands));
                         }
                         shape.setAttribute('d', newPathCommandGroups.map(
-                            (commandGroup) => serializeVectorPathCommands(commandGroup, true)
+                            (commandGroup) => serializeVectorPathCommands(commandGroup, true),
                         ).join(' '));
 
                     } else {
@@ -293,8 +293,8 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                 const updateLayerAction = new UpdateLayerAction({
                     id: layer.id,
                     data: {
-                        sourceUuid: await createStoredSvg(image)
-                    }
+                        sourceUuid: await createStoredSvg(image),
+                    },
                 });
                 await updateLayerAction.do();
                 this.freeEstimates.memory += updateLayerAction.freeEstimates.memory;
