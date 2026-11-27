@@ -98,6 +98,10 @@
         "name": "layerFilter.emboss.name",
         "group": "distort"
     },
+    "newsprint": {
+        "name": "layerFilter.newsprint.name",
+        "group": "distort"
+    },
     "whirlPinch": {
         "name": "layerFilter.whirlPinch.name",
         "group": "distort"
