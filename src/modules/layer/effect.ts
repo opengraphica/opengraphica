@@ -1,6 +1,6 @@
 import { watch } from 'vue';
 
-import editorStore from "@/store/editor";
+import editorStore from '@/store/editor';
 
 import { effectEmitter, isToolbarVisible as isEffectToolbarVisible } from '@/tools/store/effect-state';
 

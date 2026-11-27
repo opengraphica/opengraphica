@@ -16,9 +16,9 @@ import workingFileStore, { getSelectedLayers, getLayerById } from '@/store/worki
 import {
     cursorHoverPosition, cursorHoverAngle,
     brushDensity, brushPressureMinDensity, brushHardness, brushSize, isPreviewingSize,
-    brushPressureMinSize, brushPressureTaper, brushSmoothing, brushStrength, brushOpacity,
+    brushPressureMinSize, brushPressureTaper, brushSmoothing, brushStrength, brushOpacity
 } from '../store/deform-blur-state';
-import {  activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
+import { activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
@@ -31,7 +31,7 @@ import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/render
 
 import { RendererBrushStrokeDrawMode } from '@/types/renderer';
 import type {
-    RendererFrontend, RendererTextureTile, UpdateRasterLayerOptions, WorkingFileAnyLayer,
+    RendererFrontend, RendererTextureTile, UpdateRasterLayerOptions, WorkingFileAnyLayer
 } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -95,7 +95,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
             } else {
                 cursorHoverPosition.value = new DOMPoint(
                     -100000000000,
-                    -100000000000
+                    -100000000000,
                 );
             }
         });
@@ -104,17 +104,17 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
         appEmitter.on('editor.tool.delete', this.onDelete);
         this.onSelectAll = this.onSelectAll.bind(this);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
-        
+
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
-            -100000000000
-        )
+            -100000000000,
+        );
         cursorHoverAngle.value = 0;
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.deformBlurToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.deformBlurToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.deformBlurToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -122,8 +122,8 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
                     title: t('tutorialTip.deformBlurToolIntroduction.title'),
                     message: {
                         touch: message,
-                        mouse: message
-                    }
+                        mouse: message,
+                    },
                 });
             });
         }
@@ -166,7 +166,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             cursorHoverAngle.value = e.twist;
             isPreviewingSize.value = false;
@@ -216,7 +216,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
     }
 
     protected async blurStart(e: PointerEvent) {
-        let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
+        const selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
         if (selectedLayers.length === 0) {
             appEmitter.emit('app.notify', {
                 type: 'info',
@@ -247,7 +247,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
         // Populate first drawing point
         const transformedPoint = new DOMPoint(
             this.lastCursorX * devicePixelRatio,
-            this.lastCursorY * devicePixelRatio
+            this.lastCursorY * devicePixelRatio,
         ).matrixTransform(canvasStore.state.transform.inverse());
 
         const pressure = this.blurringUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
@@ -270,7 +270,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
                 tiltX: 0,
                 tiltY: 0,
                 twist: e.twist,
-            }
+            },
         );
 
         // Draw first point
@@ -296,7 +296,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
         if ((e.pointerType === 'pen' || !editorStore.state.isPenUser) && !isPreviewingSize.value) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             cursorHoverAngle.value = e.twist;
         }
@@ -307,9 +307,9 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
         ) {
             const transformedPoint = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
-            
+
             const pressure = this.blurringUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
             const size = brushSize.value * (
                 brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
@@ -364,7 +364,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
 
             if (count > 60) break;
         }
-        
+
         if (now - this.blurLoopLastPointerMoveTimestamp > 25) {
             this.blurLoopDeltaAccumulator += now - this.blurLoopLastRunTimestamp;
 
@@ -440,7 +440,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
                     collectedTiles.push(
                         this.renderer.stopBrushStroke(
                             layer.id,
-                        )
+                        ),
                     );
                 }
             }
@@ -467,8 +467,8 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
                                 data: {
                                     tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
                                     alreadyRendererd: true,
-                                }
-                            })
+                                },
+                            }),
                         );
                     }
                 }
@@ -501,7 +501,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
     private onSelectAll() {
         if (activeSelectionMask.value || appliedSelectionMask.value) {
             historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
+                action: new ClearSelectionAction(),
             });
         }
     }
@@ -515,7 +515,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
     }
 
     protected handleCursorIcon() {
-        let newIcon = super.handleCursorIcon();
+        const newIcon = super.handleCursorIcon();
         canvasStore.set('cursor', newIcon);
         return newIcon;
     }

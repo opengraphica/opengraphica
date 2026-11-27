@@ -28,14 +28,14 @@ export function fragment(
     const sourceB = rgba.b;
 
     const radius = 0.75;
-    
+
     const interpolation = Math.min(Math.max(pointDistance2d(0.0, 0.0, -0.5 + uvX, -0.5 + uvY) - (1.0 - radius), 0.0), 1.0);
     const gradientColor = {
         r: (interpolation * stop2.r) + (1.0 - interpolation) * stop1.r,
         g: (interpolation * stop2.g) + (1.0 - interpolation) * stop1.g,
         b: (interpolation * stop2.b) + (1.0 - interpolation) * stop1.b,
         a: (interpolation * stop2.a) + (1.0 - interpolation) * stop1.a,
-    } 
+    };
     rgba.r = (gradientColor.r * gradientColor.a) + (rgba.r * (1.0 - gradientColor.a));
     rgba.g = (gradientColor.g * gradientColor.a) + (rgba.g * (1.0 - gradientColor.a));
     rgba.b = (gradientColor.b * gradientColor.a) + (rgba.b * (1.0 - gradientColor.a));

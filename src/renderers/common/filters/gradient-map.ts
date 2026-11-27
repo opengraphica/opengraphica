@@ -7,8 +7,8 @@ export enum GradientMapColorSpace {
 }
 
 export interface GradientMapCanvasFilterParams {
-    gradient?: Array<WorkingFileGradientColorStop<RGBAColor>>,
-    colorSpace?: GradientMapColorSpace,
+    gradient?: Array<WorkingFileGradientColorStop<RGBAColor>>;
+    colorSpace?: GradientMapColorSpace;
     mix?: number;
 }
 
@@ -24,7 +24,7 @@ export default class GradientMapCanvasFilter implements CanvasFilter<GradientMap
                 default: [
                     {
                         offset: 0,
-                        color: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' },                        
+                        color: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' },
                     },
                     {
                         offset: 1,
@@ -49,15 +49,15 @@ export default class GradientMapCanvasFilter implements CanvasFilter<GradientMap
                 options: [
                     { key: 'oklab', value: GradientMapColorSpace.OKLAB },
                     { key: 'perceptualRgb', value: GradientMapColorSpace.PERCEPTUAL_RGB },
-                    { key: 'linearRgb', value: GradientMapColorSpace.LINEAR_RGB }
-                ]
+                    { key: 'linearRgb', value: GradientMapColorSpace.LINEAR_RGB },
+                ],
             },
             mix: {
                 type: 'percentage',
                 default: 1,
                 min: 0,
-                max: 1
-            }
+                max: 1,
+            },
         } as CanvasFilterEditConfig;
     }
 }

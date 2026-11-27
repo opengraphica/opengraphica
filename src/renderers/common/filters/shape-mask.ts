@@ -51,7 +51,7 @@ export default class ShapeMaskCanvasFilter implements CanvasFilter<ShapeMaskCanv
                     { key: 'cross', value: ShapeMaskType.CROSS },
                     // { key: 'heart', value: ShapeMaskType.HEART },
                     { key: 'moon', value: ShapeMaskType.MOON },
-                ]
+                ],
             },
             squareAspect: {
                 type: 'boolean',

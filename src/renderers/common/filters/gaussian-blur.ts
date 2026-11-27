@@ -16,14 +16,14 @@ export default class GaussianBlurCanvasFilter implements CanvasFilter<GaussianBl
                 type: 'percentage',
                 default: 0.2,
                 min: 0,
-                max: 1
+                max: 1,
             },
             yRadius: {
                 type: 'percentage',
                 default: 0.2,
                 min: 0,
-                max: 1
-            }
+                max: 1,
+            },
         } as CanvasFilterEditConfig;
     }
 

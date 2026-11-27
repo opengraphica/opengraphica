@@ -3,12 +3,12 @@ import { getStoredVideo } from '@/store/video';
 import canvasStore from '@/store/canvas';
 
 interface VideoContext {
-    canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D,
-    sourceUuid: string,
-    requestId: number,
-    video: HTMLVideoElement,
-    callbackHandle: number | undefined,
+    canvas: HTMLCanvasElement;
+    context: CanvasRenderingContext2D;
+    sourceUuid: string;
+    requestId: number;
+    video: HTMLVideoElement;
+    callbackHandle: number | undefined;
 }
 
 function handleVideoFrameCallback(this: VideoContext, now?: DOMHighResTimeStamp, metadata?: VideoFrameCallbackMetadata) {
@@ -35,7 +35,7 @@ function sendBitmap(this: VideoContext, bitmap: ImageBitmap) {
         sourceUuid: this.sourceUuid,
         requestId: this.requestId,
         bitmap,
-    })
+    });
 }
 
 export class VideoPlayer {
@@ -46,7 +46,7 @@ export class VideoPlayer {
         messageBus.on('backend.requestFrontendVideoFrame', this.requestFrontendVideoFrame);
     }
 
-    requestFrontendVideoFrame(request?: { sourceUuid: string, requestId: number }) {
+    requestFrontendVideoFrame(request?: { sourceUuid: string; requestId: number; }) {
         if (!request) return;
         const { sourceUuid, requestId } = request;
         try {
@@ -66,7 +66,7 @@ export class VideoPlayer {
                     requestId,
                     video,
                     callbackHandle: undefined,
-                }
+                };
                 this.videoContexts.set(sourceUuid, videoContext);
             }
             videoContext.requestId = requestId;
@@ -82,7 +82,7 @@ export class VideoPlayer {
             });
         }
     }
-    
+
     dispose() {
         messageBus.off('backend.requestFrontendVideoFrame', this.requestFrontendVideoFrame);
         for (const videoContext of this.videoContexts.values()) {

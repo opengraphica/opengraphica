@@ -6,13 +6,13 @@ import type { CanvasFilter } from '@/types';
 const instructionQueue: Array<FilterNewBakeRequest | FilterCancelBakeRequest> = [];
 let isWorkingQueue: boolean = false;
 
-self.onmessage = ({ data }: { data: FilterNewBakeRequest | FilterCancelBakeRequest }) => {
+self.onmessage = ({ data }: { data: FilterNewBakeRequest | FilterCancelBakeRequest; }) => {
     if (data.type === 'NEW_FILTER_BAKE') {
         const queueIndex = instructionQueue.findIndex((queueItem) => {
             return (
                 (queueItem.type === 'CANCEL_FILTER_BAKE' && queueItem.queueId === data.queueId) ||
                 (queueItem.type === 'NEW_FILTER_BAKE' && queueItem.layerId === data.layerId)
-            )
+            );
         });
         if (queueIndex > -1) {
             instructionQueue.splice(queueIndex, 1);
@@ -94,8 +94,8 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
                 });
 
                 // Check if this was canceled already, don't send it back if so.
-                const cancelRequestIndex = instructionQueue.findIndex((queueItem) => 
-                    (queueItem.type === 'CANCEL_FILTER_BAKE' && queueItem.queueId === queueItem.queueId)
+                const cancelRequestIndex = instructionQueue.findIndex(
+                    (queueItem) => (queueItem.type === 'CANCEL_FILTER_BAKE' && queueItem.queueId === queueItem.queueId),
                 );
                 if (cancelRequestIndex > -1) {
                     instructionQueue.splice(cancelRequestIndex, 1);
@@ -108,10 +108,10 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
         await new Promise((resolve) => {
             setTimeout(resolve, 0);
         });
-        
+
         // Check if this was canceled already, don't send it back if so.
-        const cancelRequestIndex = instructionQueue.findIndex((queueItem) => 
-            (queueItem.type === 'CANCEL_FILTER_BAKE' && queueItem.queueId === queueItem.queueId)
+        const cancelRequestIndex = instructionQueue.findIndex(
+            (queueItem) => (queueItem.type === 'CANCEL_FILTER_BAKE' && queueItem.queueId === queueItem.queueId),
         );
         if (cancelRequestIndex > -1) {
             instructionQueue.splice(cancelRequestIndex, 1);
@@ -121,7 +121,7 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
                 type: 'FILTER_BAKE_RESULT',
                 queueId: queueItem.queueId,
                 layerId: queueItem.layerId,
-                imageData: appliedImageData
+                imageData: appliedImageData,
             } as FilterBakeResult);
         }
     } catch (error) {
@@ -130,7 +130,7 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
             type: 'FILTER_BAKE_ERROR',
             queueId: queueItem.queueId,
             layerId: queueItem.layerId,
-            message: `${error}`
+            message: `${error}`,
         } as FilterBakeError);
     }
 }

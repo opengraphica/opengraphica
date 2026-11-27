@@ -24,7 +24,7 @@ export function useViewportCommon(options: ViewportCommonOptions) {
         // document.removeEventListener('visibilitychange', onDocumentVisibilityChange);
     });
 
-    // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 
+    // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller.
     async function resetTransform(event?: AppEmitterEvents['app.canvas.resetTransform']) {
         appEmitter.emit('app.canvas.calculateDndArea');
         const margin: number = (event && event.margin) || 48;

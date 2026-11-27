@@ -14,8 +14,8 @@ export default class InstagramXpro2CanvasFilter implements CanvasFilter<Instagra
                 type: 'percentage',
                 default: 1,
                 min: 0,
-                max: 1
-            }
+                max: 1,
+            },
         } as CanvasFilterEditConfig;
     }
 }

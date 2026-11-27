@@ -128,7 +128,7 @@ export class BucketFill {
             depthWrite: false,
             transparent: true,
             premultipliedAlpha: true,
-        })
+        });
 
         this.previewTextureRenderTarget = new WebGLRenderTarget(texture.width, texture.height, {
             type: UnsignedByteType,
@@ -212,15 +212,15 @@ export class BucketFill {
                 this._m1.makeTranslation(
                     -selectionMaskOffset[0] / selectionMaskWidth,
                     1.0 + (selectionMaskOffset[1] / selectionMaskHeight),
-                    0.0
-                )
+                    0.0,
+                ),
             )
             .multiply(
                 this._m1.makeScale(
                     1.0 / selectionMaskWidth,
                     -1.0 / selectionMaskHeight,
                     1.0,
-                )
+                ),
             );
         const tileTransformResetInverse = this._m1.copy(tileTransformReset).invert();
 
@@ -228,7 +228,7 @@ export class BucketFill {
             .identity()
             .multiply(tileTransformReset)
             .multiply(
-                this.meshController.getTransform()
+                this.meshController.getTransform(),
             )
             .multiply(tileTransformResetInverse)
             .multiply(
@@ -236,14 +236,14 @@ export class BucketFill {
                     selectionMaskTileOffsetX,
                     1.0 - selectionMaskTileOffsetY - selectionMaskTileScaleY,
                     1.0,
-                )
+                ),
             )
             .multiply(
                 this._m2.makeScale(
                     selectionMaskTileScaleX,
                     selectionMaskTileScaleY,
                     1.0,
-                )
+                ),
             );
     }
 
@@ -332,7 +332,7 @@ export class BucketFill {
         const SIMILARITY_EXPONENTIAL_STRENGTH = 6.0;
 
         while (highestBucket >= 0) {
-             while (
+            while (
                 highestBucket >= 0 &&
                 bucketHeads[highestBucket] === EMPTY
             ) {
@@ -356,7 +356,7 @@ export class BucketFill {
                 if (heights[neighborIndex] !== -1) {
                     break xgt0Check;
                 }
-                
+
                 const b = neighborIndex * 4;
                 const bAlpha = buffer[b + 3] * inv255;
                 const br = (buffer[b] * inv255) * bAlpha;
@@ -372,7 +372,7 @@ export class BucketFill {
                     dr * dr +
                     dg * dg +
                     db * db +
-                    da * da
+                    da * da,
                 );
 
                 const t = Math.max(0, Math.min(1, (rgbDistance - 0.0) / (tolerance - 0.0)));
@@ -421,7 +421,7 @@ export class BucketFill {
                     dr * dr +
                     dg * dg +
                     db * db +
-                    da * da
+                    da * da,
                 );
 
                 const t = Math.max(0, Math.min(1, (rgbDistance - 0.0) / (tolerance - 0.0)));
@@ -470,7 +470,7 @@ export class BucketFill {
                     dr * dr +
                     dg * dg +
                     db * db +
-                    da * da
+                    da * da,
                 );
 
                 const t = Math.max(0, Math.min(1, (rgbDistance - 0.0) / (tolerance - 0.0)));
@@ -519,7 +519,7 @@ export class BucketFill {
                     dr * dr +
                     dg * dg +
                     db * db +
-                    da * da
+                    da * da,
                 );
 
                 const t = Math.max(0, Math.min(1, (rgbDistance - 0.0) / (tolerance - 0.0)));
@@ -574,7 +574,7 @@ export class BucketFill {
             width,
             height,
             RGBAFormat,
-            UnsignedByteType
+            UnsignedByteType,
         );
         texture.minFilter = NearestFilter;
         texture.magFilter = NearestFilter;
@@ -703,7 +703,7 @@ export class BucketFill {
             image: await createImageBitmap(
                 new ImageData(new Uint8ClampedArray(buffer), renderWidth, renderHeight),
                 { imageOrientation: 'flipY' },
-            )
+            ),
         };
     }
 

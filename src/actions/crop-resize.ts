@@ -13,7 +13,7 @@ import type {
     ColorModel, TextDocument,
     UpdateAnyLayerOptions, UpdateTextLayerOptions,
     WorkingFileLayer, WorkingFileGroupLayer, WorkingFileTextLayer,
-    MeasuringUnits, ResolutionUnits,
+    MeasuringUnits, ResolutionUnits
 } from '@/types';
 
 async function generateResizeLayerActions(
@@ -24,8 +24,8 @@ async function generateResizeLayerActions(
     cropLeft: number,
     cropTop: number,
 ): Promise<BaseAction[]> {
-    let actions: BaseAction[] = [];
-    for (let layer of layers) {
+    const actions: BaseAction[] = [];
+    for (const layer of layers) {
         if (layer.type === 'group') {
             await generateResizeLayerActions((layer as WorkingFileGroupLayer<ColorModel>).layers, mode, widthRatio, heightRatio, cropLeft, cropTop);
         } else if (layer.type === 'raster' || layer.type === 'rasterSequence' || layer.type === 'vector' || layer.type === 'gradient') {
@@ -38,8 +38,8 @@ async function generateResizeLayerActions(
             actions.push(
                 new UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>({
                     id: layer.id,
-                    transform
-                })
+                    transform,
+                }),
             );
         } else if (layer.type === 'text') {
             let transform = layer.transform;
@@ -49,7 +49,7 @@ async function generateResizeLayerActions(
                     new UpdateLayerAction<UpdateTextLayerOptions<ColorModel>>({
                         id: layer.id,
                         transform,
-                    })
+                    }),
                 );
             } else {
                 const decomposedTransform = decomposeMatrix(transform);
@@ -57,9 +57,9 @@ async function generateResizeLayerActions(
                     .translateSelf(-cropLeft * widthRatio, -cropTop * heightRatio)
                     .translateSelf(
                         -decomposedTransform.translateX + (decomposedTransform.translateX * widthRatio),
-                        -decomposedTransform.translateY + (decomposedTransform.translateY * heightRatio)
+                        -decomposedTransform.translateY + (decomposedTransform.translateY * heightRatio),
                     )
-                    .multiplySelf(layer.transform)
+                    .multiplySelf(layer.transform);
                 const oldData = JSON.parse(JSON.stringify((layer as WorkingFileTextLayer).data)) as TextDocument;
                 const newData = JSON.parse(JSON.stringify((layer as WorkingFileTextLayer).data)) as TextDocument;
                 for (const line of newData.lines) {
@@ -79,7 +79,7 @@ async function generateResizeLayerActions(
                         width: layer.width,
                         height: layer.height,
                         data: oldData,
-                    })
+                    }),
                 );
             }
         }
@@ -154,7 +154,7 @@ export class CropResizeAction extends BaseAction {
                     resolutionX: this.resolutionX,
                     resolutionY: this.resolutionY,
                     resolutionUnits: this.resolutionUnits,
-                })
+                }),
             );
         }
 

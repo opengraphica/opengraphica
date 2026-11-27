@@ -70,7 +70,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                 options.force2dRenderer = true;
             }
             const canvas = ctx.canvas;
-            
+
             // In some browsers you can see visible seams between drawImage calls that are otherwise pixel perfect aligned in certain view transforms.
             // Optionally, drawing subsequent raster layers to a buffer canvas first then applying the transform eliminates this issue at a performance cost.
             if (preferencesStore.get('enableMultiLayerBuffer') && canvasStore.get('decomposedTransform').scaleX < 1) {
@@ -91,18 +91,18 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                     }
                 }
             }
-    
+
             if (layer.type !== 'raster' && layer.type !== 'rasterSequence' && layer.type !== 'group') {
                 canvasStore.set('isDisplayingNonRasterLayer', true);
             }
-    
+
             if (options.selectionTest) {
                 ctx.save();
                 ctx.setTransform(new DOMMatrix());
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.restore();
             }
-            
+
             ctx.save();
             ctx.globalAlpha = layer.opacity;
             ctx.globalCompositeOperation = options?.globalCompositeOperation ?? getLayer2dCompositeOperation(layer);

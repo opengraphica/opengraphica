@@ -1,5 +1,5 @@
 
-export var biginteger_used: boolean;
+export const biginteger_used: boolean;
 export function Math_Abs_Int64(a: number): number;
 export function Math_Abs_Int32(a: number): number;
 export function Math_Abs_Double(a: number): number;
@@ -8,9 +8,9 @@ export function Cast_Int32(a: number): number;
 export function Cast_Int64(a: number): number;
 export function Clear(a: ArrayLike<any>): void;
 
-export var MaxSteps: number;
-export var PI: number;
-export var PI2: number;
+export const MaxSteps: number;
+export const PI: number;
+export const PI2: number;
 
 export class IntPoint {
     x: number;
@@ -159,7 +159,7 @@ export class ClipperBase {
     AddPaths(ppg: Paths, polyType: PolyType, closed: boolean): boolean;
 }
 export class Clipper extends ClipperBase {
-    static GetBounds(paths: Paths): { top: number; bottom: number; left: number; right: number };
+    static GetBounds(paths: Paths): { top: number; bottom: number; left: number; right: number; };
     static Orientation(poly: Path): boolean;
     static PointInPolygon(point: Point, path: Path): number;
     Execute(clipType: ClipType, solution: Paths | PolyTree, subjFillType: PolyFillType, clipFillType: PolyFillType): boolean;
@@ -183,7 +183,7 @@ export class PolyOffsetBuilder {
 
     constructor(
         pts: Polygons,
-        solution: { value: Polygons },
+        solution: { value: Polygons; },
         delta: number,
         jointype: JoinType,
         MiterLimit: number,
@@ -215,5 +215,5 @@ export class PolyNode {
     IsHole(): boolean;
 }
 export class PolyTree extends PolyNode {
-    
+
 }

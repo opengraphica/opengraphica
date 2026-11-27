@@ -2,7 +2,7 @@ export interface DndLayoutMenuBar {
     layout: {
         docks: string[];
         tools: string[];
-    }
+    };
 }
 
 export interface DndLayoutDock {
@@ -58,7 +58,7 @@ export interface ToolDefinition {
 export interface ToolGroupDefinition {
     tools: {
         [key: string]: ToolDefinition;
-    }
+    };
 }
 
 export interface ModuleDefinition {
@@ -73,7 +73,7 @@ export interface ModuleDefinition {
 export interface ModuleGroupDefinition {
     modules: {
         [key: string]: ModuleDefinition;
-    }
+    };
 }
 
 

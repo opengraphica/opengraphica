@@ -6,7 +6,7 @@ import {
     ACESFilmicToneMapping,
     NeutralToneMapping,
     CustomToneMapping,
-    SRGBTransfer,
+    SRGBTransfer
 } from 'three/src/constants';
 import { ColorManagement } from 'three/src/math/ColorManagement';
 import { RawShaderMaterial } from 'three/src/materials/RawShaderMaterial';
@@ -73,23 +73,23 @@ class OutputPass extends Pass {
          *
          * @type {Object}
          */
-        this.uniforms = UniformsUtils.clone( OutputShader.uniforms );
+        this.uniforms = UniformsUtils.clone(OutputShader.uniforms);
 
         /**
          * The pass material.
          *
          * @type {RawShaderMaterial}
          */
-        this.material = new RawShaderMaterial( {
+        this.material = new RawShaderMaterial({
             name: OutputShader.name,
             uniforms: this.uniforms,
             vertexShader: OutputShader.vertexShader,
-            fragmentShader: OutputShader.fragmentShader
-        } );
+            fragmentShader: OutputShader.fragmentShader,
+        });
 
         // internals
 
-        this._fsQuad = new FullScreenQuad( this.material );
+        this._fsQuad = new FullScreenQuad(this.material);
 
         this._outputColorSpace = null;
         this._toneMapping = null;
@@ -107,20 +107,20 @@ class OutputPass extends Pass {
      * @param {number} deltaTime - The delta time in seconds.
      * @param {boolean} maskActive - Whether masking is active or not.
      */
-    render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive */ ) {
+    render(renderer, writeBuffer, readBuffer/*, deltaTime, maskActive */) {
         const viewProjection = new Matrix4().multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
 
-        this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
-        this.uniforms[ 'toneMappingExposure' ].value = renderer.toneMappingExposure;
-        this.uniforms[ 'backgroundColor' ].value = this.imageBackground.backgroundMaterial.uniforms.color.value;
-        this.uniforms[ 'transparencyGridMap' ].value = this.imageBackground.backgroundMaterial.uniforms.transparencyGridMap.value;
-        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.y = this.imageBackground.backgroundMaterial.uniforms.opacity.value;
-        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.z = this.imageBackground.backgroundGeometry.parameters.width;
-        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.w = this.imageBackground.backgroundGeometry.parameters.height;
-        this.uniforms[ 'imageDimensions' ].value.x = readBuffer.texture.width;
-        this.uniforms[ 'imageDimensions' ].value.y = readBuffer.texture.height;
-        this.uniforms[ 'backgroundInverseViewProjection' ].value.copy(viewProjection).invert();
-        this.uniforms[ 'backgroundWorldToLocal' ].value.copy(this.imageBackground.backgroundMesh.matrixWorld).invert();
+        this.uniforms['tDiffuse'].value = readBuffer.texture;
+        this.uniforms['toneMappingExposure'].value = renderer.toneMappingExposure;
+        this.uniforms['backgroundColor'].value = this.imageBackground.backgroundMaterial.uniforms.color.value;
+        this.uniforms['transparencyGridMap'].value = this.imageBackground.backgroundMaterial.uniforms.transparencyGridMap.value;
+        this.uniforms['backgroundTileSizeOpacityDimensions'].value.y = this.imageBackground.backgroundMaterial.uniforms.opacity.value;
+        this.uniforms['backgroundTileSizeOpacityDimensions'].value.z = this.imageBackground.backgroundGeometry.parameters.width;
+        this.uniforms['backgroundTileSizeOpacityDimensions'].value.w = this.imageBackground.backgroundGeometry.parameters.height;
+        this.uniforms['imageDimensions'].value.x = readBuffer.texture.width;
+        this.uniforms['imageDimensions'].value.y = readBuffer.texture.height;
+        this.uniforms['backgroundInverseViewProjection'].value.copy(viewProjection).invert();
+        this.uniforms['backgroundWorldToLocal'].value.copy(this.imageBackground.backgroundMesh.matrixWorld).invert();
 
         const cTransparencyEnabled = this.imageBackground.backgroundMaterial.defines.cTransparencyEnabled;
         const cImageBoundaryEnabled = this.imageBoundaryMask.imageBoundaryMesh?.visible ? 1 : 0;
@@ -139,32 +139,32 @@ class OutputPass extends Pass {
 
             this.material.defines = {};
 
-            if ( ColorManagement.getTransfer( this._outputColorSpace ) === SRGBTransfer ) this.material.defines.SRGB_TRANSFER = '';
+            if (ColorManagement.getTransfer(this._outputColorSpace) === SRGBTransfer) this.material.defines.SRGB_TRANSFER = '';
 
             this.material.defines.cTransparencyEnabled = cTransparencyEnabled;
             this.material.defines.cImageBoundaryEnabled = cImageBoundaryEnabled;
-            if ( this._toneMapping === LinearToneMapping ) this.material.defines.LINEAR_TONE_MAPPING = '';
-            else if ( this._toneMapping === ReinhardToneMapping ) this.material.defines.REINHARD_TONE_MAPPING = '';
-            else if ( this._toneMapping === CineonToneMapping ) this.material.defines.CINEON_TONE_MAPPING = '';
-            else if ( this._toneMapping === ACESFilmicToneMapping ) this.material.defines.ACES_FILMIC_TONE_MAPPING = '';
-            else if ( this._toneMapping === AgXToneMapping ) this.material.defines.AGX_TONE_MAPPING = '';
-            else if ( this._toneMapping === NeutralToneMapping ) this.material.defines.NEUTRAL_TONE_MAPPING = '';
-            else if ( this._toneMapping === CustomToneMapping ) this.material.defines.CUSTOM_TONE_MAPPING = '';
+            if (this._toneMapping === LinearToneMapping) this.material.defines.LINEAR_TONE_MAPPING = '';
+            else if (this._toneMapping === ReinhardToneMapping) this.material.defines.REINHARD_TONE_MAPPING = '';
+            else if (this._toneMapping === CineonToneMapping) this.material.defines.CINEON_TONE_MAPPING = '';
+            else if (this._toneMapping === ACESFilmicToneMapping) this.material.defines.ACES_FILMIC_TONE_MAPPING = '';
+            else if (this._toneMapping === AgXToneMapping) this.material.defines.AGX_TONE_MAPPING = '';
+            else if (this._toneMapping === NeutralToneMapping) this.material.defines.NEUTRAL_TONE_MAPPING = '';
+            else if (this._toneMapping === CustomToneMapping) this.material.defines.CUSTOM_TONE_MAPPING = '';
 
             this.material.needsUpdate = true;
 
         }
 
-        if ( this.renderToScreen === true ) {
+        if (this.renderToScreen === true) {
 
-            renderer.setRenderTarget( null );
-            this._fsQuad.render( renderer );
+            renderer.setRenderTarget(null);
+            this._fsQuad.render(renderer);
 
         } else {
 
-            renderer.setRenderTarget( writeBuffer );
-            if ( this.clear ) renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
-            this._fsQuad.render( renderer );
+            renderer.setRenderTarget(writeBuffer);
+            if (this.clear) renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
+            this._fsQuad.render(renderer);
 
         }
 

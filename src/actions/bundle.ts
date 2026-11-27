@@ -60,7 +60,7 @@ export class BundleAction extends BaseAction {
 
     free() {
         if (this.actions) {
-            for (let action of this.actions) {
+            for (const action of this.actions) {
                 action.free();
             }
             (this.actions as BaseAction[] | null) = null;

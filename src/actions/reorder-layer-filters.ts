@@ -82,13 +82,13 @@ export class ReorderLayerFiltersAction extends BaseAction {
         }
 
         // Place inserted filters back in their original positions
-        let previousPositions = this.insertFilterIndices.sort();
-        let sortedRemovedFilters = [...removedFilters].sort((a, b) => {
+        const previousPositions = this.insertFilterIndices.sort();
+        const sortedRemovedFilters = [...removedFilters].sort((a, b) => {
             const originalPositionA = this.insertFilterIndices[removedFilters.indexOf(a)];
             const originalPositionB = this.insertFilterIndices[removedFilters.indexOf(b)];
             return originalPositionA < originalPositionB ? -1 : (originalPositionA > originalPositionB ? 1 : 0);
         });
-        for (let [filterIndex, insertPosition] of previousPositions.entries()) {
+        for (const [filterIndex, insertPosition] of previousPositions.entries()) {
             layer.filters.splice(insertPosition, 0, sortedRemovedFilters[filterIndex]);
         }
 

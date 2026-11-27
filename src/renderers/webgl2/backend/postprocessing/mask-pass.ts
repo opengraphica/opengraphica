@@ -41,7 +41,7 @@ class MaskPass extends Pass {
 
         let writeValue, clearValue;
 
-        if ( this.inverse ) {
+        if (this.inverse) {
             writeValue = 0;
             clearValue = 1;
         } else {

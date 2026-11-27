@@ -1,6 +1,6 @@
 import {
     LinearFilter, SRGBColorSpace, RGBAFormat,
-    HalfFloatType, UnsignedByteType, NoColorSpace,
+    HalfFloatType, UnsignedByteType, NoColorSpace
 } from 'three/src/constants';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { Object3D } from 'three/src/core/Object3D';
@@ -34,7 +34,7 @@ import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
     RendererFrontendTakeSnapshotCropOptions, ClassType,
-    RendererBucketFillSettings,RendererPickedVectorLayerElement,
+    RendererBucketFillSettings, RendererPickedVectorLayerElement
 } from '@/types';
 
 const MAX_CPU_PIXEL_FIX_SIZE = 4096;
@@ -54,12 +54,12 @@ export interface Webgl2RendererApplySelectionMaskToAlphaChannelOptions {
     invert?: boolean;
 }
 
-export type MeshControllerInterface = any & { dispose: () => void };
+export type MeshControllerInterface = any & { dispose: () => void; };
 
 export interface Webgl2RendererBackendPublic {
     isOffscreen: boolean;
-    onRequestFrontendSvg?: (request: { sourceUuid: string, requestId: number, width: number, height: number }) => void;
-    onRequestFrontendTexture?: (request: { sourceUuid: string, requestId: number }) => void;
+    onRequestFrontendSvg?: (request: { sourceUuid: string; requestId: number; width: number; height: number; }) => void;
+    onRequestFrontendTexture?: (request: { sourceUuid: string; requestId: number; }) => void;
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     getMaxTextureSize(): Promise<number>;
@@ -68,7 +68,7 @@ export interface Webgl2RendererBackendPublic {
     enableImageBoundaryMask(enabled: boolean): Promise<void>;
     setBackgroundColor(r: number, g: number, b: number, alpha: number): Promise<void>;
     setMasks(masks: Record<number, WorkingFileLayerMask>): Promise<void>;
-    setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }): Promise<void>;
+    setSelectionMask(image?: ImageBitmap, offset?: { x: number; y: number; }): Promise<void>;
     setViewTransform(transform: Float64Array): Promise<void>;
     setLayerOrder(layerOrder: WorkingFileLayer[]): Promise<void>;
     overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null): Promise<void>;
@@ -164,9 +164,9 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         this.renderer.sortObjects = true;
         this.renderer.setSize(1, 1, false);
         this.renderer.setTransparentSort((a, b) => {
-            if ( a.renderOrder !== b.renderOrder ) {
+            if (a.renderOrder !== b.renderOrder) {
                 return a.renderOrder - b.renderOrder;
-            } else if ( a.z !== b.z ) {
+            } else if (a.z !== b.z) {
                 return b.z - a.z;
             } else {
                 return a.id - b.id;
@@ -278,7 +278,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         const addedOrChanged = [...maskIds].filter((id) => {
             const idNumber = parseInt(id);
-            return !maskTextureIds.has(id) || this.masks[idNumber].hash !== masks[idNumber].hash
+            return !maskTextureIds.has(id) || this.masks[idNumber].hash !== masks[idNumber].hash;
         });
         const removed = [...maskTextureIds].filter((id) => !maskIds.has(id));
 
@@ -309,7 +309,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         return this.maskTextures[maskId];
     }
 
-    async setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }) {
+    async setSelectionMask(image?: ImageBitmap, offset?: { x: number; y: number; }) {
         this.selectionMask.setImage(image, offset);
         this.dirty = true;
     }
@@ -318,7 +318,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         this.viewTransform.set(
             transform[0], transform[1], transform[2], transform[3],
             transform[4], transform[5], transform[6], transform[7],
-            transform[8], transform[9], transform[10], transform[11], 
+            transform[8], transform[9], transform[10], transform[11],
             transform[12], transform[13], transform[14], transform[15],
         );
         this.dirty = true;
@@ -338,7 +338,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         this.createLayerPasses();
     }
 
-    async overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null){
+    async overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null) {
         const meshController = this.meshControllersById.get(layerId);
         if (!meshController) return;
         meshController.overrideFilterParams(filterIndex, params);
@@ -360,8 +360,8 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         composer.disposeAllPasses();
         // Prevents bug where readTarget contains old texture (delete layers with merge blend mode).
         composer.clearRenderer();
-    
-        let passScenes: Array<Scene> = [];
+
+        const passScenes: Array<Scene> = [];
 
         let currentScene = new Scene();
         currentScene.background = null;
@@ -397,7 +397,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         if (currentSceneIsUsed) {
             passScenes.push(currentScene);
         }
-    
+
         if (this.selectionMask && passScenes.length > 0) {
             this.selectionMask.swapScene(passScenes[passScenes.length - 1]);
         }
@@ -428,7 +428,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
     }
 
     unregisterBeforeRenderCallback(callback: (timelineCursor: number) => void) {
-        let index = this.beforeRenderCallbacks.indexOf(callback);
+        const index = this.beforeRenderCallbacks.indexOf(callback);
         if (index > -1) {
             this.beforeRenderCallbacks.splice(index, 1);
         }
@@ -479,7 +479,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
     async takeSnapshot(
         imageWidth: number,
         imageHeight: number,
-        options?: Webgl2RendererBackendTakeSnapshotOptions
+        options?: Webgl2RendererBackendTakeSnapshotOptions,
     ): Promise<ImageBitmap> {
         imageWidth = Math.floor(imageWidth);
         imageHeight = Math.floor(imageHeight);
@@ -500,12 +500,12 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                     t[1], t[5], t[9], t[13],
                     t[2], t[6], t[10], t[14],
                     t[3], t[7], t[11], t[15],
-                )
+                ),
             );
         }
         if (!options?.disableScaleToSize) {
             snapshotCamera.projectionMatrix.scale(
-                new Vector3(imageWidth / this.imageWidth, imageHeight / this.imageHeight, 1)
+                new Vector3(imageWidth / this.imageWidth, imageHeight / this.imageHeight, 1),
             );
         }
 
@@ -526,7 +526,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             stencilBuffer: false,
         });
 
-        let isHighQuality = imageWidth > 80 || imageHeight > 80;
+        const isHighQuality = imageWidth > 80 || imageHeight > 80;
 
         this.rendererBusy = true;
 
@@ -681,13 +681,13 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                         const alpha = buffer[i + 3] / 255;
                         if (alpha > 0) {
                             buffer[i] = Math.min(255, Math.round(
-                                linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i] / 255) / alpha) * 255
+                                linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i] / 255) / alpha) * 255,
                             ));
                             buffer[i + 1] = Math.min(255, Math.round(
-                                linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 1] / 255) / alpha) * 255
+                                linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 1] / 255) / alpha) * 255,
                             ));
                             buffer[i + 2] = Math.min(255, Math.round(
-                                linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 2] / 255) / alpha) * 255
+                                linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 2] / 255) / alpha) * 255,
                             ));
                         }
                     }
@@ -701,13 +701,13 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                     const alpha = buffer[i + 3] / 255;
                     if (alpha > 0) {
                         buffer[i] = Math.min(255, Math.round(
-                            linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i] / 255) / alpha) * 255
+                            linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i] / 255) / alpha) * 255,
                         ));
                         buffer[i + 1] = Math.min(255, Math.round(
-                            linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 1] / 255) / alpha) * 255
+                            linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 1] / 255) / alpha) * 255,
                         ));
                         buffer[i + 2] = Math.min(255, Math.round(
-                            linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 2] / 255) / alpha) * 255
+                            linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 2] / 255) / alpha) * 255,
                         ));
                     }
                 }
@@ -716,7 +716,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         const bitmap = await createImageBitmap(
             new ImageData(new Uint8ClampedArray(buffer), imageWidth, imageHeight),
-            { imageOrientation: 'flipY' }
+            { imageOrientation: 'flipY' },
         );
 
         snapshotRenderTarget.dispose();
@@ -739,7 +739,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                 new Vector2(meshController.getLayerWidth(), meshController.getLayerHeight()),
                 transform,
                 settings,
-            )
+            ),
         );
     }
 
@@ -791,7 +791,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                 new Vector2(
                     layerSpacePoint.x / texture.width,
                     layerSpacePoint.y / texture.height,
-                )
+                ),
             );
         }
         await this.compositor.createBucketFill(
@@ -801,7 +801,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             new Vector4(settings.color[0], settings.color[1], settings.color[2], settings.color[3]),
             settings.feather,
             settings.antialias,
-            settings.blendingMode ?? 'normal'
+            settings.blendingMode ?? 'normal',
         );
     }
 
@@ -843,18 +843,18 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
     getRecommendedMsaa(gl?: WebGLRenderingContext | WebGL2RenderingContext): number {
         if (!gl || !window.navigator) return 0;
-        
+
         const isMobileUA = (
             navigator.userAgentData?.mobile === true
             || /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent)
         );
 
-        const hasCoarsePointer = matchMedia("(pointer: coarse)").matches;
+        const hasCoarsePointer = matchMedia('(pointer: coarse)').matches;
         const hasTouch = navigator.maxTouchPoints > 0;
 
         const screenWidth = Math.max(
             screen.width || 0,
-            screen.height || 0
+            screen.height || 0,
         );
 
         const isMobileLike = isMobileUA || (hasCoarsePointer && hasTouch && screenWidth < 1400);

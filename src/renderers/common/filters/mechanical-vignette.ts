@@ -33,7 +33,7 @@ export default class MechanicalVignetteCanvasFilter implements CanvasFilter<Mech
                 options: [
                     { key: 'simulate', value: MechanicalVignetteMode.SIMULATE },
                     { key: 'remove', value: MechanicalVignetteMode.REMOVE },
-                ]
+                ],
             },
             sensorWidth: {
                 type: 'float',

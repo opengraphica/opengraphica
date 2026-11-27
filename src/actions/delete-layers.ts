@@ -18,8 +18,8 @@ export class DeleteLayersAction extends BaseAction {
 
     private deleteLayerIds: number[] = [];
     private deletedLayers: {
-        layer: WorkingFileAnyLayer<ColorModel>,
-        parentIndex: number
+        layer: WorkingFileAnyLayer<ColorModel>;
+        parentIndex: number;
     }[] = [];
     private selectLayersAction: SelectLayersAction | null = null;
 
@@ -36,19 +36,19 @@ export class DeleteLayersAction extends BaseAction {
 
         const layers = workingFileStore.get('layers');
 
-        for (let layerId of this.deleteLayerIds) {
+        for (const layerId of this.deleteLayerIds) {
             const layer = getLayerById(layerId);
             if (layer) {
                 let parentList = layers;
                 if (layer.groupId != null) {
                     parentList = getGroupLayerById(layer.groupId, layers)?.layers || layers;
                 }
-                let parentListIndex = parentList.indexOf(layer);
+                const parentListIndex = parentList.indexOf(layer);
                 if (parentListIndex > -1) {
                     parentList.splice(parentList.indexOf(layer), 1);
                     this.deletedLayers.unshift({
                         layer,
-                        parentIndex: parentListIndex
+                        parentIndex: parentListIndex,
                     });
                 }
                 appEmitter.emit('app.workingFile.layerDetached', layer);
@@ -74,7 +74,7 @@ export class DeleteLayersAction extends BaseAction {
 
         const layers = workingFileStore.get('layers');
 
-        for (let deletedLayerInfo of this.deletedLayers) {
+        for (const deletedLayerInfo of this.deletedLayers) {
             const layer = deletedLayerInfo.layer;
             let parentList = layers;
             if (layer.groupId != null) {
@@ -110,7 +110,7 @@ export class DeleteLayersAction extends BaseAction {
         super.free();
 
         if (this.isDone) {
-            for (let deletedLayerInfo of this.deletedLayers) {
+            for (const deletedLayerInfo of this.deletedLayers) {
                 const layer = deletedLayerInfo.layer;
                 if (layer.type === 'raster') {
                     if (layer.data.sourceUuid) {
@@ -118,7 +118,7 @@ export class DeleteLayersAction extends BaseAction {
                     }
                 }
                 else if (layer.type === 'rasterSequence') {
-                    for (let frame of layer.data.sequence) {
+                    for (const frame of layer.data.sequence) {
                         if (frame.image.sourceUuid) {
                             unreserveStoredImage(frame.image.sourceUuid, `${layer.id}`);
                         }

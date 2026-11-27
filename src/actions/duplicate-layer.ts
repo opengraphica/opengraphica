@@ -76,7 +76,7 @@ export class DuplicateLayerAction extends BaseAction {
             layerClone.groupId = referenceLayer.groupId;
         }
         const insertLayerAction = new InsertLayerAction(
-            layerClone, insertPosition, insertAroundId
+            layerClone, insertPosition, insertAroundId,
         );
         await insertLayerAction.do();
         this.insertLayerActions!.unshift(insertLayerAction);
@@ -86,7 +86,7 @@ export class DuplicateLayerAction extends BaseAction {
                 await this.createInsertLayerActions(
                     childLayer,
                     'bottom',
-                    insertLayerAction.insertedLayerId
+                    insertLayerAction.insertedLayerId,
                 );
             }
         }

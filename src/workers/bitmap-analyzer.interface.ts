@@ -18,7 +18,7 @@ export function createBitmapAnalyzer(): string {
     const uuid = uuidv4();
 
     const worker = new Worker(
-        /* webpackChunkName: 'worker-bitmap-analyzer' */ new URL('./bitmap-analyzer.worker.ts', import.meta.url)
+        /* webpackChunkName: 'worker-bitmap-analyzer' */ new URL('./bitmap-analyzer.worker.ts', import.meta.url),
     );
 
     worker.onmessage = ({ data }) => {
@@ -32,7 +32,7 @@ export function createBitmapAnalyzer(): string {
             const [queueItem] = requestQueue.splice(queueItemIndex, 1);
             queueItem.resolve({ verticalLines, horizontalLines });
         }
-    }
+    };
 
     worker.onmessageerror = (error) => {
         console.error('[src/workers/bitmap-analyzer.interface.ts] Error received from bitmapAnalyzerWorker', error);
@@ -46,12 +46,12 @@ export function createBitmapAnalyzer(): string {
     return uuid;
 }
 
-export function getBitmapContrastLines(uuid: string, bitmap: ImageBitmap): Promise<{ verticalLines: number[], horizontalLines: number[] }> {
+export function getBitmapContrastLines(uuid: string, bitmap: ImageBitmap): Promise<{ verticalLines: number[]; horizontalLines: number[]; }> {
     const workerInfo = workerMap.get(uuid);
     if (!workerInfo) return Promise.resolve({ verticalLines: [], horizontalLines: [] });
     const queueUuid = uuidv4();
-    let promiseResolve!: (lines: { verticalLines: number[], horizontalLines: number[] }) => void;
-    const promise = new Promise<{ verticalLines: number[], horizontalLines: number[] }>((resolve) => {
+    let promiseResolve!: (lines: { verticalLines: number[]; horizontalLines: number[]; }) => void;
+    const promise = new Promise<{ verticalLines: number[]; horizontalLines: number[]; }>((resolve) => {
         promiseResolve = resolve;
     });
     workerInfo.requestQueue.push({ uuid: queueUuid, resolve: promiseResolve });

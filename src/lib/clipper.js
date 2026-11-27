@@ -2554,7 +2554,7 @@
                  return true;
              pp2 = pp2.Next;
          }
-         while (pp2 !== pp)
+         while (pp2 !== pp);
          return false;
      };
  
@@ -2975,7 +2975,7 @@
              if (IsFlat && E.Curr.y !== eStart.Curr.y)
                  IsFlat = false;
          }
-         while (E !== eStart)
+         while (E !== eStart);
          //4. Finally, add edge bounds to LocalMinima list ...
          //Totally flat paths must be handled differently when adding them
          //to LocalMinima list to avoid endless loops etc ...
@@ -3401,7 +3401,7 @@
          }
          e.NextInAEL = null;
          e.PrevInAEL = null;
-     }
+     };
  
      // public Clipper(int InitOptions = 0)
      /**
@@ -4314,7 +4314,7 @@
              seg2b = tmp;
          }
          return (seg1a < seg2b) && (seg2a < seg1b);
-     }
+     };
  
      ClipperLib.Clipper.prototype.SetHoleState = function (e, outRec)
      {
@@ -4456,7 +4456,7 @@
              if (outRec1 === outRec2)
                  return true;
          }
-         while (outRec1 !== null)
+         while (outRec1 !== null);
          return false;
      };
  
@@ -4573,7 +4573,7 @@
              pp1.Prev = pp2;
              pp1 = pp2;
          }
-         while (pp1 !== pp)
+         while (pp1 !== pp);
      };
  
      ClipperLib.Clipper.SwapSides = function (edge1, edge2)
@@ -5273,17 +5273,17 @@
      */
      var R1 = function (a)
      {
-         return a < 0 ? Math.ceil(a - 0.5) : Math.round(a)
+         return a < 0 ? Math.ceil(a - 0.5) : Math.round(a);
      };
  
      var R2 = function (a)
      {
-         return a < 0 ? Math.ceil(a - 0.5) : Math.floor(a + 0.5)
+         return a < 0 ? Math.ceil(a - 0.5) : Math.floor(a + 0.5);
      };
  
      var R3 = function (a)
      {
-         return a < 0 ? -Math.round(Math.abs(a)) : Math.round(a)
+         return a < 0 ? -Math.round(Math.abs(a)) : Math.round(a);
      };
  
      var R4 = function (a)
@@ -5564,7 +5564,7 @@
              result++;
              p = p.Next;
          }
-         while (p !== pts)
+         while (p !== pts);
          return result;
      };
  
@@ -6060,7 +6060,7 @@
                  else if (paths[i][j].y > result.bottom) result.bottom = paths[i][j].y;
              }
          return result;
-     }
+     };
      ClipperLib.Clipper.prototype.GetBounds2 = function (ops)
      {
          var opStart = ops;
@@ -6197,7 +6197,7 @@
                  return res > 0;
              op = op.Next;
          }
-         while (op !== outPt1)
+         while (op !== outPt1);
          return true;
      };
  
@@ -6214,7 +6214,7 @@
                      outRec.FirstLeft = NewOutRec;
              }
          }
-     }
+     };
  
      ClipperLib.Clipper.prototype.FixupFirstLefts2 = function (innerOutRec, outerOutRec)
      {
@@ -6239,7 +6239,7 @@
              else if (outRec.FirstLeft === innerOutRec || outRec.FirstLeft === outerOutRec)
                  outRec.FirstLeft = orfl;
          }
-     }
+     };
  
      ClipperLib.Clipper.prototype.FixupFirstLefts3 = function (OldOutRec, NewOutRec)
      {
@@ -6253,7 +6253,7 @@
              if (outRec.Pts !== null && firstLeft === OldOutRec)
                  outRec.FirstLeft = NewOutRec;
          }
-     }
+     };
  
      ClipperLib.Clipper.ParseFirstLeft = function (FirstLeft)
      {
@@ -6359,7 +6359,7 @@
              op.Idx = outrec.Idx;
              op = op.Prev;
          }
-         while (op !== outrec.Pts)
+         while (op !== outrec.Pts);
      };
  
      ClipperLib.Clipper.prototype.DoSimplePolygons = function ()
@@ -6420,7 +6420,7 @@
                  }
                  op = op.Next;
              }
-             while (op !== outrec.Pts)
+             while (op !== outrec.Pts);
          }
      };
  
@@ -6450,7 +6450,7 @@
              op = op.Next;
          } while (op !== opFirst); // && typeof op !== 'undefined');
          return a * 0.5;
-     }
+     };
  
      ClipperLib.Clipper.prototype.Area$1 = function (outRec)
      {
@@ -6523,7 +6523,7 @@
              else
                  return ClipperLib.Clipper.DistanceFromLineSqrd(pt3, pt1, pt2) < distSqrd;
          }
-     }
+     };
  
      ClipperLib.Clipper.PointsAreClose = function (pt1, pt2, distSqrd)
      {
@@ -6674,7 +6674,7 @@
                  ClipperLib.PolyFillType.pftNonZero, ClipperLib.PolyFillType.pftNonZero);
              return solution;
          }
-     }
+     };
  
      ClipperLib.Clipper.TranslatePath = function (path, delta)
      {
@@ -6682,7 +6682,7 @@
          for (var i = 0; i < path.length; i++)
              outPath.push(new ClipperLib.IntPoint2(path[i].x + delta.x, path[i].y + delta.y));
          return outPath;
-     }
+     };
  
      ClipperLib.Clipper.MinkowskiDiff = function (poly1, poly2)
      {
@@ -6691,7 +6691,7 @@
          c.AddPaths(paths, ClipperLib.PolyType.ptSubject, true);
          c.Execute(ClipperLib.ClipType.ctUnion, paths, ClipperLib.PolyFillType.pftNonZero, ClipperLib.PolyFillType.pftNonZero);
          return paths;
-     }
+     };
  
      ClipperLib.Clipper.PolyTreeToPaths = function (polytree)
      {
@@ -7298,7 +7298,7 @@
              []
          ];
          return results;
-     }
+     };
      // Make deep copy of Polygons or Polygon
      // so that also IntPoint objects are cloned and not only referenced
      // This should be the fastest way
@@ -7340,7 +7340,7 @@
          if (!(polygon instanceof Array)) return [];
          if (typeof tolerance !== "number" || tolerance === null)
          {
-             ClipperLib.Error("Tolerance is not a number in Lighten().")
+             ClipperLib.Error("Tolerance is not a number in Lighten().");
              return ClipperLib.JS.Clone(polygon);
          }
          if (polygon.length === 0 || (polygon.length === 1 && polygon[0].length === 0) || tolerance < 0)
@@ -7451,7 +7451,7 @@
              results = [];
          }
          return results;
-     }
+     };
  
      ClipperLib.JS.PerimeterOfPath = function (path, closed, scale)
      {
@@ -7560,7 +7560,7 @@
      ClipperLib.ExPolygons = function ()
      {
          return [];
-     }
+     };
      /**
      * @constructor
      */
@@ -7605,7 +7605,7 @@
              }
          }
          return paths;
-     }
+     };
      ClipperLib.JS.PolyTreeToExPolygons = function (polytree)
      {
          var expolygons = new ClipperLib.ExPolygons();

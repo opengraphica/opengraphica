@@ -29,7 +29,7 @@ export interface SerializedFileTimeline {
     end: number;
     tracks: {
         [key: string]: SerializedFileTimelineTrack;
-    }
+    };
 }
 
 export interface SerializedFileLayer<T extends ColorModel = ColorModel> {
@@ -65,7 +65,7 @@ export interface SerializedFileRasterLayer<T extends ColorModel = ColorModel> ex
     type: 'raster';
     data: {
         sourceImageSerialized?: string;
-    }
+    };
 }
 
 export interface SerializedFileRasterSequenceLayerFrame<T extends ColorModel = ColorModel> {
@@ -85,14 +85,14 @@ export interface SerializedFileVectorLayer<T extends ColorModel = ColorModel> ex
     type: 'vector';
     data: {
         sourceSvgSerialized?: string;
-    }
+    };
 }
 
 export interface SerializedFileVideoLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'video';
     data: {
         sourceVideoSerialized?: string;
-    }
+    };
 }
 
 export interface SerializedFileTextLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {

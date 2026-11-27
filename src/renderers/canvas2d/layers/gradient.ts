@@ -24,7 +24,7 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
             case 'radial':
                 const radius = pointDistance2d(xformStart.x, xformStart.y, xformEnd.x, xformEnd.y);
                 gradient = ctx.createRadialGradient(
-                    xformStart.x, xformStart.y, 0, xformStart.x, xformStart.y, radius
+                    xformStart.x, xformStart.y, 0, xformStart.x, xformStart.y, radius,
                 );
                 break;
             case 'linear':

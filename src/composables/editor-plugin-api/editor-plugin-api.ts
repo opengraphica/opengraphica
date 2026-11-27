@@ -7,9 +7,9 @@ import type { defineComponent, defineAsyncComponent } from 'vue';
 import type BaseCanvasController from '@/tools/controllers/base';
 import type { CanvasFilter, ClassType } from '@/types';
 
-declare var __webpack_require__: any;
+declare let __webpack_require__: any;
 
-let moduleChunkMap: Record<string, { id: string, chunks: number[] }> | null = null;
+let moduleChunkMap: Record<string, { id: string; chunks: number[]; }> | null = null;
 
 interface CreateFilterDefinition {
     name: string;
@@ -153,7 +153,7 @@ export function createEditorPluginApi(pluginId: string) {
 
     const notifyPluginInstallSuccess = () => {
         resolvePluginInstall();
-    }
+    };
 
     const notifyPluginInstallError = (error) => {
         rejectPluginInstall();
@@ -186,7 +186,7 @@ export function createEditorPluginApi(pluginId: string) {
         } else if (path.startsWith('@/')) {
             if (moduleChunkMap == null) {
                 moduleChunkMap = await (await fetch(
-                    preferencesStore.state.assetsBasePath + 'module-chunk-map.json'
+                    preferencesStore.state.assetsBasePath + 'module-chunk-map.json',
                 )).json();
             }
             let normalizedPath = path.replace(/@\//g, 'src/');
@@ -226,5 +226,5 @@ export function createEditorPluginApi(pluginId: string) {
         _installPromise: pluginInstallPromise,
         _notifyPluginInstallSuccess: notifyPluginInstallSuccess,
         _notifyPluginInstallError: notifyPluginInstallError,
-    }
+    };
 }

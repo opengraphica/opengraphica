@@ -32,18 +32,18 @@ export function fragment(
     const bottomB = linearSrgbChannelToSrgbChannel(overlayFill.b);
     rgba.r = (rgba.r * (1.0 - overlayFill.a))
         + srgbChannelToLinearSrgbChannel(
-            (step(bottomR, 0.5) * (topR * bottomR * 2.0)) + 
-            (step(0.5, bottomR) * (1.0 - ((1.0 - topR) * (1.0 - bottomR) * 2.0)))
+            (step(bottomR, 0.5) * (topR * bottomR * 2.0)) +
+            (step(0.5, bottomR) * (1.0 - ((1.0 - topR) * (1.0 - bottomR) * 2.0))),
         ) * overlayFill.a;
-    rgba.g =  (rgba.g * (1.0 - overlayFill.a))
+    rgba.g = (rgba.g * (1.0 - overlayFill.a))
         + srgbChannelToLinearSrgbChannel(
-            (step(bottomG, 0.5) * (topG * bottomG * 2.0)) + 
-            (step(0.5, bottomG) * (1.0 - ((1.0 - topG) * (1.0 - bottomG) * 2.0)))
+            (step(bottomG, 0.5) * (topG * bottomG * 2.0)) +
+            (step(0.5, bottomG) * (1.0 - ((1.0 - topG) * (1.0 - bottomG) * 2.0))),
         ) * overlayFill.a;
-    rgba.b =  (rgba.b * (1.0 - overlayFill.a))
+    rgba.b = (rgba.b * (1.0 - overlayFill.a))
         + srgbChannelToLinearSrgbChannel(
-            (step(bottomB, 0.5) * (topB * bottomB * 2.0)) + 
-            (step(0.5, bottomB) * (1.0 - ((1.0 - topB) * (1.0 - bottomB) * 2.0)))
+            (step(bottomB, 0.5) * (topB * bottomB * 2.0)) +
+            (step(0.5, bottomB) * (1.0 - ((1.0 - topB) * (1.0 - bottomB) * 2.0))),
         ) * overlayFill.a;
 
     const contrast = -1.0 + Math.tan((Math.min(0.9999, 0.1) + 1.0) * Math.PI / 4.0);

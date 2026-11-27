@@ -26,8 +26,8 @@ export default class HueCanvasFilter implements CanvasFilter<HueCanvasFilterPara
                 options: [
                     { key: 'oklab', value: HueColorSpace.OKLAB },
                     { key: 'perceptualRgb', value: HueColorSpace.PERCEPTUAL_RGB },
-                    { key: 'linearRgb', value: HueColorSpace.LINEAR_RGB }
-                ]
+                    { key: 'linearRgb', value: HueColorSpace.LINEAR_RGB },
+                ],
             },
             rotate: {
                 type: 'percentage',
@@ -44,8 +44,8 @@ export default class HueCanvasFilter implements CanvasFilter<HueCanvasFilterPara
                 type: 'percentageRange',
                 default: [1, 1],
                 min: 0,
-                max: 1
-            }
+                max: 1,
+            },
         } as CanvasFilterEditConfig;
     }
 }

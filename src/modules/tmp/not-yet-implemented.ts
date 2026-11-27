@@ -7,6 +7,6 @@ export async function notYetImplemented() {
     appEmitter.emit('app.notify', {
         type: 'error',
         title: 'Not Yet Implemented',
-        message: 'This feature is not yet implemented, future development task.'
+        message: 'This feature is not yet implemented, future development task.',
     });
 }

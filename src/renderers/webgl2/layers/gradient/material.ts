@@ -19,7 +19,7 @@ import { createLayerShader } from '../base/material';
 import type { Matrix4 } from 'three';
 import type {
     RGBAColor, Webgl2RendererCanvasFilter, WorkingFileGradientLayer,
-    WorkingFileGradientColorStop, WorkingFileGradientColorSpace,
+    WorkingFileGradientColorStop, WorkingFileGradientColorSpace
 } from '@/types';
 
 enum GradientColorSpace {
@@ -52,7 +52,7 @@ const generatedGradientStopTextures = new Map<number, Texture>();
 function createGradientStopTexture(
     stops: WorkingFileGradientColorStop<RGBAColor>[],
     colorSpace: WorkingFileGradientColorSpace,
-    textureSize: number = 64
+    textureSize: number = 64,
 ): Texture {
     const texture = new Texture(generateGradientImage(stops, colorSpace, textureSize));
     texture.colorSpace = SRGBColorSpace;
@@ -72,7 +72,7 @@ function calculateGradientAverageBrightness(stops: WorkingFileGradientColorStop<
 }
 
 export async function createGradientMaterial(
-    { opacity, canvasFilters, canvasWidth, canvasHeight, gradientData, transform }: GradientMaterialUpdateParams
+    { opacity, canvasFilters, canvasWidth, canvasHeight, gradientData, transform }: GradientMaterialUpdateParams,
 ) {
     const uuid = uuidv4();
 
@@ -116,7 +116,7 @@ export async function createGradientMaterial(
 
     material.defines.cCanvasWidth = canvasWidth ?? 1;
     material.defines.cCanvasHeight = canvasHeight ?? 1;
-    
+
     if (gradientData) {
         const newStopsHash = generateObjectHash(gradientData.stops) + generateStringHash(gradientData.blendColorSpace) + generateStringHash(uuid);
         const newStopsTexture = createGradientStopTexture(gradientData.stops, gradientData.blendColorSpace);
@@ -153,7 +153,7 @@ export async function createGradientMaterial(
 
 export async function updateGradientMaterial(
     material: ShaderMaterial,
-    { opacity, gradientData, canvasWidth, canvasHeight, transform }: GradientMaterialUpdateParams
+    { opacity, gradientData, canvasWidth, canvasHeight, transform }: GradientMaterialUpdateParams,
 ) {
     const cCanvasWidth = canvasWidth;
     const cCanvasHeight = canvasHeight;
@@ -177,7 +177,7 @@ export async function updateGradientMaterial(
         material.defines.cAverageBrightness = cAverageBrightness;
         material.needsUpdate = true;
     }
-    
+
     const newStopsHash = generateObjectHash(gradientData.stops) + generateStringHash(gradientData.blendColorSpace) + generateStringHash(material.userData.uuid);
     if (newStopsHash !== material.userData.stopsHash) {
         generatedGradientStopTextures.get(material.userData.stopsHash)?.dispose();

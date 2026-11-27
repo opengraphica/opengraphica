@@ -56,7 +56,7 @@ async function generateLayer(
             'repeat': 'repeat',
             'reflect': 'reflect',
             'truncate': null,
-        }[layer.data.spreadMethod]
+        }[layer.data.spreadMethod];
 
         const colorInterpolation: string | null = {
             'oklab': 'linearRGB',
@@ -191,8 +191,8 @@ async function generateLayer(
         text.setAttribute('stroke-width', `${textMetaDefaults.stroke1Size}`);
         text.setAttribute('opacity', `${layer.opacity}`);
 
-        let isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
-        
+        const isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
+
         const { lines: lineRenderInfo, wrappedLines, wrapDirectionSize } = calculateTextPlacement(layer.data, {
             wrapSize: isHorizontal ? layer.width : layer.height,
         });
@@ -203,7 +203,7 @@ async function generateLayer(
                 const y = renderInfo.wrapOffset;
 
                 for (const span of line.spans) {
-                    const firstGlyph = renderInfo.glyphs.find((glyph) => glyph.meta === span.meta);                
+                    const firstGlyph = renderInfo.glyphs.find((glyph) => glyph.meta === span.meta);
                     const tspan = svgDocument.createElementNS(SVG_NS, 'tspan');
 
                     const x = renderInfo.lineStartOffset + (firstGlyph?.advanceOffset ?? 0);
@@ -353,7 +353,7 @@ function serializeStoredImage(imageUuid?: string): string {
             return '';
         }
         ctx.imageSmoothingEnabled = false;
-        
+
         if (canvasStore.state.renderer === 'webgl' && sourceImage instanceof ImageBitmap) {
             ctx.scale(1, -1);
             ctx.translate(0, -sourceImage.height);

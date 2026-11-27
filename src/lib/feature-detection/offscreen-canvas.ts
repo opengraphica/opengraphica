@@ -16,7 +16,7 @@ export function isOffscreenCanvasSupported(): Promise<boolean> {
         let worker: Worker | undefined = undefined;
         try {
             worker = new Worker(
-                /* webpackChunkName: 'worker-offscreen-canvas-detection' */ new URL('./workers/offscreen-canvas.worker.ts', import.meta.url)
+                /* webpackChunkName: 'worker-offscreen-canvas-detection' */ new URL('./workers/offscreen-canvas.worker.ts', import.meta.url),
             );
             let sourceCanvas: HTMLCanvasElement = document.createElement('canvas');
             sourceCanvas.width = 2;
@@ -25,7 +25,7 @@ export function isOffscreenCanvasSupported(): Promise<boolean> {
             targetCanvas.width = 2;
             targetCanvas.height = 2;
             let offscreenCanvas = sourceCanvas.transferControlToOffscreen();
-        
+
             worker.onmessage = () => {
                 try {
                     const targetCanvasCtx = targetCanvas.getContext('2d');
@@ -53,8 +53,8 @@ export function isOffscreenCanvasSupported(): Promise<boolean> {
                 (offscreenCanvas as unknown) = null;
                 worker?.terminate();
                 worker = undefined;
-            }
-        
+            };
+
             worker.postMessage({
                 canvas: offscreenCanvas,
             }, [offscreenCanvas]);

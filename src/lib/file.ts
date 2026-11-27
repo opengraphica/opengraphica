@@ -18,7 +18,7 @@ export function getMimeTypeForExtension(extension: string) {
         case 'ogg': return 'video/ogg';
         case 'mov': return 'video/quicktime';
         case 'webm': return 'video/webm';
-        default: 'application/octet-binary';
+        default: return 'application/octet-binary';
     }
 }
 
@@ -48,7 +48,7 @@ export interface PickFileOptions {
     multiple?: boolean;
     types?: Array<{
         description?: string;
-        accept: Record<string, string[]>
+        accept: Record<string, string[]>;
     }>;
 }
 
@@ -63,50 +63,50 @@ export function pickFile(options: PickFileOptions = {}): any {
     if (window.showOpenFilePicker && window.location.protocol !== 'file:') {
         return window.showOpenFilePicker(options as ShowOpenFilePickerOptions)
             .then((handles: any) => handles[0])
-            .then((handle: any) => handle.getFile())
+            .then((handle: any) => handle.getFile());
     }
 
     // Fallback to the file input element
     return new Promise((resolve, reject) => {
-        let input = document.getElementById('fallback-file-input') as HTMLInputElement | null
-        let isChangeFired = false
+        let input = document.getElementById('fallback-file-input') as HTMLInputElement | null;
+        let isChangeFired = false;
         if (!input || input.hasAttribute('multiple') !== !!options.multiple) {
-            document.getElementById('fallback-file-input')?.remove()
-            input = document.createElement('input')
-            input.setAttribute('type', 'file')
-            input.id = 'fallback-file-input'
-            input.style.display = 'none'
-            document.body.appendChild(input)
+            document.getElementById('fallback-file-input')?.remove();
+            input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.id = 'fallback-file-input';
+            input.style.display = 'none';
+            document.body.appendChild(input);
         }
 
         if (options.types && options.types.length) {
             const accept = options.types
                 .map(t => Object.entries(t.accept || {})
-                .map(([mime, exts]) => exts.map(e => `.${e.replace(/^\./, '')}`).join(','))
-                .join(','))
-                .join(',')
-            input.setAttribute('accept', accept)
+                    .map(([mime, exts]) => exts.map(e => `.${e.replace(/^\./, '')}`).join(','))
+                    .join(','))
+                .join(',');
+            input.setAttribute('accept', accept);
         }
-        input.setAttribute('multiple', !!options.multiple + '')
+        input.setAttribute('multiple', !!options.multiple + '');
 
         const clean = () => {
-            input.value = ''
-            input.removeEventListener('change', onChange)
+            input.value = '';
+            input.removeEventListener('change', onChange);
         };
 
         const onChange = () => {
-            if (isChangeFired) return
-            isChangeFired = true
-            if (input.files?.length === 0) return reject(new DOMException('No file selected', 'AbortError'))
+            if (isChangeFired) return;
+            isChangeFired = true;
+            if (input.files?.length === 0) return reject(new DOMException('No file selected', 'AbortError'));
             if (options.multiple) {
-                resolve(input.files)
+                resolve(input.files);
             } else {
-                resolve(input.files?.[0])
+                resolve(input.files?.[0]);
             }
-            clean()
+            clean();
         };
 
-        input.addEventListener('change', onChange)
-        input.click()
+        input.addEventListener('change', onChange);
+        input.click();
     });
 }

@@ -25,8 +25,8 @@ export default class InfiniteBackbuffer {
     }
 
     public drawCanvas(canvas: HTMLCanvasElement | OffscreenCanvas, x: number, y: number) {
-        let sxi = Math.floor(x / this.gridSize);
-        let syi = Math.floor(y / this.gridSize);
+        const sxi = Math.floor(x / this.gridSize);
+        const syi = Math.floor(y / this.gridSize);
         const exi = Math.floor((x + canvas.width) / this.gridSize);
         const eyi = Math.floor((y + canvas.height) / this.gridSize);
         let cellX: number = 0;
@@ -45,8 +45,8 @@ export default class InfiniteBackbuffer {
     }
 
     public drawToCtx(sx: number, sy: number, sw: number, sh: number, dCtx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, dx: number, dy: number) {
-        let sxi = Math.floor(sx / this.gridSize);
-        let syi = Math.floor(sy / this.gridSize);
+        const sxi = Math.floor(sx / this.gridSize);
+        const syi = Math.floor(sy / this.gridSize);
         const exi = Math.floor((sx + sw) / this.gridSize);
         const eyi = Math.floor((sy + sh) / this.gridSize);
         let cellX: number, cellY: number, srcX: number, srcY: number, srcW: number, srcH: number, destX: number, destY: number, previousGlobalAlpha: number;

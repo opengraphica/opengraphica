@@ -36,8 +36,8 @@ declare namespace pica {
         cancelToken?: Promise<unknown>;
         // Timers
         timers?: {
-            processTile?: number
-        }
+            processTile?: number;
+        };
     }
 
     interface PicaResizeBufferOptions {

@@ -59,8 +59,8 @@ export async function pasteFromEditorCopyBuffer() {
                                         editorStore.state.clipboardBufferSelectionMaskCanvasOffset,
                                         sourceImage,
                                         rasterLayer.transform,
-                                        'source-in'
-                                    )
+                                        'source-in',
+                                    ),
                                 ),
                             };
                         }
@@ -77,8 +77,8 @@ export async function pasteFromEditorCopyBuffer() {
                 }
                 actions.push(new TrimLayerEmptySpaceAction(-1));
                 return actions;
-            }))).flat()
-        )
+            }))).flat(),
+        ),
     });
 }
 
@@ -89,7 +89,7 @@ export interface ImagePasteModuleProperties {
 
 let isPastingImage: boolean = false;
 export async function paste(options?: ImagePasteModuleProperties) {
-    let files: File[] = options?.files ?? [];
+    const files: File[] = options?.files ?? [];
 
     let isDefaultPrevented: boolean = false;
     const preventDefault = () => {
@@ -107,7 +107,7 @@ export async function paste(options?: ImagePasteModuleProperties) {
             const clipboardContents = await navigator.clipboard.read();
             for (const item of clipboardContents) {
                 if (item.types.includes('image/png')) {
-                    let blob = await item.getType('image/png');
+                    const blob = await item.getType('image/png');
                     files.push(new File([blob], 'clipboard.png'));
                 }
             }
@@ -120,7 +120,7 @@ export async function paste(options?: ImagePasteModuleProperties) {
         appEmitter.emit('app.wait.startBlocking', { id: 'documentPasteImage', label: 'app.wait.loadingImage' });
         isPastingImage = true;
 
-        for (let file of files) {
+        for (const file of files) {
             try {
                 let isUseFile: boolean = true;
                 if (editorStore.state.hasClipboardUpdateSupport) {

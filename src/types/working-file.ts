@@ -80,9 +80,9 @@ export interface WorkingFileLayerRenderer<T extends ColorModel = ColorModel> {
     onRenderGroup(renderer: WebGLRenderer, camera: Camera, layer: WorkingFileGroupLayer<ColorModel>): void;
     onContextRestored(renderer: WebGLRenderer): void;
 }
-export declare var WorkingFileLayerRenderer: {
+export declare const WorkingFileLayerRenderer: {
     new (layer: WorkingFileLayer<ColorModel>): void;
-}
+};
 
 export interface WorkingFileTimelineKey {
     timing: number[]; // Cubic beizer, array of 4
@@ -107,7 +107,7 @@ export interface WorkingFileTimeline {
     end: number;
     tracks: {
         [key: string]: WorkingFileTimelineTrack; // Mapping of layer id to frame list
-    }
+    };
 }
 
 export interface WorkingFileLayerRasterTileUpdate {
@@ -131,7 +131,7 @@ export interface WorkingFileLayerDraft {
 }
 
 export interface WorkingFileLayerDraftDrawable {
-    type: string,
+    type: string;
     left: number;
     right: number;
     top: number;
@@ -190,7 +190,7 @@ export interface WorkingFileGradientLayer<T extends ColorModel = ColorModel> ext
         blendColorSpace: WorkingFileGradientColorSpace;
         fillType: WorkingFileGradientFillType;
         spreadMethod: WorkingFileGradientSpreadMethod;
-    }
+    };
 }
 
 export interface WorkingFileGroupLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
@@ -206,7 +206,7 @@ export interface WorkingFileRasterLayer<T extends ColorModel = ColorModel> exten
         tileUpdates?: WorkingFileLayerRasterTileUpdate[];
         tileUpdateId?: string; // This value changes every chunk update to trigger a re-render
         alreadyRendererd?: boolean; // Stalls tileUpdateId generation for one update
-    }
+    };
 }
 
 export interface WorkingFileRasterSequenceLayerFrame<T extends ColorModel = ColorModel> {
@@ -231,14 +231,14 @@ export interface WorkingFileVectorLayer<T extends ColorModel = ColorModel> exten
         sourceDocumentSerialized?: string; // Temporary XML document serialization for passing to renderer
         sourceUuid?: string; // SVG Image Reference
         pendingSourceDocumentUpdateNodeIds?: string[];
-    }
+    };
 }
 
 export interface WorkingFileVideoLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
     type: 'video';
     data: {
         sourceUuid?: string;
-    }
+    };
 }
 
 export interface WorkingFileTextLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
@@ -310,15 +310,15 @@ export type UpdateAnyLayerOptions<T extends ColorModel = ColorModel>
     | UpdateVideoLayerOptions<T> | UpdateTextLayerOptions<T>;
 
 export interface NewFilePreset {
-    name: string,
-    width: number,
-    height: number,
-    measuringUnits: 'px' | 'cm' | 'mm' | 'in',
-    resolutionX: number,
-    resolutionY: number,
-    resolutionUnits: 'px/in' | 'px/mm' | 'px/cm',
-    colorProfile: string,
-    scaleFactor: 1
+    name: string;
+    width: number;
+    height: number;
+    measuringUnits: 'px' | 'cm' | 'mm' | 'in';
+    resolutionX: number;
+    resolutionY: number;
+    resolutionUnits: 'px/in' | 'px/mm' | 'px/cm';
+    colorProfile: string;
+    scaleFactor: 1;
 }
 
 export interface WorkingFileLayerMask {

@@ -10,7 +10,7 @@ import { Texture } from 'three/src/textures/Texture';
 
 import { textMetaDefaults } from '@/lib/text-common';
 import {
-    getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement,
+    getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement
 } from '@/lib/text-render';
 
 import { getWebgl2RendererBackend, markRenderDirty, Webgl2RendererBackend } from '@/renderers/webgl2/backend';
@@ -52,7 +52,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     regenerateThumbnailTimeoutHandle: number | undefined;
     waitingToLoadFontFamilies: string[] = [];
     overrideFilterParamTextures: Texture<any>[] = [];
-    
+
     letterMeshes: InstanceType<typeof Mesh>[] = [];
 
     attach(id: number) {
@@ -158,7 +158,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         const wrapSize = isHorizontal ? this.width : this.height;
         const { lines, lineDirectionSize, wrapDirection, wrapDirectionSize } = calculateTextPlacement(data, { wrapSize });
         const wrapSign = ['ltr', 'ttb'].includes(wrapDirection) ? 1 : -1;
-        let wrapOffsetStart = wrapSign > 0 ? 0 : wrapDirectionSize;
+        const wrapOffsetStart = wrapSign > 0 ? 0 : wrapDirectionSize;
 
         const width = isHorizontal ? data.boundary === 'box' ? this.width : lineDirectionSize : wrapDirectionSize;
         const height = isHorizontal ? wrapDirectionSize : data.boundary === 'box' ? this.height : lineDirectionSize;
@@ -237,7 +237,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         this.textGroup?.matrix.set(
             transform[0], transform[1], transform[2], transform[3],
             transform[4], transform[5], transform[6], transform[7],
-            transform[8], transform[9], transform[10], transform[11], 
+            transform[8], transform[9], transform[10], transform[11],
             transform[12], transform[13], transform[14], transform[15],
         );
         markRenderDirty();
@@ -245,8 +245,10 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
 
     updateVisible(visible: boolean) {
         this.visible = visible;
-        let oldVisibility = this.textGroup?.visible;
-        this.textGroup && (this.textGroup.visible = this.visibleOverride ?? this.visible);
+        const oldVisibility = this.textGroup?.visible;
+        if (this.textGroup) {
+            this.textGroup.visible = this.visibleOverride ?? this.visible;
+        }
         if (this.textGroup?.visible !== oldVisibility) {
             markRenderDirty();
         }
@@ -279,7 +281,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     setDraftTexture(texture?: Texture<any>) {
         // TODO
     }
-    
+
     swapScene(scene: Scene) {
         if (!this.textGroup) return;
         this.scene?.remove(this.textGroup);
@@ -383,7 +385,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         this.material.uniforms.dstTexture.value = texture;
         this.material.uniformsNeedUpdate = true;
     }
-    
+
     detach() {
         const backend = getWebgl2RendererBackend();
         backend.removeMeshController(this.id);
@@ -398,7 +400,9 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         this.letterMeshCache?.dispose();
         this.letterMeshCache = undefined;
 
-        this.textGroup && this.scene?.remove(this.textGroup);
+        if (this.textGroup) {
+            this.scene?.remove(this.textGroup);
+        }
         this.textGroup = undefined;
 
         if (this.material) {

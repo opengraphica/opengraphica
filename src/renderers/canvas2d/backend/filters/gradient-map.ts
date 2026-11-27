@@ -20,11 +20,11 @@ export function fragment(
 ) {
     const percentage = filter.params.mix ?? 0;
 
-    let rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
-    
+    const rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
+
     const lcha = labaToLcha(linearSrgbaToOklab(rgba));
 
-    var newRgba = sampleGradient(filter.params.gradient!, colorSpaceMap[filter.params.colorSpace!], lcha.l);
+    const newRgba = sampleGradient(filter.params.gradient!, colorSpaceMap[filter.params.colorSpace!], lcha.l);
 
     rgba.r = (rgba.r * (1 - percentage)) + (newRgba.r * percentage);
     rgba.g = (rgba.g * (1 - percentage)) + (newRgba.g * percentage);

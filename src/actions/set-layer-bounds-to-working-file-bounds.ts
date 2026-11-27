@@ -34,7 +34,7 @@ export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
 
         const layerCanvas = await prepareStoredImageForEditing(layer.data.sourceUuid);
         if (!layerCanvas) throw new Error('[src/actions/set-layer-bounds-to-working-file-bounds.ts] Unable to edit existing layer image.');
-        
+
         const newWidth = workingFileStore.get('width');
         const newHeight = workingFileStore.get('height');
         const transform = layer.transform;
@@ -60,8 +60,8 @@ export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
             height: textureHeight,
             transform: new DOMMatrix().scaleSelf(newWidth / textureWidth, newHeight / textureHeight),
             data: {
-                sourceUuid: await createStoredImage(workingCanvas)
-            }
+                sourceUuid: await createStoredImage(workingCanvas),
+            },
         });
         await this.updateLayerAction.do();
 
@@ -88,7 +88,7 @@ export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
 
         if (this.updateLayerAction) {
             this.updateLayerAction.free();
-            this.updateLayerAction = null
+            this.updateLayerAction = null;
         }
         if (this.applyLayerTransformAction) {
             this.applyLayerTransformAction.free();

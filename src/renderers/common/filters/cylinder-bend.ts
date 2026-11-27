@@ -16,20 +16,20 @@ export default class CylinderBendCanvasFilter implements CanvasFilter<CylinderBe
                 type: 'percentage',
                 default: 0,
                 min: -1,
-                max: 1
+                max: 1,
             },
             perspective: {
                 type: 'percentage',
                 default: 0,
                 preview: 0.5,
                 min: 0,
-                max: 1
+                max: 1,
             },
             viewPosition: {
                 type: 'percentage',
                 default: 0,
                 min: -1,
-                max: 1
+                max: 1,
             },
         } as CanvasFilterEditConfig;
     }

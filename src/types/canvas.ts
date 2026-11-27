@@ -57,8 +57,8 @@ export interface CanvasFilterEditConfigComputedFloat extends CanvasFilterEditCon
     preview?: number;
     valueMap: {
         referenceParam: string;
-        map: { [key: number]: number };
-    }
+        map: { [key: number]: number; };
+    };
 }
 
 export interface CanvasFilterEditConfigPercentage extends CanvasFilterEditConfigFieldCommon {

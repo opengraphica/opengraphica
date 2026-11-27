@@ -16,10 +16,10 @@ import {
     isTransformBoundsTransparent, rotationSnappingDegrees,
     editControlPointNodes, renderControlPointAttributeEdits, editControlPointNodeParsedAttributes,
     editingLayers, hasVisibleToolbarOverlay, showShapeDrawer,
-    type ControlPointAttributeEdit,
+    type ControlPointAttributeEdit
 } from '@/tools/store/draw-shape-state';
 import {
-    activeSelectionPath, appliedSelectionPaths,
+    activeSelectionPath, appliedSelectionPaths
 } from '@/tools/store/selection-state';
 
 import { hexToColor } from '@/lib/color';
@@ -29,7 +29,7 @@ import { isShiftKeyPressed } from '@/lib/keyboard';
 import { isEqualApprox, pointDistance2d } from '@/lib/math';
 import {
     calculateShapeAabb, getViewBox, generateSvgElementIds, parseNodeTransform,
-    serializeVectorPathCommands, parseCommonNodeAttributes, parseAnyShapeAttributes,
+    serializeVectorPathCommands, parseCommonNodeAttributes, parseAnyShapeAttributes
 } from '@/lib/svg';
 import { AsyncCallbackQueue } from '@/lib/timing';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
@@ -38,7 +38,7 @@ import { t, tm, rt } from '@/i18n';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, {
-    createHistoryReserveToken, historyBlockInteractionUntilComplete, historyReserveQueueFree,
+    createHistoryReserveToken, historyBlockInteractionUntilComplete, historyReserveQueueFree
 } from '@/store/history';
 import preferencesStore from '@/store/preferences';
 import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';
@@ -58,7 +58,7 @@ import {
     type WorkingFileVectorLayer,
     type InsertVectorLayerOptions, type UpdateVectorLayerOptions,
     type VectorPathCommand,
-    VectorPathCommandType,
+    VectorPathCommandType
 } from '@/types';
 
 const EPSILON = 1e-6;
@@ -120,7 +120,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     private renderer: RendererFrontend | null = null;
 
     private selectedLayers: WorkingFileVectorLayer[] = [];
-    
+
     private dragHandleRadius: number = 6;
     private dragHandleRadiusTouch: number = 10;
     private dragControlPointPointerId: number | null = null;
@@ -182,7 +182,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         this.createEditingLayersFromSelectedLayers = this.createEditingLayersFromSelectedLayers.bind(this);
         this.selectedLayerIdsUnwatch = watch(
             () => workingFileStore.state.selectedLayerIds,
-            this.createEditingLayersFromSelectedLayers
+            this.createEditingLayersFromSelectedLayers,
         );
         editingLayers.value = [];
         // Force re-generation of control points on tool entry. Not doing this causes major bugs.
@@ -228,7 +228,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         // Tutorial message
         if (!editorStore.state.tutorialFlags.drawShapeToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.drawShapeToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.drawShapeToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -239,15 +239,15 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                             return `<p class="mb-3!">${rt(message, {
                                 add: `<strong class="font-bold"><span class="bi bi-plus-circle"></span> ${t('tutorialTip.drawShapeToolIntroduction.bodyTitle.add')}</strong>`,
                                 edit: `<strong class="font-bold"><span class="bi bi-pencil-square"></span> ${t('tutorialTip.drawShapeToolIntroduction.bodyTitle.edit')}</strong>`,
-                            })}</p>`
+                            })}</p>`;
                         }).join(''),
                         mouse: message + (tm('tutorialTip.drawShapeToolIntroduction.body.mouse') as string[]).map((message) => {
                             return `<p class="mb-3!">${rt(message, {
                                 add: `<strong class="font-bold"><span class="bi bi-plus-circle"></span> ${t('tutorialTip.drawShapeToolIntroduction.bodyTitle.add')}</strong>`,
                                 edit: `<strong class="font-bold"><span class="bi bi-pencil-square"></span> ${t('tutorialTip.drawShapeToolIntroduction.bodyTitle.edit')}</strong>`,
-                            })}</p>`
+                            })}</p>`;
                         }).join(''),
-                    }
+                    },
                 });
             });
         }
@@ -315,7 +315,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         if ((e.pointerType === 'pen' || (e.pointerType === 'mouse' && !editorStore.state.isPenUser))) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
@@ -358,7 +358,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 } else {
                     transformRotateHandleHighlight.value = false;
                     if (selectedShapes.value.length > 0) {
-                        let transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
+                        const transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
                         if (transformDragType != null) {
                             transformDragHandleHighlight.value = transformDragType;
                         } else {
@@ -390,7 +390,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         } else if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
@@ -423,7 +423,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         transformDragHandleHighlight.value = null;
                     } else {
                         transformRotateHandleHighlight.value = false;
-                        let transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
+                        const transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
                         if (transformDragType != null) {
                             transformDragHandleHighlight.value = transformDragType;
                         } else {
@@ -515,7 +515,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         if (selectedShapes.value.length > 0) {
             const { transformBoundsPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
             if (!this.isJustSelectedShapes) {
-                let transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
+                const transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
                 if (transformDragType === DRAG_TYPE_ALL) {
                     this.uselessClickCount = 0;
                     this.isJustDeselectedShapes = true;
@@ -561,7 +561,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         const { width, height } = workingFileStore.state;
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'vector' || layer.type === 'empty');
-        let layerActions: BaseAction[] = [];
+        const layerActions: BaseAction[] = [];
 
         const newSvgString = `<svg width="${Math.round(width)}" height="${Math.round(height)}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>`;
 
@@ -571,7 +571,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             layerActions.push(new InsertLayerAction<InsertVectorLayerOptions>({
                 type: 'vector',
                 name: ensureUniqueLayerSiblingName(
-                    workingFileStore.state.layers[0]?.id, t('toolbar.drawShape.newVectorLayerName')
+                    workingFileStore.state.layers[0]?.id, t('toolbar.drawShape.newVectorLayerName'),
                 ),
                 width,
                 height,
@@ -583,7 +583,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         return image;
                     })()),
                     sourceDocument: svgDocument,
-                }
+                },
             }));
         }
 
@@ -608,13 +608,13 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                                     };
                                     image.onerror = () => {
                                         resolve(image);
-                                    }
+                                    };
                                     image.src = URL.createObjectURL(new Blob([newSvgString], { type: 'image/svg+xml' }));
                                 }),
                             ),
                             sourceDocument: svgDocument,
                         },
-                    })
+                    }),
                 );
             } else if (selectedLayer.type !== 'vector') {
                 selectedLayers.splice(i, 1);
@@ -670,7 +670,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 if (!element) continue;
 
                 const viewBox = getViewBox(layer.data.sourceDocument);
-                const transform  = parseNodeTransform(layerDocument.documentElement);
+                const transform = parseNodeTransform(layerDocument.documentElement);
                 const nodeXf = layer.transform.scale(
                     layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
                 ).translateSelf(
@@ -723,8 +723,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                             position2.y = Math.round(position2.y);
                         }
                         let radius = pointDistance2d(position1.x, position1.y, position2.x, position2.y);
-                        let x = position1.x;
-                        let y = position1.y;
+                        const x = position1.x;
+                        const y = position1.y;
                         if (pixelSnap.value) {
                             radius = Math.max(1, Math.round(radius));
                         } else {
@@ -750,8 +750,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                             position2.x = Math.round(position2.x);
                             position2.y = Math.round(position2.y);
                         }
-                        let x = (position1.x + position2.x) / 2;
-                        let y = (position1.y + position2.y) / 2;
+                        const x = (position1.x + position2.x) / 2;
+                        const y = (position1.y + position2.y) / 2;
                         let rx = Math.abs(position1.x - position2.x) / 2;
                         let ry = Math.abs(position1.y - position2.y) / 2;
                         if (pixelSnap.value) {
@@ -938,8 +938,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         position2.y = Math.round(position2.y);
                     }
                     let radius = pointDistance2d(position1.x, position1.y, position2.x, position2.y);
-                    let x = position1.x;
-                    let y = position1.y;
+                    const x = position1.x;
+                    const y = position1.y;
                     if (pixelSnap.value) {
                         radius = Math.max(1, Math.round(radius));
                     } else {
@@ -968,8 +968,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         position2.x = Math.round(position2.x);
                         position2.y = Math.round(position2.y);
                     }
-                    let x = (position1.x + position2.x) / 2;
-                    let y = (position1.y + position2.y) / 2;
+                    const x = (position1.x + position2.x) / 2;
+                    const y = (position1.y + position2.y) / 2;
                     let rx = Math.abs(position1.x - position2.x) / 2;
                     let ry = Math.abs(position1.y - position2.y) / 2;
                     if (pixelSnap.value) {
@@ -1053,7 +1053,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     break;
                 }
             }
-            
+
             this.renderer?.updateVectorLayerAttributes(
                 layer.id,
                 nodeId,
@@ -1090,7 +1090,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
                     const elementId = element.getAttribute('data-ogr-id');
                     if (elementId) {
-                    if (!layer.data.pendingSourceDocumentUpdateNodeIds) {
+                        if (!layer.data.pendingSourceDocumentUpdateNodeIds) {
                             layer.data.pendingSourceDocumentUpdateNodeIds = [];
                         }
                         layer.data.pendingSourceDocumentUpdateNodeIds.push(elementId);
@@ -1103,7 +1103,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         };
                         image.onerror = () => {
                             resolve(image);
-                        }
+                        };
                         image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
                     });
 
@@ -1135,7 +1135,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
         }
-        
+
         this.drawingPointerId = null;
         this.drawingShapes = [];
     }
@@ -1162,13 +1162,13 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             const node = editControlPointNodes.value[point.nodeIndex];
             const nodeId = node.getAttribute('data-ogr-id');
             if (!nodeId) continue;
-            let pathStart = node.getAttribute('d') ?? node.getAttribute('points');
+            const pathStart = node.getAttribute('d') ?? node.getAttribute('points');
             if (pathStart == null) continue;
             const layerDocument = layer.data.sourceDocument;
             if (!layerDocument) continue;
 
             const viewBox = getViewBox(layer.data.sourceDocument);
-            const transform  = parseNodeTransform(node);
+            const transform = parseNodeTransform(node);
             const nodeXf = layer.transform.scale(
                 layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
             ).translateSelf(
@@ -1248,7 +1248,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         const actions: UpdateVectorLayerAttributesAction[] = [];
 
-        let tagName = this.extendPathInfo[0]?.tagName;
+        const tagName = this.extendPathInfo[0]?.tagName;
         for (const { layerId, tagName, nodeId, nodeXf, pathStart } of this.extendPathInfo) {
             const attributes: Record<string, string> = {};
 
@@ -1277,13 +1277,13 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         }
 
         this.extendPathPointerId = null;
-        
+
         await historyStore.dispatch('runAction', {
             action: new BundleAction(
                 'moveVectorLayerControlPoints',
                 'action.moveVectorLayerControlPoints',
                 actions,
-            )
+            ),
         });
         this.hasUncroppedChanges = true;
 
@@ -1300,12 +1300,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     protected dragEditControlPointStart(e: PointerTracker) {
         this.dragControlPointPointerId = e.down.pointerId;
-         
+
         ({ viewTransformPoint: this.dragStartPoint } = this.getTransformedCursorInfo());
 
         this.uselessClickCount = 0;
 
-        let selectedAttachedEditControlPointIndices: number[] = [];
+        const selectedAttachedEditControlPointIndices: number[] = [];
         const selectedEditControlAttachPointIndicesSet = new Set<number>();
 
         const referencedControlPointIndices = new Set<number>();
@@ -1318,12 +1318,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         const firstCheckIndex = Math.min(
             editControlPoints.value[selectedEditControlPointIndices.value[0]].attachToIndex ?? Infinity,
-            selectedEditControlPointIndices.value[0]
+            selectedEditControlPointIndices.value[0],
         );
         // This loops under the assumption attached indices always follow what they're attached to
         for (let i = firstCheckIndex + 1; i < editControlPoints.value.length; i++) {
             const point = editControlPoints.value[i];
-            for (let selectedIndex of selectedEditControlPointIndices.value) {
+            for (const selectedIndex of selectedEditControlPointIndices.value) {
                 if (
                     point.attachToIndex === selectedIndex
                     && i !== selectedIndex
@@ -1341,7 +1341,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         selectedEditControlAttachPointIndices.value = Array.from(selectedEditControlAttachPointIndicesSet);
 
         this.draggingEditControlPointIndices = selectedEditControlPointIndices.value.slice();
-        for (let pointIndex of selectedAttachedEditControlPointIndices) {
+        for (const pointIndex of selectedAttachedEditControlPointIndices) {
             this.draggingEditControlPointIndices.push(pointIndex);
         }
 
@@ -1357,7 +1357,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         const nodeIndices = selectedEditControlPointIndices.value.map((selectedIndex) => {
             const point = editControlPoints.value[selectedIndex];
             return point.nodeIndex;
-        })
+        });
 
         let averageFillColor: RGBAColor | null = null;
         let averageStrokeColor: RGBAColor | null = null;
@@ -1431,7 +1431,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
                 const referencePointXf = new DOMPoint(
                     point.sx!,
-                    point.sy!
+                    point.sy!,
                 ).matrixTransform(inverseNodeXf);
                 const newPointXf = new DOMPoint(
                     point.sx! + (viewTransformPoint.x - this.dragStartPoint.x),
@@ -1482,7 +1482,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         let snapXOffset = 0;
         let snapYOffset = 0;
         if (useSnapping.value && (useCanvasEdgeSnapping.value || useControlPointSnapping.value)) {
-            let checkPoints: DOMPoint[] = this.draggingEditControlPointIndices.map((pointIndex) => {
+            const checkPoints: DOMPoint[] = this.draggingEditControlPointIndices.map((pointIndex) => {
                 const point = editControlPoints.value[pointIndex];
                 return new DOMPoint(point.x, point.y);
             });
@@ -1504,7 +1504,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 if (Math.abs(snapPoint.value - checkPoint.x) <= this.snapSensitivity) {
                     if (snapLineX.value.length === 0) {
                         snapXOffset = snapPoint.value - checkPoint.x;
-                        for (let pointY of snapPoint.points) {
+                        for (const pointY of snapPoint.points) {
                             snapLineX.value.push(snapPoint.value, pointY);
                         }
                         snapLineXLayerPointIndex = snapLineX.value.length;
@@ -1535,7 +1535,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 if (Math.abs(snapPoint.value - checkPoint.y) <= this.snapSensitivity) {
                     if (snapLineY.value.length === 0) {
                         snapYOffset = snapPoint.value - checkPoint.y;
-                        for (let pointX of snapPoint.points) {
+                        for (const pointX of snapPoint.points) {
                             snapLineY.value.push(pointX, snapPoint.value);
                         }
                     }
@@ -1558,7 +1558,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 this.draggingEditControlPointIndices.forEach((pointIndex) => {
                     const point = editControlPoints.value[pointIndex];
                     const pointXf = new DOMPoint(point.x, point.y).matrixTransform(
-                        new DOMMatrix().translate(snapXOffset, snapYOffset)
+                        new DOMMatrix().translate(snapXOffset, snapYOffset),
                     );
                     point.x = pointXf.x;
                     point.y = pointXf.y;
@@ -1595,7 +1595,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 'moveVectorLayerControlPoints',
                 'action.moveVectorLayerControlPoints',
                 actions,
-            )
+            ),
         });
         this.hasUncroppedChanges = true;
     }
@@ -1617,7 +1617,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         let currentDistance = Infinity;
         let currentIsAttached = true;
-        let currentIndices: number[] = [];
+        const currentIndices: number[] = [];
 
         let selectedNodeIndex: number | null = null;
         for (const [pathPointIndex, pathPoint] of editControlPoints.value.entries()) {
@@ -1696,7 +1696,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             (xMap[x] ??= []).push(y);
             (yMap[y] ??= []).push(x);
         }
-        
+
         if (useSnapping.value && useCanvasEdgeSnapping.value) {
             const width = workingFileStore.get('width');
             const height = workingFileStore.get('height');
@@ -1714,7 +1714,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         for (const xStr in xMap) {
             this.snapXPoints.push({
                 value: +xStr,
-                points: Int32Array.from(xMap[xStr])
+                points: Int32Array.from(xMap[xStr]),
             });
         }
 
@@ -1722,7 +1722,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         for (const yStr in yMap) {
             this.snapYPoints.push({
                 value: +yStr,
-                points: Int32Array.from(yMap[yStr])
+                points: Int32Array.from(yMap[yStr]),
             });
         }
 
@@ -1758,7 +1758,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         if (selectedShapes.value.length > 0) {
             const { transformBoundsPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
-            let transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
+            const transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
             transformRotateHandleHighlight.value = false;
             if (transformDragType != null) {
                 transformDragHandleHighlight.value = transformDragType;
@@ -1824,7 +1824,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     private async transformShapesStart() {
         this.uselessClickCount = 0;
         this.isTransformShapesDragging = false;
-        let { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
+        const { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
 
         // Figure out which resize/rotate handles were clicked on, or if clicked in empty space just to drag
         this.determineDragRotateType(viewTransformPoint, transformBoundsPoint, viewDecomposedTransform);
@@ -1852,7 +1852,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
             if (shouldSnapRotationDegrees) {
                 const targetRotation = this.transformShapeStartDimensions.rotation + rotationDelta;
-                let roundedTargetRotation = Math.round(targetRotation / (rotationSnappingDegrees.value * Math.DEGREES_TO_RADIANS)) * (rotationSnappingDegrees.value * Math.DEGREES_TO_RADIANS);
+                const roundedTargetRotation = Math.round(targetRotation / (rotationSnappingDegrees.value * Math.DEGREES_TO_RADIANS)) * (rotationSnappingDegrees.value * Math.DEGREES_TO_RADIANS);
                 rotationDelta -= targetRotation - roundedTargetRotation;
             }
 
@@ -1862,10 +1862,10 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         else if (this.transformShapeIsDragging) {
 
             const isDragAll = this.transformShapeDragType === DRAG_TYPE_ALL;
-            let isDragLeft = Math.floor(this.transformShapeDragType / DRAG_TYPE_LEFT) % 2 === 1;
-            let isDragRight = Math.floor(this.transformShapeDragType / DRAG_TYPE_RIGHT) % 2 === 1;
-            let isDragTop = Math.floor(this.transformShapeDragType / DRAG_TYPE_TOP) % 2 === 1;
-            let isDragBottom = Math.floor(this.transformShapeDragType / DRAG_TYPE_BOTTOM) % 2 === 1;
+            const isDragLeft = Math.floor(this.transformShapeDragType / DRAG_TYPE_LEFT) % 2 === 1;
+            const isDragRight = Math.floor(this.transformShapeDragType / DRAG_TYPE_RIGHT) % 2 === 1;
+            const isDragTop = Math.floor(this.transformShapeDragType / DRAG_TYPE_TOP) % 2 === 1;
+            const isDragBottom = Math.floor(this.transformShapeDragType / DRAG_TYPE_BOTTOM) % 2 === 1;
 
             const dx = Math.round(viewTransformPoint.x - this.transformShapeTranslateStart.x);
             const dy = Math.round(viewTransformPoint.y - this.transformShapeTranslateStart.y);
@@ -1882,7 +1882,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             if (isDragTop) {
                 offsetHeight = this.transformShapeStartDimensions.height - ((xFactor * dy) - (yFactor * dx));
             }
-            // @ts-ignore 2365
+            // @ts-expect-error 2365
             if (shouldMaintainAspectRatio && (isDragLeft + isDragRight + isDragTop + isDragBottom > 1)) {
                 const ratioOffsetWidth = offsetHeight * (this.transformShapeStartDimensions.width / this.transformShapeStartDimensions.height);
                 const ratioOffsetHeight = offsetWidth * (this.transformShapeStartDimensions.height / this.transformShapeStartDimensions.width);
@@ -1940,7 +1940,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 shouldScaleDuringResize,
                 true,
             );
-            
+
         }
 
         canvasStore.set('dirty', true);
@@ -1958,7 +1958,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         drawShapeToolbarEmitter.emit('setTransformDimensions', {
             rotation: newRotation,
             transformOriginX: transformOriginX.value,
-            transformOriginY: transformOriginY.value
+            transformOriginY: transformOriginY.value,
         });
         for (const [i, [layerId, shapeId]] of selectedShapes.value.entries()) {
             const layerTransformOriginX = transformBoundsLeft.value + (transformOriginX.value * transformBoundsWidth.value);
@@ -1970,12 +1970,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             const decomposedTransform = decomposeMatrix(screenTransform);
             const newScreenTransform =
                 DOMMatrix.fromMatrix(screenTransform)
-                .translateSelf(layerTransformOrigin.x, layerTransformOrigin.y)
-                .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
-                .rotateSelf(rotationDelta * Math.RADIANS_TO_DEGREES)
-                .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
-                .translateSelf(-layerTransformOrigin.x, -layerTransformOrigin.y);
-            
+                    .translateSelf(layerTransformOrigin.x, layerTransformOrigin.y)
+                    .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
+                    .rotateSelf(rotationDelta * Math.RADIANS_TO_DEGREES)
+                    .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
+                    .translateSelf(-layerTransformOrigin.x, -layerTransformOrigin.y);
+
             this.transformShapeLayerData[i].newShapeTransform = parentTransform.inverse().multiply(newScreenTransform);
             const { a, b, c, d, e, f } = this.transformShapeLayerData[i].newShapeTransform;
             this.renderer?.updateVectorLayerAttributes(layerId, shapeId, {
@@ -1993,26 +1993,26 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         let transformOriginYPoint = (this.transformShapeStartDimensions.height * transformOriginY.value);
         const decomposedStartDimensions = decomposeMatrix(
             new DOMMatrix()
-            .translateSelf(-transformOriginXPoint, -transformOriginYPoint)
-            .translateSelf(newTransform.left, newTransform.top)
-            .rotateSelf(transformBoundsRotation.value * Math.RADIANS_TO_DEGREES)
-            .translateSelf(transformOriginXPoint, transformOriginYPoint)
+                .translateSelf(-transformOriginXPoint, -transformOriginYPoint)
+                .translateSelf(newTransform.left, newTransform.top)
+                .rotateSelf(transformBoundsRotation.value * Math.RADIANS_TO_DEGREES)
+                .translateSelf(transformOriginXPoint, transformOriginYPoint),
         );
         transformOriginXPoint = (newTransform.width * transformOriginX.value);
         transformOriginYPoint = (newTransform.height * transformOriginY.value);
         const decomposedEndDimensions = decomposeMatrix(
             new DOMMatrix()
-            .translateSelf(-transformOriginXPoint, -transformOriginYPoint)
-            .translateSelf(newTransform.left, newTransform.top)
-            .rotateSelf(transformBoundsRotation.value * Math.RADIANS_TO_DEGREES)
-            .translateSelf(transformOriginXPoint, transformOriginYPoint)
+                .translateSelf(-transformOriginXPoint, -transformOriginYPoint)
+                .translateSelf(newTransform.left, newTransform.top)
+                .rotateSelf(transformBoundsRotation.value * Math.RADIANS_TO_DEGREES)
+                .translateSelf(transformOriginXPoint, transformOriginYPoint),
         );
 
         let boundsLeft = newTransform.left + decomposedEndDimensions.translateX - decomposedStartDimensions.translateX;
         let boundsTop = newTransform.top + decomposedEndDimensions.translateY - decomposedStartDimensions.translateY;
-        let boundsWidth = newTransform.width;
-        let boundsHeight = newTransform.height;
-        
+        const boundsWidth = newTransform.width;
+        const boundsHeight = newTransform.height;
+
         // Apply snapping
         snapLineX.value = [];
         snapLineY.value = [];
@@ -2023,11 +2023,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 .translateSelf(boundsLeft + boundsWidth / 2, boundsTop + boundsHeight / 2)
                 .rotateSelf(transformBoundsRotation.value * Math.RADIANS_TO_DEGREES)
                 .translateSelf(-boundsWidth / 2, -boundsHeight / 2);
-            let checkPoints: DOMPoint[] = [];
-            let p0 = new DOMPoint(0, 0).matrixTransform(boundingBoxTransform);
-            let p1 = new DOMPoint(newTransform.width, 0).matrixTransform(boundingBoxTransform);
-            let p2 = new DOMPoint(0, newTransform.height).matrixTransform(boundingBoxTransform);
-            let p3 = new DOMPoint(newTransform.width, newTransform.height).matrixTransform(boundingBoxTransform);
+            const checkPoints: DOMPoint[] = [];
+            const p0 = new DOMPoint(0, 0).matrixTransform(boundingBoxTransform);
+            const p1 = new DOMPoint(newTransform.width, 0).matrixTransform(boundingBoxTransform);
+            const p2 = new DOMPoint(0, newTransform.height).matrixTransform(boundingBoxTransform);
+            const p3 = new DOMPoint(newTransform.width, newTransform.height).matrixTransform(boundingBoxTransform);
             if (useCanvasEdgeSnapping.value /*|| useLayerEdgeSnapping.value*/) {
                 checkPoints.push(p0, p1, p2, p3);
             }
@@ -2055,7 +2055,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 if (Math.abs(snapPoint.value - checkPoint.x) <= this.snapSensitivity) {
                     if (snapLineX.value.length === 0) {
                         snapXOffset = snapPoint.value - checkPoint.x;
-                        for (let pointY of snapPoint.points) {
+                        for (const pointY of snapPoint.points) {
                             snapLineX.value.push(snapPoint.value, pointY);
                         }
                         snapLineXLayerPointIndex = snapLineX.value.length;
@@ -2086,7 +2086,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 if (Math.abs(snapPoint.value - checkPoint.y) <= this.snapSensitivity) {
                     if (snapLineY.value.length === 0) {
                         snapYOffset = snapPoint.value - checkPoint.y;
-                        for (let pointX of snapPoint.points) {
+                        for (const pointX of snapPoint.points) {
                             snapLineY.value.push(pointX, snapPoint.value);
                         }
                     }
@@ -2107,7 +2107,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
             if (snapXOffset !== 0 || snapYOffset !== 0) {
                 const newTopLeft = new DOMPoint(boundsLeft, boundsTop).matrixTransform(
-                    new DOMMatrix().translate(snapXOffset, snapYOffset)
+                    new DOMMatrix().translate(snapXOffset, snapYOffset),
                 );
                 boundsLeft = newTopLeft.x;
                 boundsTop = newTopLeft.y;
@@ -2119,7 +2119,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             left: boundsLeft,
             top: boundsTop,
             width: newTransform.width,
-            height: newTransform.height
+            height: newTransform.height,
         });
 
         // Apply the transform offset to each layer
@@ -2128,11 +2128,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             const { parentTransform, shapeTransform, shapeBounds } = this.transformShapeLayerData[i];
             const screenTransform = parentTransform.multiply(shapeTransform);
             const decomposedTransform = decomposeMatrix(screenTransform);
-            let newScreenTransform = DOMMatrix.fromMatrix(screenTransform);
-            let transformStartOriginX = 0;
-            let transformStartOriginY = 0;
-            let transformEndOriginX = 0;
-            let transformEndOriginY = 0;
+            const newScreenTransform = DOMMatrix.fromMatrix(screenTransform);
+            const transformStartOriginX = 0;
+            const transformStartOriginY = 0;
+            const transformEndOriginX = 0;
+            const transformEndOriginY = 0;
             if (shouldScaleDuringResize) {
                 newScreenTransform.translateSelf(shapeBounds.left, shapeBounds.top);
                 newScreenTransform.scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY);
@@ -2143,11 +2143,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     (newTransform.left + snapXOffset + transformEndOriginX) - (this.transformShapeStartDimensions.left + transformStartOriginX),
                     (newTransform.top + snapYOffset + transformEndOriginY) - (this.transformShapeStartDimensions.top + transformStartOriginY),
                 )
-                .rotateSelf((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
+                .rotateSelf((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES);
             if (shouldScaleDuringResize) {
                 newScreenTransform.scaleSelf(
                     decomposedTransform.scaleX * newTransform.width / this.transformShapeStartDimensions.width,
-                    decomposedTransform.scaleY * newTransform.height / this.transformShapeStartDimensions.height
+                    decomposedTransform.scaleY * newTransform.height / this.transformShapeStartDimensions.height,
                 );
                 newScreenTransform.translateSelf(-shapeBounds.left, -shapeBounds.top);
             }
@@ -2177,7 +2177,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     updateActions.push(
                         new UpdateVectorLayerAttributesAction(layerId, shapeId, {
                             transform: `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`,
-                        })
+                        }),
                     );
                 }
 
@@ -2186,8 +2186,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         action: new BundleAction('freeTransform', [
                             ...(isRotate ? ['action.freeTransformRotate'] : []),
                             ...(isScale ? ['action.freeTransformScale'] : []),
-                            ...(isTranslate ? ['action.freeTransformTranslate'] : [])
-                        ][0], updateActions)
+                            ...(isTranslate ? ['action.freeTransformTranslate'] : []),
+                        ][0], updateActions),
                     });
                     this.hasUncroppedChanges = true;
                 }
@@ -2240,18 +2240,18 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             const decomposedTransform = decomposeMatrix(nodeXf);
             const decomposedPositionTransform = decomposeMatrix(
                 DOMMatrix.fromMatrix(nodeXf)
-                .translateSelf(originPosX, originPosY)
-                .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
-                .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
-                .translateSelf(-originPosX + bounds.left, -originPosY + bounds.top)
+                    .translateSelf(originPosX, originPosY)
+                    .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
+                    .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                    .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
+                    .translateSelf(-originPosX + bounds.left, -originPosY + bounds.top),
             );
             drawShapeToolbarEmitter.emit('setTransformDimensions', {
                 left: decomposedPositionTransform.translateX,
                 top: decomposedPositionTransform.translateY,
                 width: bounds.width * decomposedTransform.scaleX,
                 height: bounds.height * decomposedTransform.scaleY,
-                rotation: decomposedTransform.rotation
+                rotation: decomposedTransform.rotation,
             });
         }
     }
@@ -2267,11 +2267,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             width: transformBoundsWidth.value,
             height: transformBoundsHeight.value,
             rotation: transformBoundsRotation.value,
-            handleToRotationOrigin: 0
+            handleToRotationOrigin: 0,
         };
         this.transformShapeLayerData = [];
 
-        for (let [layerId, nodeId] of selectedShapes.value) {
+        for (const [layerId, nodeId] of selectedShapes.value) {
             const layer = getLayerById<WorkingFileVectorLayer>(layerId);
             const layerDocument = layer?.data.sourceDocument;
             const shapeNode = layerDocument?.querySelector(`[data-ogr-id="${nodeId}"]`);
@@ -2315,13 +2315,13 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             transformRotateHandleHighlight.value = true;
             this.transformShapeStartDimensions.handleToRotationOrigin = Math.atan2(
                 viewTransformPoint.y - (transformBoundsTop.value + (transformBoundsHeight.value * transformOriginY.value)),
-                viewTransformPoint.x - (transformBoundsLeft.value + (transformBoundsWidth.value * transformOriginX.value))
+                viewTransformPoint.x - (transformBoundsLeft.value + (transformBoundsWidth.value * transformOriginX.value)),
             );
             this.transformShapeDragType = DRAG_TYPE_ALL;
             transformDragHandleHighlight.value = null;
         } else {
             transformRotateHandleHighlight.value = false;
-            let transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
+            const transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
             if (transformDragType != null) {
                 this.transformShapeDragType = transformDragType;
             } else {
@@ -2435,7 +2435,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     'updateShapeFillColor',
                     'action.updateShapeFillColor',
                     actions,
-                )
+                ),
             });
         }
     }
@@ -2478,7 +2478,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     'updateShapeFillColor',
                     'action.updateShapeFillColor',
                     actions,
-                )
+                ),
             });
             this.setTransformBoundsFromSelectedShapesImmediate();
         }
@@ -2545,7 +2545,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     'updateShapeStrokeWidth',
                     'action.updateShapeStrokeWidth',
                     actions,
-                )
+                ),
             });
             this.setTransformBoundsFromSelectedShapesImmediate();
             this.hasUncroppedChanges = true;
@@ -2816,7 +2816,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         };
                         image.onerror = () => {
                             resolve(image);
-                        }
+                        };
                         image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
                     });
 
@@ -2852,7 +2852,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         };
                         image.onerror = () => {
                             resolve(image);
-                        }
+                        };
                         image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
                     });
 
@@ -2967,7 +2967,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
             const zoom = canvasStore.state.decomposedTransform.scaleX;
             const newLayerOffset = Math.max(10,
-                Math.round(((1 / (zoom || 0.00001)) * (window.innerHeight / 20)) / 10) * 10
+                Math.round(((1 / (zoom || 0.00001)) * (window.innerHeight / 20)) / 10) * 10,
             ) * this.currentCopiedShapesPasteCount;
 
             const serializer = new XMLSerializer();
@@ -2994,7 +2994,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
                     const elementId = element.getAttribute('data-ogr-id');
                     if (elementId) {
-                    if (!layer.data.pendingSourceDocumentUpdateNodeIds) {
+                        if (!layer.data.pendingSourceDocumentUpdateNodeIds) {
                             layer.data.pendingSourceDocumentUpdateNodeIds = [];
                         }
                         layer.data.pendingSourceDocumentUpdateNodeIds.push(elementId);
@@ -3011,7 +3011,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     };
                     image.onerror = () => {
                         resolve(image);
-                    }
+                    };
                     image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
                 });
 
@@ -3096,7 +3096,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 const sourceDocument = (layer.data.sourceDocument?.documentElement)
                     ? layer.data.sourceDocument
                     : await getStoredSvgDocument(layer.data.sourceUuid);
-                
+
                 for (const nodeId of Array.from(nodeIds)) {
                     const shapeNode = sourceDocument.querySelector(`[data-ogr-id="${nodeId}"]`);
                     if (!shapeNode) continue;
@@ -3121,7 +3121,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     const { a, b, c, d, e, f } = new DOMMatrix()
                         .translateSelf(rotatedOffset.x, rotatedOffset.y)
                         .multiply(shapeTransform);
-                    
+
                     this.renderer?.updateVectorLayerAttributes(layerId, nodeId, {
                         transform: `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`,
                     });
@@ -3129,7 +3129,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     updateActions.push(
                         new UpdateVectorLayerAttributesAction(layerId, nodeId, {
                             transform: `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`,
-                        })
+                        }),
                     );
                 }
             }
@@ -3169,7 +3169,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             //     if (point.yProp) {
             //         attributes[point.yProp] = originalAttributes[point.yProp] + rotatedOffset.y;
             //     }
-                
+
             //     this.renderer?.updateVectorLayerAttributes(layer.id, shapeId, attributes);
 
             // }
@@ -3198,8 +3198,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private isReadyForPathExtension(): boolean {
         let tagName: string | null = null;
-        let maxPathIndices = new Map<string, number>();
-        for (let point of editControlPoints.value) {
+        const maxPathIndices = new Map<string, number>();
+        for (const point of editControlPoints.value) {
             const mapEntry = maxPathIndices.get(`${point.layerIndex}_${point.nodeIndex}`);
             if (
                 (!mapEntry || point.pathIndex > mapEntry)
@@ -3209,7 +3209,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             }
         }
         if (selectedEditControlPointIndices.value.length === 0) return false;
-        for (let selectedIndex of selectedEditControlPointIndices.value) {
+        for (const selectedIndex of selectedEditControlPointIndices.value) {
             const { layerIndex, nodeIndex, pathIndex } = editControlPoints.value[selectedIndex];
             const node = editControlPointNodes.value[nodeIndex];
             if (tagName == null) {
@@ -3237,7 +3237,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
                 let isExtendingPathsContinue: boolean | null = extendPathInfo.length > 0 ? false : null;
 
-                const greatestIndices = new Map<string, { pointIndex: number, pathIndex: number }>();
+                const greatestIndices = new Map<string, { pointIndex: number; pathIndex: number; }>();
 
                 for (const [pointIndex, { layerIndex, nodeIndex, pathIndex, attachToIndex }] of editControlPoints.value.entries()) {
                     const pointLayer = editingLayers.value[layerIndex];
@@ -3318,13 +3318,13 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         }
 
         getSelectedLayers<WorkingFileVectorLayer>(oldIds).filter(
-            layer => layer.type === 'vector'
+            layer => layer.type === 'vector',
         ).forEach((layer) => {
             delete layer.data.sourceDocument;
         });
 
         this.selectedLayers = getSelectedLayers<WorkingFileVectorLayer>(newIds).filter(
-            layer => layer.type === 'vector'
+            layer => layer.type === 'vector',
         );
         for (const layer of this.selectedLayers) {
             getStoredSvgDocument(layer.data.sourceUuid).then((document) => {
@@ -3338,28 +3338,28 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private updateToolbarFromEditingLayers() {
         if (editingLayers.value.length > 0) {
-            
+
         }
     }
 
-    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint, transformBoundsPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix } {
+    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint; transformBoundsPoint: DOMPoint; viewDecomposedTransform: DecomposedMatrix; } {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewDecomposedTransform = canvasStore.get('decomposedTransform');
         const viewTransformPoint = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
             .matrixTransform(viewTransform.inverse());
-        
+
         const originTranslateX = transformBoundsLeft.value + (transformOriginX.value * transformBoundsWidth.value);
         const originTranslateY = transformBoundsTop.value + (transformOriginY.value * transformBoundsHeight.value);
         const boundsTransform =
             new DOMMatrix()
-            .translateSelf(originTranslateX, originTranslateY)
-            .rotateSelf(transformBoundsRotation.value * Math.RADIANS_TO_DEGREES)
-            .translateSelf(-originTranslateX, -originTranslateY);
+                .translateSelf(originTranslateX, originTranslateY)
+                .rotateSelf(transformBoundsRotation.value * Math.RADIANS_TO_DEGREES)
+                .translateSelf(-originTranslateX, -originTranslateY);
         const transformBoundsPoint =
             new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
-            .matrixTransform(viewTransform.inverse())
-            .matrixTransform(boundsTransform.inverse());
+                .matrixTransform(viewTransform.inverse())
+                .matrixTransform(boundsTransform.inverse());
         return {
             viewTransformPoint,
             transformBoundsPoint,

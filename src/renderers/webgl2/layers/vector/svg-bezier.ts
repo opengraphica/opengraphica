@@ -24,8 +24,8 @@ export function sliceLineSegment(p0: Vector2, p1: Vector2, startT: number, endT:
     let isReversed = false;
     if (startT > endT) {
         isReversed = true;
-        let tmp = endT;
-        endT = startT
+        const tmp = endT;
+        endT = startT;
         startT = tmp;
     }
     if (startT == 0.0 && endT == 1.0) {
@@ -65,16 +65,16 @@ export function splitQuadraticBezier(p0: Vector2, p1: Vector2, p2: Vector2, t: n
     const y2 = p1.y;
     const x3 = p2.x;
     const y3 = p2.y;
-    
+
     const x12 = (x2 - x1) * t + x1;
     const y12 = (y2 - y1) * t + y1;
-    
+
     const x23 = (x3 - x2) * t + x2;
     const y23 = (y3 - y2) * t + y2;
-    
+
     const x123 = (x23 - x12) * t + x12;
     const y123 = (y23 - y12) * t + y12;
-    
+
     return [
         new Vector2(x1, y1),
         new Vector2(x12, y12),
@@ -88,8 +88,8 @@ export function sliceQuadraticBezier(p0: Vector2, p1: Vector2, p2: Vector2, star
     let isReversed = false;
     if (startT > endT) {
         isReversed = true;
-        let tmp = endT;
-        endT = startT
+        const tmp = endT;
+        endT = startT;
         startT = tmp;
     }
     if (startT == 0.0 && endT == 1.0) {
@@ -130,7 +130,7 @@ export function cubicBezierAt(p0: Vector2 | null, p1: Vector2 | null, p2: Vector
 }
 
 export function cubicBezierLength(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, subdiv: number = 5.0) {
-    var length = 0;
+    let length = 0;
     if (subdiv > 0) {
         const a = p0.clone().add(p1.clone().sub(p0).multiplyScalar(0.5));
         const b = p1.clone().add(p2.clone().sub(p1).multiplyScalar(0.5));
@@ -173,32 +173,32 @@ export function findCubicBezierDirectionAt(
 }
 
 export function splitCubicBezier(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: number) {
-    const x1 = p0.x
-    const y1 = p0.y
-    const x2 = p1.x
-    const y2 = p1.y
-    const x3 = p2.x
-    const y3 = p2.y
-    const x4 = p3.x
-    const y4 = p3.y
+    const x1 = p0.x;
+    const y1 = p0.y;
+    const x2 = p1.x;
+    const y2 = p1.y;
+    const x3 = p2.x;
+    const y3 = p2.y;
+    const x4 = p3.x;
+    const y4 = p3.y;
 
-    const x12 = (x2 - x1) * t + x1
-    const y12 = (y2 - y1) * t + y1
+    const x12 = (x2 - x1) * t + x1;
+    const y12 = (y2 - y1) * t + y1;
 
-    const x23 = (x3 - x2) * t + x2
-    const y23 = (y3 - y2) * t + y2
+    const x23 = (x3 - x2) * t + x2;
+    const y23 = (y3 - y2) * t + y2;
 
-    const x34 = (x4 - x3) * t + x3
-    const y34 = (y4 - y3) * t + y3
+    const x34 = (x4 - x3) * t + x3;
+    const y34 = (y4 - y3) * t + y3;
 
-    const x123 = (x23 - x12) * t + x12
-    const y123 = (y23 - y12) * t + y12
+    const x123 = (x23 - x12) * t + x12;
+    const y123 = (y23 - y12) * t + y12;
 
-    const x234 = (x34 - x23) * t + x23
-    const y234 = (y34 - y23) * t + y23
+    const x234 = (x34 - x23) * t + x23;
+    const y234 = (y34 - y23) * t + y23;
 
-    const x1234 = (x234 - x123) * t + x123
-    const y1234 = (y234 - y123) * t + y123
+    const x1234 = (x234 - x123) * t + x123;
+    const y1234 = (y234 - y123) * t + y123;
 
     return [
         new Vector2(x1, y1),
@@ -215,7 +215,7 @@ export function sliceCubicBezier(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vect
     let isReversed = false;
     if (startT > endT) {
         isReversed = true;
-        let tmp = endT;
+        const tmp = endT;
         endT = startT;
         startT = tmp;
     }
@@ -226,8 +226,8 @@ export function sliceCubicBezier(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vect
             return [p0.clone(), p1.clone(), p2.clone(), p3.clone()];
         }
     } else {
-        var leftSplit = splitCubicBezier(p0, p1, p2, p3, startT);
-        var rightSplit = (
+        const leftSplit = splitCubicBezier(p0, p1, p2, p3, startT);
+        const rightSplit = (
             startT < 1.0
                 ? splitCubicBezier(leftSplit[3], leftSplit[4], leftSplit[5], leftSplit[6], (endT - startT) / (1.0 - startT))
                 : [p3.clone(), p3.clone(), p3.clone(), p3.clone(), p3.clone(), p3.clone(), p3.clone()]

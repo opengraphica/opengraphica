@@ -64,5 +64,5 @@ export default class DropShadowCanvasFilter implements CanvasFilter<DropShadowCa
             Math.max(params.blurRadius + params.growRadius + params.xOffset, 0.0),
             Math.max(params.blurRadius + params.growRadius + params.yOffset, 0.0),
         ];
-    }
+    };
 }

@@ -9,70 +9,70 @@ import { ColorBlindnessSimulationMethod, ColorBlindnessType, type ColorBlindness
 
 import type { CanvasFilter } from '@/types';
 
-const brettelParams: Record<ColorBlindnessType, { rgbCvdFromRgb1: number[], rgbCvdFromRgb2: number[], separationPlaneNormalInRgb: number[] }> = {
+const brettelParams: Record<ColorBlindnessType, { rgbCvdFromRgb1: number[]; rgbCvdFromRgb2: number[]; separationPlaneNormalInRgb: number[]; }> = {
     [ColorBlindnessType.PROTAN]: {
         rgbCvdFromRgb1: [
             0.14980, 1.19548, -0.34528,
             0.10764, 0.84864, 0.04372,
-            0.00384, -0.00540, 1.00156
+            0.00384, -0.00540, 1.00156,
         ],
         rgbCvdFromRgb2: [
             0.14570, 1.16172, -0.30742,
             0.10816, 0.85291, 0.03892,
-            0.00386, -0.00524, 1.00139
+            0.00386, -0.00524, 1.00139,
         ],
-        separationPlaneNormalInRgb: [ 0.00048, 0.00393, -0.00441 ]
+        separationPlaneNormalInRgb: [0.00048, 0.00393, -0.00441],
     },
     [ColorBlindnessType.DEUTERAN]: {
         rgbCvdFromRgb1: [
             0.36477, 0.86381, -0.22858,
             0.26294, 0.64245, 0.09462,
-            -0.02006, 0.02728, 0.99278
+            -0.02006, 0.02728, 0.99278,
         ],
         rgbCvdFromRgb2: [
             0.37298, 0.88166, -0.25464,
             0.25954, 0.63506, 0.10540,
-            -0.01980, 0.02784, 0.99196
+            -0.01980, 0.02784, 0.99196,
         ],
-        separationPlaneNormalInRgb: [ -0.00281, -0.00611, 0.00892 ]
+        separationPlaneNormalInRgb: [-0.00281, -0.00611, 0.00892],
     },
     [ColorBlindnessType.TRITAN]: {
         rgbCvdFromRgb1: [
             1.01277, 0.13548, -0.14826,
             -0.01243, 0.86812, 0.14431,
-            0.07589, 0.80500, 0.11911
+            0.07589, 0.80500, 0.11911,
         ],
         rgbCvdFromRgb2: [
             0.93678, 0.18979, -0.12657,
             0.06154, 0.81526, 0.12320,
-            -0.37562, 1.12767, 0.24796
+            -0.37562, 1.12767, 0.24796,
         ],
-        separationPlaneNormalInRgb: [ 0.03901, -0.02788, -0.01113 ]
+        separationPlaneNormalInRgb: [0.03901, -0.02788, -0.01113],
     },
     [ColorBlindnessType.ACHROMA]: {
         rgbCvdFromRgb1: [],
         rgbCvdFromRgb2: [],
-        separationPlaneNormalInRgb: []
-    }
+        separationPlaneNormalInRgb: [],
+    },
 };
 
 const vienotParams: Record<ColorBlindnessType, number[]> = {
     [ColorBlindnessType.PROTAN]: [
         0.11238, 0.88762, 0.00000,
         0.11238, 0.88762, -0.00000,
-        0.00401, -0.00401, 1.00000
+        0.00401, -0.00401, 1.00000,
     ],
     [ColorBlindnessType.DEUTERAN]: [
         0.29275, 0.70725, 0.00000,
         0.29275, 0.70725, -0.00000,
-        -0.02234, 0.02234, 1.00000
+        -0.02234, 0.02234, 1.00000,
     ],
     [ColorBlindnessType.TRITAN]: [
         1.00000, 0.14461, -0.14461,
         0.00000, 0.85924, 0.14076,
-        -0.00000, 0.85924, 0.14076
+        -0.00000, 0.85924, 0.14076,
     ],
-    [ColorBlindnessType.ACHROMA]: []
+    [ColorBlindnessType.ACHROMA]: [],
 };
 
 export function fragment(
@@ -85,7 +85,7 @@ export function fragment(
     const method = filter.params.method ?? 0;
     const severity = filter.params.severity ?? 1;
 
-    let rgbCvd!: { r: number, g: number, b: number, alpha: number };
+    let rgbCvd!: { r: number; g: number; b: number; alpha: number; };
 
     if (type === ColorBlindnessType.ACHROMA) {
         const rgba = transfer8BitImageDataToSrgb(sourceImageData, dataPosition);
@@ -101,7 +101,7 @@ export function fragment(
 
     if (method === ColorBlindnessSimulationMethod.BRETTEL) {
         const deficiencyParams = brettelParams[type];
-        
+
         const n = deficiencyParams.separationPlaneNormalInRgb;
         const dotWithSepPlane = rgba.r * n[0] + rgba.g * n[1] + rgba.b * n[2];
         const rgbCvdFromRgb = (dotWithSepPlane >= 0 ? deficiencyParams.rgbCvdFromRgb1 : deficiencyParams.rgbCvdFromRgb2);
@@ -109,7 +109,7 @@ export function fragment(
             r: rgbCvdFromRgb[0] * rgba.r + rgbCvdFromRgb[1] * rgba.g + rgbCvdFromRgb[2] * rgba.b,
             g: rgbCvdFromRgb[3] * rgba.r + rgbCvdFromRgb[4] * rgba.g + rgbCvdFromRgb[5] * rgba.b,
             b: rgbCvdFromRgb[6] * rgba.r + rgbCvdFromRgb[7] * rgba.g + rgbCvdFromRgb[8] * rgba.b,
-            alpha: rgba.alpha
+            alpha: rgba.alpha,
         };
         rgbCvd.r = rgbCvd.r * severity + rgba.r * (1 - severity);
         rgbCvd.g = rgbCvd.g * severity + rgba.g * (1 - severity);
@@ -123,7 +123,7 @@ export function fragment(
             r: rgbCvdFromRgb[0] * rgba.r + rgbCvdFromRgb[1] * rgba.g + rgbCvdFromRgb[2] * rgba.b,
             g: rgbCvdFromRgb[3] * rgba.r + rgbCvdFromRgb[4] * rgba.g + rgbCvdFromRgb[5] * rgba.b,
             b: rgbCvdFromRgb[6] * rgba.r + rgbCvdFromRgb[7] * rgba.g + rgbCvdFromRgb[8] * rgba.b,
-            alpha: rgba.alpha
+            alpha: rgba.alpha,
         };
 
         if (severity < 0.999) {

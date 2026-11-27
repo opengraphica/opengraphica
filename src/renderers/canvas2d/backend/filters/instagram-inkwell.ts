@@ -11,7 +11,7 @@ export function fragment(
 ) {
     const mix = filter.params.mix ?? 0;
 
-    let rgba = transfer8BitImageDataToSrgb(sourceImageData, dataPosition);
+    const rgba = transfer8BitImageDataToSrgb(sourceImageData, dataPosition);
     const sourceR = rgba.r;
     const sourceG = rgba.g;
     const sourceB = rgba.b;

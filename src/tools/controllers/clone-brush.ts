@@ -19,9 +19,9 @@ import {
     cursorHoverPosition, cursorHoverAngle,
     sourceX, sourceY, sourceDrawingOffsetX, sourceDrawingOffsetY, cursorIsHoveringSource,
     brushHardness, brushSize, isPreviewingSize,
-    brushPressureMinSize, brushPressureTaper, brushSmoothing, brushOpacity,
+    brushPressureMinSize, brushPressureTaper, brushSmoothing, brushOpacity
 } from '../store/clone-brush-state';
-import {  activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
+import { activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
@@ -34,7 +34,7 @@ import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/render
 
 import { RendererBrushStrokeDrawMode } from '@/types/renderer';
 import type {
-    RendererFrontend, RendererTextureTile, UpdateRasterLayerOptions, WorkingFileAnyLayer,
+    RendererFrontend, RendererTextureTile, UpdateRasterLayerOptions, WorkingFileAnyLayer
 } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -102,7 +102,7 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
         this.isPreviewingSizeUnwatch = watch(() => isPreviewingSize.value, () => {
             cursorHoverPosition.value = new DOMPoint(
                 -100000000000,
-                -100000000000
+                -100000000000,
             );
         });
 
@@ -110,17 +110,17 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
         appEmitter.on('editor.tool.delete', this.onDelete);
         this.onSelectAll = this.onSelectAll.bind(this);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
-        
+
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
-            -100000000000
-        )
+            -100000000000,
+        );
         cursorHoverAngle.value = 0;
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.cloneBrushToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.cloneBrushToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.cloneBrushToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -128,12 +128,12 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
                     title: t('tutorialTip.cloneBrushToolIntroduction.title'),
                     message: {
                         touch: message + (tm('tutorialTip.cloneBrushToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`;
                         }).join(''),
                         mouse: message + (tm('tutorialTip.cloneBrushToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`;
                         }).join(''),
-                    }
+                    },
                 });
             });
         }
@@ -176,14 +176,14 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             cursorHoverAngle.value = e.twist;
             if (this.sourceLayer) {
                 const { width, height, transform: layerTransform } = this.sourceLayer;
                 const point = new DOMPoint(
                     width * sourceX.value,
-                    height * sourceY.value
+                    height * sourceY.value,
                 ).matrixTransform(layerTransform);
                 if (pointDistance2d(point.x, point.y, cursorHoverPosition.value.x, cursorHoverPosition.value.y) < brushSize.value / 2) {
                     cursorIsHoveringSource.value = true;
@@ -252,7 +252,7 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
     }
 
     protected async cloneStart(e: PointerEvent) {
-        let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
+        const selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
         if (selectedLayers.length === 0) {
             appEmitter.emit('app.notify', {
                 type: 'info',
@@ -288,7 +288,7 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
         // Populate first drawing point
         const transformedPoint = new DOMPoint(
             this.lastCursorX * devicePixelRatio,
-            this.lastCursorY * devicePixelRatio
+            this.lastCursorY * devicePixelRatio,
         ).matrixTransform(canvasStore.state.transform.inverse());
 
         this.cloneStartX = transformedPoint.x;
@@ -317,7 +317,7 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
                 tiltX: 0,
                 tiltY: 0,
                 twist: e.twist,
-            }
+            },
         );
 
         // Draw first point
@@ -342,8 +342,8 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
         const sourcePosition = canvasPosition.matrixTransform(
             new DOMMatrix()
                 .scaleSelf(1 / this.sourceLayer.width, 1 / this.sourceLayer.height)
-                .multiplySelf(this.sourceLayer.transform.inverse())
-        )
+                .multiplySelf(this.sourceLayer.transform.inverse()),
+        );
         sourceX.value = sourcePosition.x;
         sourceY.value = sourcePosition.y;
         cursorIsHoveringSource.value = true;
@@ -356,14 +356,14 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
         if ((e.pointerType === 'pen' || !editorStore.state.isPenUser) && !isPreviewingSize.value) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             cursorHoverAngle.value = e.twist;
             if (this.sourceLayer) {
                 const { width, height, transform: layerTransform } = this.sourceLayer;
                 const point = new DOMPoint(
                     width * sourceX.value,
-                    height * sourceY.value
+                    height * sourceY.value,
                 ).matrixTransform(layerTransform);
                 if (pointDistance2d(point.x, point.y, cursorHoverPosition.value.x, cursorHoverPosition.value.y) < brushSize.value / 2) {
                     cursorIsHoveringSource.value = true;
@@ -386,14 +386,14 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
         ) {
             const transformedPoint = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
 
             if (!this.isQueueingInput) {
                 sourceDrawingOffsetX.value = transformedPoint.x - this.cloneStartX;
                 sourceDrawingOffsetY.value = transformedPoint.y - this.cloneStartY;
             }
-            
+
             const pressure = this.cloneUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
             const size = brushSize.value * (
                 brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
@@ -448,7 +448,7 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
 
             if (count > 60) break;
         }
-        
+
         if (now - this.cloneLoopLastPointerMoveTimestamp > 25) {
             this.cloneLoopDeltaAccumulator += now - this.cloneLoopLastRunTimestamp;
 
@@ -478,8 +478,8 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
                     (pointer.move.x - pointer.down.x) * devicePixelRatio * (1 / canvasStore.state.decomposedTransform.scaleX),
                     (pointer.move.y - pointer.down.y) * devicePixelRatio * (1 / canvasStore.state.decomposedTransform.scaleY),
                 )
-                .multiplySelf(this.sourceLayer.transform)
-        )
+                .multiplySelf(this.sourceLayer.transform),
+        );
         this.setSourceFromCanvasPosition(point);
     }
 
@@ -546,7 +546,7 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
                     collectedTiles.push(
                         this.renderer.stopBrushStroke(
                             layer.id,
-                        )
+                        ),
                     );
                 }
             }
@@ -573,8 +573,8 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
                                 data: {
                                     tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
                                     alreadyRendererd: true,
-                                }
-                            })
+                                },
+                            }),
                         );
                     }
                 }
@@ -611,7 +611,7 @@ export default class CanvasCloneBrushController extends BaseCanvasMovementContro
     private onSelectAll() {
         if (activeSelectionMask.value || appliedSelectionMask.value) {
             historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
+                action: new ClearSelectionAction(),
             });
         }
     }

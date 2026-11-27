@@ -37,7 +37,7 @@ interface CreateStoredImageOptions {
 }
 export async function createStoredImage(imageOrCanvas: HTMLCanvasElement | HTMLImageElement | ImageBitmap, options?: CreateStoredImageOptions): Promise<string> {
     let sourceCanvas: HTMLCanvasElement | null = null;
-    let sourceBitmap: ImageBitmap | null = null;
+    const sourceBitmap: ImageBitmap | null = null;
     if (imageOrCanvas instanceof HTMLCanvasElement) {
         sourceCanvas = imageOrCanvas;
     } else {
@@ -91,8 +91,8 @@ export async function getStoredImageCanvas(uuid?: string): Promise<HTMLCanvasEle
 export async function getStoredImageAsBitmap(
     uuid?: string,
     options?: {
-        imageOrientation: 'flipY' | 'none',
-    }
+        imageOrientation: 'flipY' | 'none';
+    },
 ): Promise<ImageBitmap | null> {
     const storedImage = imageUuidMap.get(uuid);
     if (storedImage?.sourceBitmap) {
@@ -101,7 +101,7 @@ export async function getStoredImageAsBitmap(
         return await createImageBitmap(
             storedImage.sourceCanvas, 0, 0,
             storedImage.sourceCanvas.width, storedImage.sourceCanvas.height,
-            { imageOrientation: options?.imageOrientation ?? 'none', premultiplyAlpha: 'none' }
+            { imageOrientation: options?.imageOrientation ?? 'none', premultiplyAlpha: 'none' },
         );
     }
     return null;
@@ -132,7 +132,7 @@ export async function prepareStoredImageForEditing(uuid?: string): Promise<HTMLC
                 };
                 image.onerror = () => {
                     resolve();
-                }
+                };
             });
             URL.revokeObjectURL(imageBlobUrl);
             sourceBitmap = await createImageBitmap(
@@ -140,7 +140,7 @@ export async function prepareStoredImageForEditing(uuid?: string): Promise<HTMLC
                 0, 0, width, height, {
                     imageOrientation: canvasStore.get('renderer') === '2d' ? 'none' : 'flipY',
                     premultiplyAlpha: 'none',
-                }
+                },
             );
         }
         if (!sourceBitmap) return null;
@@ -169,7 +169,7 @@ export async function prepareStoredImageForArchival(uuid?: string) {
  * Releases the stored image from memory, and from the database.
  * @param uuid - ID of the database entry for the image
  */
- export async function deleteStoredImage(uuid?: string) {
+export async function deleteStoredImage(uuid?: string) {
     const storedImage = imageUuidMap.get(uuid);
     if (!storedImage) return;
     imageUuidMap.delete(uuid);
@@ -193,7 +193,7 @@ export async function prepareStoredImageForArchival(uuid?: string) {
  * @param uuid - ID of the database entry for the image
  */
 export function reserveStoredImage(imageUuid: string, userId: string) {
-    let users = imageUserUuidMap.get(imageUuid) ?? new Set<string>();
+    const users = imageUserUuidMap.get(imageUuid) ?? new Set<string>();
     users.add(userId);
     imageUserUuidMap.set(imageUuid, users);
 }
@@ -203,7 +203,7 @@ export function reserveStoredImage(imageUuid: string, userId: string) {
  * @param uuid - ID of the database entry for the image
  */
 export function unreserveStoredImage(imageUuid: string, userId: string) {
-    let users = imageUserUuidMap.get(imageUuid) ?? new Set<string>();
+    const users = imageUserUuidMap.get(imageUuid) ?? new Set<string>();
     users.delete(userId);
     imageUserUuidMap.set(imageUuid, users);
     if (users.size === 0) {

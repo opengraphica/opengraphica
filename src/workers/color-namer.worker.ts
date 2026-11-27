@@ -6,7 +6,7 @@ self.onmessage = ({ data }) => {
     if (data.type === 'COLOR_NAME') {
         nameColor(data);
     }
-}
+};
 
 function nameColor(request: ColorNameRequest) {
     let name = '';

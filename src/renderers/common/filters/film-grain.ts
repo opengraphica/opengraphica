@@ -30,7 +30,7 @@ export default class FilmGrainCanvasFilter implements CanvasFilter<FilmGrainCanv
                 default: 0.25,
                 preview: 0.4,
                 min: 0,
-                max: 1
+                max: 1,
             },
             grainScale: {
                 type: 'percentage',
@@ -52,7 +52,7 @@ export default class FilmGrainCanvasFilter implements CanvasFilter<FilmGrainCanv
                     { key: 'normal', value: FilmGrainBlendMode.NORMAL },
                     { key: 'subtract', value: FilmGrainBlendMode.SUBTRACT },
                     { key: 'add', value: FilmGrainBlendMode.ADD },
-                ]
+                ],
             },
         } as CanvasFilterEditConfig;
     }

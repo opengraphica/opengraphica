@@ -124,7 +124,7 @@ export class BrushPreview {
 
     async generatePixelBuffer(
         originalViewport: Vector4,
-        settings: RendererBrushStrokePreviewSettings
+        settings: RendererBrushStrokePreviewSettings,
     ): Promise<Uint8Array> {
         const brushStroke = new BrushStroke(
             this.renderer,
@@ -161,14 +161,14 @@ export class BrushPreview {
 
         while (distance < this.length) {
             t = this.getTAtLength(distance);
-            
+
             pressure = 1;
             if (t < 0.4) {
                 pressure = t / 0.4;
             } else if (t > 0.6) {
                 pressure = (1 - t) / 0.4;
             }
-            
+
             size = settings.size * (settings.pressureMinSize + (1.0 - settings.pressureMinSize) * pressure);
             density = settings.pressureMinDensity + (settings.density - settings.pressureMinDensity) * pressure;
             colorBlendingStrength = settings.pressureMinColorBlendingStrength + (settings.colorBlendingStrength - settings.pressureMinColorBlendingStrength) * (1 - pressure);

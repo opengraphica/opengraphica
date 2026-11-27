@@ -9,10 +9,10 @@ import { createWebdavClient } from '@/composables/webdav-client';
 import('@/lib/keyboard');
 
 export interface OpenGraphica extends App<Element> {
-    on: typeof appEmitter.on,
-    off: typeof appEmitter.off,
-    emit: typeof appEmitter.emit,
-    theme: (themes: { [themeName: string]: string }) => Promise<OpenGraphica>
+    on: typeof appEmitter.on;
+    off: typeof appEmitter.off;
+    emit: typeof appEmitter.emit;
+    theme: (themes: { [themeName: string]: string; }) => Promise<OpenGraphica>;
 }
 
 
@@ -26,7 +26,7 @@ app.off = appEmitter.off;
 app.emit = appEmitter.emit;
 
 // Theme loader
-app.theme = async (themes: { [themeName: string]: string }): Promise<OpenGraphica> => {
+app.theme = async (themes: { [themeName: string]: string; }): Promise<OpenGraphica> => {
     const editorStore = (await import('@/store/editor')).default;
     await editorStore.dispatch('setThemes', themes);
     return app;
@@ -59,7 +59,7 @@ Promise.all([
         canvasStore,
         editorStore,
         historyStore,
-        workingFileStore
+        workingFileStore,
     ] = results;
     (app as any).store = {
         canvas: canvasStore.default,
@@ -96,7 +96,7 @@ if ((window as any).webpackHotUpdateOpenGraphica) {
     setTimeout(() => {
         (window as any).OpenGraphica = app;
     }, 50);
-    document.title = 'OpenGraphica - Dev'
+    document.title = 'OpenGraphica - Dev';
 }
 
 export default app;

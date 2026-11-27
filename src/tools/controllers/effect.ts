@@ -27,7 +27,7 @@ export default class EffectController extends BaseCanvasMovementController {
 
     onEnter(): void {
         super.onEnter();
-        
+
         this.onDelete = this.onDelete.bind(this);
         appEmitter.on('editor.tool.delete', this.onDelete);
         this.onSelectAll = this.onSelectAll.bind(this);
@@ -36,7 +36,7 @@ export default class EffectController extends BaseCanvasMovementController {
         // Tutorial message
         if (!editorStore.state.tutorialFlags.effectToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.effectToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.effectToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -44,8 +44,8 @@ export default class EffectController extends BaseCanvasMovementController {
                     title: t('tutorialTip.effectToolIntroduction.title'),
                     message: {
                         touch: message,
-                        mouse: message
-                    }
+                        mouse: message,
+                    },
                 });
             });
         }
@@ -83,7 +83,7 @@ export default class EffectController extends BaseCanvasMovementController {
     }
 
     private async onPointerClick() {
-        let { viewTransformPoint } = this.getTransformedCursorInfo();
+        const { viewTransformPoint } = this.getTransformedCursorInfo();
         const pickLayerId = this.pickLayer(viewTransformPoint);
         if (pickLayerId != null) {
             await historyStore.dispatch('runAction', {
@@ -108,7 +108,7 @@ export default class EffectController extends BaseCanvasMovementController {
     private onSelectAll() {
         if (activeSelectionMask.value || appliedSelectionMask.value) {
             historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
+                action: new ClearSelectionAction(),
             });
         }
     }
@@ -123,13 +123,13 @@ export default class EffectController extends BaseCanvasMovementController {
         const selectionTest: DrawWorkingFileOptions['selectionTest'] = {
             point: new DOMPoint(),
             resultId: undefined,
-            resultPixelTest: undefined
+            resultPixelTest: undefined,
         };
         drawWorkingFileToCanvas2d(workingCanvas, ctx, { initialTransform, selectionTest });
         return selectionTest.resultId != null ? selectionTest.resultId : null;
     }
 
-    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint } {
+    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint; } {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewTransformPoint = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
@@ -140,7 +140,7 @@ export default class EffectController extends BaseCanvasMovementController {
     }
 
     protected handleCursorIcon() {
-        let newIcon = super.handleCursorIcon();
+        const newIcon = super.handleCursorIcon();
         canvasStore.set('cursor', newIcon);
         return newIcon;
     }

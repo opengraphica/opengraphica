@@ -6,7 +6,7 @@
 import { toRaw, toRefs, watch, type WatchStopHandle } from 'vue';
 
 import type {
-    WgpuWasmRendererBackendPublic, MeshControllerInterface,
+    WgpuWasmRendererBackendPublic, MeshControllerInterface
 } from '@/renderers/wgpu-wasm/backend';
 import type { RendererLayerWatcher, WorkingFileRasterLayer } from '@/types';
 

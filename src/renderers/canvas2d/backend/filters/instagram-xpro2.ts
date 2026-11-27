@@ -17,7 +17,7 @@ export function fragment(
 ) {
     const mix = filter.params.mix ?? 0;
 
-    let rgba = transfer8BitImageDataToSrgb(sourceImageData, dataPosition);
+    const rgba = transfer8BitImageDataToSrgb(sourceImageData, dataPosition);
 
     const uvX = ((dataPosition / 4) % width) / width;
     const uvY = 1.0 - Math.floor((dataPosition / 4) / width) / height;
@@ -27,13 +27,13 @@ export function fragment(
     const sourceB = rgba.b;
 
     const radius = 0.85;
-    
+
     const interpolation = Math.min(Math.max(pointDistance2d(0.0, 0.0, -0.5 + uvX, -0.5 + uvY) - (1.0 - radius), 0.0), 1.0);
     const gradientColor = {
         r: (interpolation * stop2.r) + (1.0 - interpolation) * stop1.r,
         g: (interpolation * stop2.g) + (1.0 - interpolation) * stop1.g,
         b: (interpolation * stop2.b) + (1.0 - interpolation) * stop1.b,
-    } 
+    };
 
     rgba.r = (1.0 - ((1.0 - (rgba.r)) / Math.max(0.00001, (gradientColor.r))));
     rgba.g = (1.0 - ((1.0 - (rgba.g)) / Math.max(0.00001, (gradientColor.g))));

@@ -25,12 +25,12 @@ interface AppEmitterEvents {
         name: string;
         placement: 'top' | 'bottom' | 'left' | 'right';
         immediate?: boolean;
-    },
+    };
     'app.menuDrawer.openFromModule': {
         name: string;
         placement: 'top' | 'bottom' | 'left' | 'right';
         immediate?: boolean;
-    },
+    };
     'app.notify': Partial<NotificationProps> & { onCreated?: (handle: NotificationHandle) => void; };
     'app.preload.show': undefined;
     'app.preload.hide': undefined;
@@ -41,7 +41,7 @@ interface AppEmitterEvents {
         props?: any;
         onSuccess?: (event?: any) => void;
         onError?: (error?: any) => void;
-    },
+    };
     'app.updateRequired': void;
     'app.wait.startBlocking': {
         id: string;
@@ -71,7 +71,7 @@ interface AppEmitterEvents {
     'app.workingFile.notifyImageLoadedFromDragAndDrop': undefined;
     'editor.history.beforeStep': {
         trigger: 'do' | 'undo' | 'redo';
-    },
+    };
     'editor.history.startBlocking': {
         trigger: 'do' | 'undo' | 'redo';
         actions: Array<{
@@ -85,7 +85,7 @@ interface AppEmitterEvents {
         action: {
             id: string;
             description: string;
-        }
+        };
     };
     'editor.plugin.addFilter': undefined;
     'editor.tool.arrowDown': undefined;

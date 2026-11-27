@@ -52,10 +52,10 @@ declare global {
         }
         const bitmap = await createImageBitmap(
             new ImageData(new Uint8ClampedArray(buffer), renderTarget.width, renderTarget.height),
-            { imageOrientation: 'flipY' }
+            { imageOrientation: 'flipY' },
         );
         window.debugImage(bitmap);
-    })
+    });
 
 };
 

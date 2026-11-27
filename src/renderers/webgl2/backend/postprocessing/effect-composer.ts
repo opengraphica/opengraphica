@@ -44,7 +44,7 @@ class EffectComposer {
             this._contextRestoredCallback = () => {
                 renderer.capabilities.isWebGL2 || gl.getExtension('OES_texture_half_float');
             };
-            gl.canvas.addEventListener("webglcontextrestored", this._contextRestoredCallback, false);
+            gl.canvas.addEventListener('webglcontextrestored', this._contextRestoredCallback, false);
 
             renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, {
                 format: RGBAFormat,
@@ -204,7 +204,7 @@ class EffectComposer {
             this.renderTarget1 = this.renderTarget2;
         } else if (this.renderTarget2 === renderTarget) {
             this.renderTarget2 = this.renderTarget1;
-        } 
+        }
     }
 
     setSize(width: number, height: number) {
@@ -230,7 +230,7 @@ class EffectComposer {
     dispose() {
         if (this._contextRestoredCallback) {
             const gl = this.renderer.getContext();
-            gl.canvas.removeEventListener("webglcontextrestored", this._contextRestoredCallback, false);
+            gl.canvas.removeEventListener('webglcontextrestored', this._contextRestoredCallback, false);
             this._contextRestoredCallback = undefined;
         }
         this.renderTarget1.dispose();

@@ -21,7 +21,7 @@ import type {
     ColorModel, WorkingFileAnyLayer,
     UpdateAnyLayerOptions, UpdateGradientLayerOptions, UpdateRasterLayerOptions, UpdateVectorLayerOptions,
     UpdateVideoLayerOptions, WorkingFileRasterLayer, WorkingFileLayerRasterTileUpdate, WorkingFileVectorLayer,
-    WorkingFileVideoLayer,
+    WorkingFileVideoLayer
 } from '@/types';
 
 export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
@@ -66,7 +66,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             if (aKey !== 'draft' && bKey === 'draft') return -1;
             return 0;
         }) as Array<keyof LayerOptions>;
-        for (let prop of layerUpdateProps) {
+        for (const prop of layerUpdateProps) {
             if (prop === 'data') {
                 if (layer.type === 'raster') {
                     if (!layer.data) {
@@ -255,7 +255,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         const layers = workingFileStore.get('layers');
         const layer = getLayerById(this.updateLayerOptions.id, layers);
         if (layer) {
-            for (let prop in this.previousProps) {
+            for (const prop in this.previousProps) {
                 if (prop !== 'id') {
                     if (prop === 'type') {
                         appEmitter.emit('app.workingFile.layerDetached', layer);

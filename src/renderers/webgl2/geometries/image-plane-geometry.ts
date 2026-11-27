@@ -3,7 +3,7 @@ import { BufferGeometry } from 'three/src/core/BufferGeometry';
 import { Float32BufferAttribute } from 'three/src/core/BufferAttribute';
 
 class ImagePlaneGeometry extends BufferGeometry {
-    parameters!: { width: number, height: number };
+    parameters!: { width: number; height: number; };
 
     geometryType = 'ImagePlaneGeometry';
 
@@ -50,7 +50,7 @@ class ImagePlaneGeometry extends BufferGeometry {
         this.computeTangents();
     }
 
-    static fromJSON(data: { width: number, height: number }) {
+    static fromJSON(data: { width: number; height: number; }) {
         return new ImagePlaneGeometry(data.width, data.height);
     }
 }

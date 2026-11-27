@@ -19,7 +19,7 @@ export function fragment(
     let rgba = (colorSpace === NegativeInvertColorSpace.PERCEPTUAL_RGB)
         ? transfer8BitImageDataToSrgb(sourceImageData, dataPosition)
         : transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
-    
+
     if (invertRed) {
         rgba.r = 1.0 - rgba.r;
     }
@@ -34,7 +34,7 @@ export function fragment(
         hsva.v = 1.0 - hsva.v;
         rgba = colorToRgba(hsva, 'hsva');
     }
-    
+
     return (colorSpace === NegativeInvertColorSpace.PERCEPTUAL_RGB)
         ? transferSrgbTo8BitImageData(rgba, targetImageData, dataPosition)
         : transferLinearSrgbTo8BitImageData(rgba, targetImageData, dataPosition);

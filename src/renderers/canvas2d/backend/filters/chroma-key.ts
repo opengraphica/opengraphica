@@ -13,7 +13,7 @@ export function fragment(
     // const mode = filter.params.mode ?? 0;
     // const chroma = Math.tan((Math.min(0.9999, filter.params.chroma ?? 0.0) + 1.0) * Math.PI / 4.0) + (mode === ChromaModifyMode.MULTIPLY ? 0.0 : -1.0);
 
-    let rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
+    const rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
     // const laba = linearSrgbaToOklab(rgba);
     // const lcha = labaToLcha(laba);
     // if (mode === ChromaModifyMode.MULTIPLY) {

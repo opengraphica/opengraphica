@@ -8,7 +8,7 @@ import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import {
     generateSvgElementIds, parseRectNodeAttributes, parsePolygonNodeAttributes,
     parsePolylineNodeAttributes, parseCircleNodeAttributes, parseEllipseNodeAttributes,
-    parseLineNodeAttributes,
+    parseLineNodeAttributes
 } from '@/lib/svg';
 
 import { UpdateLayerAction } from './update-layer';

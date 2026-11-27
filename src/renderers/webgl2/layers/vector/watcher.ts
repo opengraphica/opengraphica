@@ -6,7 +6,7 @@
 import { toRaw, toRefs, watch, type WatchStopHandle } from 'vue';
 
 import type {
-    Webgl2RendererBackendPublic, MeshControllerInterface,
+    Webgl2RendererBackendPublic, MeshControllerInterface
 } from '@/renderers/webgl2/backend';
 import type { RendererLayerWatcher, WorkingFileVectorLayer } from '@/types';
 
@@ -64,7 +64,7 @@ export class VectorLayerWatcher implements RendererLayerWatcher<WorkingFileVecto
                     transform.m12, transform.m22, transform.m32, transform.m42,
                     transform.m13, transform.m23, transform.m33, transform.m43,
                     transform.m14, transform.m24, transform.m34, transform.m44,
-                ])
+                ]),
             );
         }, { immediate: true });
     }

@@ -12,7 +12,7 @@ export function createArrayBufferFromBlob(blob: Blob): Promise<ArrayBuffer> {
             resolve(fileReader.result as ArrayBuffer);
         });
         fileReader.addEventListener('error', () => {
-            reject(fileReader.error)
+            reject(fileReader.error);
         });
 
         fileReader.readAsArrayBuffer(blob);
@@ -28,7 +28,7 @@ export function createBlobFromDataUri(dataUri: string): Blob {
     const mime = mimeDataSplit[0];
     const binary = atob(mimeDataSplit[1] ?? '');
     const array = new Uint8Array(binary.length);
-    for (var i = 0; i < binary.length; i++) {
+    for (let i = 0; i < binary.length; i++) {
         array[i] = binary.charCodeAt(i);
     }
     return new Blob([array], { type: mime });

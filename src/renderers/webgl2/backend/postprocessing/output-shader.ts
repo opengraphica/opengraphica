@@ -198,7 +198,7 @@ const OutputShader = {
 
             #endif
 
-        }`
+        }`,
 
 };
 

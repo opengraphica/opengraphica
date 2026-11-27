@@ -42,10 +42,10 @@ registerTool({
                 {
                     type: 'text',
                     text: t('mcp.cropWorkingFile.response.success'),
-                }
+                },
             ],
         };
-    }
+    },
 });
 
 registerTool({
@@ -92,8 +92,8 @@ registerTool({
                 {
                     type: 'text',
                     text: t('mcp.resampleWorkingFile.response.success'),
-                }
+                },
             ],
         };
-    }
+    },
 });

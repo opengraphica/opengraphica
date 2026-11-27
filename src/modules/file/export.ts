@@ -4,9 +4,9 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
- import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver';
 
- import { t } from '@/i18n';
+import { t } from '@/i18n';
 
 import workingFileStore, {
     getCanvasRenderingContext2DSettings,
@@ -31,13 +31,14 @@ import { activeSelectionMask, appliedSelectionMask } from '@/tools/store/selecti
 
 import { useRenderer } from '@/renderers';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import GIF from '@/lib/gif.js';
 
 import type { WorkingFileRasterSequenceLayer, FileSystemFileHandle, ColorModel } from '@/types';
 
 declare class ClipboardItem {
-    constructor(data: { [mimeType: string]: Blob });
+    constructor(data: { [mimeType: string]: Blob; });
 }
 
 export interface ExportAsImageOptions {
@@ -65,7 +66,7 @@ export interface ExportAsImageResults {
     generatedImageHash: string;
 }
 
-const extensionToMimeType: { [key: string]: string } = {
+const extensionToMimeType: { [key: string]: string; } = {
     png: 'image/png',
     jpg: 'image/jpeg',
     jxl: 'image/jxl',
@@ -77,8 +78,8 @@ const extensionToMimeType: { [key: string]: string } = {
 };
 
 export async function exportAsImage(options: ExportAsImageOptions): Promise<ExportAsImageResults> {
-    let results: ExportAsImageResults = {
-        generatedImageHash: ''
+    const results: ExportAsImageResults = {
+        generatedImageHash: '',
     };
     return await new Promise<ExportAsImageResults>(async (resolve, reject) => {
         try {
@@ -153,9 +154,9 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         transform: new DOMMatrix().scaleSelf(width / canvas.width, height / canvas.height),
                         data: {
                             sourceUuid: await createStoredImage(canvas),
-                        }
-                    })
-                })
+                        },
+                    }),
+                });
             } else if (options.toClipboard) {
                 if (await promptClipboardWritePermission()) {
                     canvas.toBlob(async (blob) => {
@@ -304,11 +305,11 @@ export function isfileFormatSupported(extensionOrMimeType: string) {
     canvas.width = 1;
     canvas.height = 1;
     const data = canvas.toDataURL(mimeType);
-    var actualType = data.replace(/^data:([^;]*).*/, '$1');
+    const actualType = data.replace(/^data:([^;]*).*/, '$1');
     if (mimeType === 'image/gif') {
         return true;
     }
-    else if (mimeType != actualType && mimeType != "text/plain") {
+    else if (mimeType != actualType && mimeType != 'text/plain') {
         return false;
     }
     return true;
@@ -334,20 +335,20 @@ export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options:
     const quality = options.quality == null ? 1 : options.quality;
 
     const rasterSequenceLayers = getLayersByType('rasterSequence') as WorkingFileRasterSequenceLayer<ColorModel>[];
-    let significantFramesSet = new Set<number>();
-    for (let layer of rasterSequenceLayers) {
-        for (let frame of layer.data.sequence) {
+    const significantFramesSet = new Set<number>();
+    for (const layer of rasterSequenceLayers) {
+        for (const frame of layer.data.sequence) {
             significantFramesSet.add(frame.start);
             significantFramesSet.add(frame.end);
         }
     }
-    let significantFrames = [...significantFramesSet].sort((a, b) => {
+    const significantFrames = [...significantFramesSet].sort((a, b) => {
         return a < b ? -1 : 1;
     });
-    let minimumFrameTime = 10;
-    let frameTimes: number[] = [significantFrames[0]];
+    const minimumFrameTime = 10;
+    const frameTimes: number[] = [significantFrames[0]];
     let previousFrame: number = significantFrames[0];
-    for (let frame of significantFrames.slice(1)) {
+    for (const frame of significantFrames.slice(1)) {
         if (frame > previousFrame + minimumFrameTime) {
             previousFrame = Math.floor(Math.floor(frame / minimumFrameTime) * minimumFrameTime);
             if (frame % minimumFrameTime !== 0) {
@@ -381,7 +382,7 @@ export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options:
         ctx.clearRect(0, 0, gifSettings.width, gifSettings.height);
         drawWorkingFileToCanvas2d(canvas, ctx, {
             force2dRenderer: true,
-            selectedLayersOnly: options.layerSelection === 'selected'
+            selectedLayersOnly: options.layerSelection === 'selected',
         });
         gif.addFrame(ctx, { copy: true, delay: delay });
     }
@@ -398,6 +399,6 @@ export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options:
 export function flattenToNewLayer() {
     exportAsImage({
         fileType: 'png',
-        toNewLayer: true
+        toNewLayer: true,
     });
 }

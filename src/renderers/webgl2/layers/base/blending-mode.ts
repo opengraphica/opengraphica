@@ -5,12 +5,12 @@ import {
     SrcAlphaFactor,
     OneMinusSrcAlphaFactor,
     OneFactor,
-    ZeroFactor,
+    ZeroFactor
 } from 'three/src/constants';
 
 import type { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import type { Blending, BlendingEquation, BlendingDstFactor } from 'three/src/constants';
-import type { WorkingFileLayerBlendingMode } from "@/types";
+import type { WorkingFileLayerBlendingMode } from '@/types';
 
 export enum LayerBlendingMode {
     normal = 0,

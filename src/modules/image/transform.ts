@@ -12,7 +12,7 @@ import {
     parseRectNodeAttributes, parsePolylineNodeAttributes, parsePolygonNodeAttributes,
     parseCircleNodeAttributes, parseEllipseNodeAttributes, parseLineNodeAttributes,
     parsePathNodeAttributes, parseNodeTransform,
-    serializeVectorPathCommands,
+    serializeVectorPathCommands
 } from '@/lib/svg';
 
 import { BaseAction } from '@/actions/base';
@@ -23,7 +23,7 @@ import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
 import { VectorPathCommandType } from '@/types/vector';
 import type {
     UpdateRasterLayerOptions, UpdateRasterSequenceLayerOptions,
-    WorkingFileGradientLayer, WorkingFileRasterSequenceLayer,
+    WorkingFileGradientLayer, WorkingFileRasterSequenceLayer
 } from '@/types';
 
 function flipImageDataX(imageData: ImageData) {
@@ -33,10 +33,10 @@ function flipImageDataX(imageData: ImageData) {
         for (let x = 0; x < Math.floor(width / 2); x++) {
             const leftIndex = (y * 4 * width) + (x * 4);
             const rightIndex = (y * 4 * width) + ((width - x) * 4);
-            let tmpR = imageData.data[leftIndex];
-            let tmpG = imageData.data[leftIndex + 1];
-            let tmpB = imageData.data[leftIndex + 2];
-            let tmpA = imageData.data[leftIndex + 3];
+            const tmpR = imageData.data[leftIndex];
+            const tmpG = imageData.data[leftIndex + 1];
+            const tmpB = imageData.data[leftIndex + 2];
+            const tmpA = imageData.data[leftIndex + 3];
             imageData.data[leftIndex] = imageData.data[rightIndex];
             imageData.data[leftIndex + 1] = imageData.data[rightIndex + 1];
             imageData.data[leftIndex + 2] = imageData.data[rightIndex + 2];
@@ -74,7 +74,7 @@ function flipVectorDataX(svgDocument: Document) {
         const layerSpaceTransformInverse = layerSpaceTransform.inverse();
 
         const flipPoint = (point: DOMPoint) => {
-            let xfPoint = point.matrixTransform(layerSpaceTransform);
+            const xfPoint = point.matrixTransform(layerSpaceTransform);
             xfPoint.x = viewBox.width - xfPoint.x;
             return xfPoint.matrixTransform(layerSpaceTransformInverse);
         };
@@ -160,10 +160,10 @@ function flipImageDataY(imageData: ImageData) {
         for (let y = 0; y < Math.floor(height / 2); y++) {
             const topIndex = (y * 4 * width) + (x * 4);
             const bottomIndex = ((height - y) * 4 * width) + (x * 4);
-            let tmpR = imageData.data[topIndex];
-            let tmpG = imageData.data[topIndex + 1];
-            let tmpB = imageData.data[topIndex + 2];
-            let tmpA = imageData.data[topIndex + 3];
+            const tmpR = imageData.data[topIndex];
+            const tmpG = imageData.data[topIndex + 1];
+            const tmpB = imageData.data[topIndex + 2];
+            const tmpA = imageData.data[topIndex + 3];
             imageData.data[topIndex] = imageData.data[bottomIndex];
             imageData.data[topIndex + 1] = imageData.data[bottomIndex + 1];
             imageData.data[topIndex + 2] = imageData.data[bottomIndex + 2];
@@ -201,7 +201,7 @@ function flipVectorDataY(svgDocument: Document) {
         const layerSpaceTransformInverse = layerSpaceTransform.inverse();
 
         const flipPoint = (point: DOMPoint) => {
-            let xfPoint = point.matrixTransform(layerSpaceTransform);
+            const xfPoint = point.matrixTransform(layerSpaceTransform);
             xfPoint.y = viewBox.height - xfPoint.y;
             return xfPoint.matrixTransform(layerSpaceTransformInverse);
         };
@@ -461,15 +461,15 @@ async function transformLayersGeneral(
                 new UpdateLayerAction({
                     id: layer.id,
                     data: newGradientData,
-                })
+                }),
             );
         } else if (layer.type === 'group') {
             // NOOP
         } else if (layer.type === 'raster') {
             const storedImage = await getStoredImageCanvas(layer.data.sourceUuid);
             if (!storedImage) continue;
-            let oldWidth = storedImage.width;
-            let oldHeight = storedImage.height;
+            const oldWidth = storedImage.width;
+            const oldHeight = storedImage.height;
             let imageData = getImageDataFromCanvas(storedImage);
             imageData = imageDataModifier(imageData);
             const updateOptions: UpdateRasterLayerOptions = {
@@ -478,13 +478,13 @@ async function transformLayersGeneral(
                 height: imageData.height,
                 data: {
                     sourceUuid: await createStoredImage(
-                        await createImageFromImageData(imageData)
+                        await createImageFromImageData(imageData),
                     ),
                 },
-            }
+            };
             if (imageData.width !== oldWidth || imageData.height !== oldHeight) {
                 const oldCenter = layer.transform.transformPoint(
-                    new DOMPoint(oldWidth / 2, oldHeight / 2)
+                    new DOMPoint(oldWidth / 2, oldHeight / 2),
                 );
                 const transform = new DOMMatrix([
                     layer.transform.a,
@@ -509,7 +509,7 @@ async function transformLayersGeneral(
                 newWidth = imageData.width;
                 newHeight = imageData.height;
                 newSequence[frameIndex].image.sourceUuid = await createStoredImage(
-                    await createImageFromImageData(imageData)
+                    await createImageFromImageData(imageData),
                 );
             }
             const updateOptions: UpdateRasterSequenceLayerOptions = {
@@ -522,7 +522,7 @@ async function transformLayersGeneral(
             };
             if (newWidth !== layer.width || newHeight !== layer.height) {
                 const oldCenter = layer.transform.transformPoint(
-                    new DOMPoint(layer.width / 2, layer.height / 2)
+                    new DOMPoint(layer.width / 2, layer.height / 2),
                 );
                 const transform = new DOMMatrix([
                     layer.transform.a,
@@ -561,7 +561,7 @@ async function transformLayersGeneral(
                     data: {
                         sourceUuid: await createStoredSvg(image),
                     },
-                })
+                }),
             );
             if (isResizeExpected) {
                 updateActions.push(new TrimLayerEmptySpaceAction(layer.id));
@@ -572,8 +572,8 @@ async function transformLayersGeneral(
                     new UpdateLayerAction({
                         id: layer.id,
                         transform: transformModifier(layer.transform, layer.width, layer.height),
-                    })
-                )
+                    }),
+                );
             }
         } else if (layer.type === 'text') {
             if (transformModifier) {
@@ -581,14 +581,14 @@ async function transformLayersGeneral(
                     new UpdateLayerAction({
                         id: layer.id,
                         transform: transformModifier(layer.transform, layer.width, layer.height),
-                    })
-                )
+                    }),
+                );
             }
         }
     }
     if (updateActions.length > 0) {
         await historyStore.dispatch('runAction', {
-            action: new BundleAction(actionId, 'action.' + actionId, updateActions)
+            action: new BundleAction(actionId, 'action.' + actionId, updateActions),
         });
     } else {
         appEmitter.emit('app.notify', {

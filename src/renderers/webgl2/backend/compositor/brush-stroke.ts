@@ -34,7 +34,7 @@ import { RendererBrushStrokeDrawMode } from '@/types/renderer';
 import type { Camera, WebGLRenderer } from 'three';
 import type { SelectionMask } from '../selection-mask';
 import type {
-    RendererBrushStrokeSettings, RendererTextureTile, WorkingFileLayerBlendingMode,
+    RendererBrushStrokeSettings, RendererTextureTile, WorkingFileLayerBlendingMode
 } from '@/types';
 
 let useHalfFloatColorBufferFallback: boolean = false;
@@ -61,7 +61,7 @@ export class BrushStroke {
     geometry!: PlaneGeometry;
     mesh!: Mesh;
     scene!: Scene;
-    
+
     brushMaterial!: ShaderMaterial;
     compositorMaterial!: ShaderMaterial;
     copyTileMaterial!: ShaderMaterial;
@@ -237,7 +237,7 @@ export class BrushStroke {
             this.gaussianBlurMaterial = new ShaderMaterial({
                 uniforms: {
                     map: { value: this.texture },
-                    mapSize: { value: new Vector2(this.texture.width, this.texture.height)  },
+                    mapSize: { value: new Vector2(this.texture.width, this.texture.height) },
                     tileOffsetAndSize: { value: new Vector4(0, 0, 1, 1) },
                     blurMipLevel: { value: Math.floor(this.brushColor[0] * 5) },
                 },
@@ -266,7 +266,7 @@ export class BrushStroke {
             this.sharpenMaterial = new ShaderMaterial({
                 uniforms: {
                     map: { value: this.texture },
-                    mapSize: { value: new Vector2(this.texture.width, this.texture.height)  },
+                    mapSize: { value: new Vector2(this.texture.width, this.texture.height) },
                     tileOffsetAndSize: { value: new Vector4(0, 0, 1, 1) },
                     sharpness: { value: this.brushColor[0] * 5 },
                 },
@@ -335,15 +335,15 @@ export class BrushStroke {
                 this._m1.makeTranslation(
                     -selectionMaskOffset[0] / selectionMaskWidth,
                     1.0 + (selectionMaskOffset[1] / selectionMaskHeight),
-                    0.0
-                )
+                    0.0,
+                ),
             )
             .multiply(
                 this._m1.makeScale(
                     1.0 / selectionMaskWidth,
                     -1.0 / selectionMaskHeight,
                     1.0,
-                )
+                ),
             );
         const tileTransformResetInverse = this._m1.copy(tileTransformReset).invert();
 
@@ -351,7 +351,7 @@ export class BrushStroke {
             .identity()
             .multiply(tileTransformReset)
             .multiply(
-                this.layerTransform
+                this.layerTransform,
             )
             .multiply(tileTransformResetInverse)
             .multiply(
@@ -359,14 +359,14 @@ export class BrushStroke {
                     selectionMaskTileOffsetX,
                     1.0 - selectionMaskTileOffsetY - selectionMaskTileScaleY,
                     1.0,
-                )
+                ),
             )
             .multiply(
                 this._m2.makeScale(
                     selectionMaskTileScaleX,
                     selectionMaskTileScaleY,
                     1.0,
-                )
+                ),
             );
     }
 
@@ -510,7 +510,7 @@ export class BrushStroke {
             const sourceX = this.brushColor[0];
             const sourceY = this.brushColor[1];
             const point = new Vector3(x, y, 0).applyMatrix4(
-                this.layerTransformInverse
+                this.layerTransformInverse,
             );
             const uvOffsetX = sourceX - (point.x / this.layerSize.x);
             const uvOffsetY = (point.y / this.layerSize.y) - sourceY;
@@ -604,7 +604,7 @@ export class BrushStroke {
 
                 const tileTransformReset = this._m0.identity()
                     .multiply(
-                        this._m1.makeTranslation(this._v30)
+                        this._m1.makeTranslation(this._v30),
                     )
                     .multiply(
                         this._m1.makeScale(
@@ -792,7 +792,7 @@ export class BrushStroke {
             const oldTextureTile = this.createDestinationTextureRenderTarget(xi, yi, tileWidth, tileHeight);
             const oldBuffer = new Uint8Array(tileWidth * tileHeight * 4);
             oldImageBufferReads.push(
-                this.renderer.readRenderTargetPixelsAsync(oldTextureTile, 0, 0, tileWidth, tileHeight, oldBuffer) as Promise<Uint8Array>
+                this.renderer.readRenderTargetPixelsAsync(oldTextureTile, 0, 0, tileWidth, tileHeight, oldBuffer) as Promise<Uint8Array>,
             );
 
             // Render a crop of the current texture a tile render target & read its pixels.
@@ -808,10 +808,10 @@ export class BrushStroke {
             this.renderer.setRenderTarget(outputRenderTarget);
             this.renderer.clearColor();
             this.renderer.render(this.scene, this.camera);
-            
+
             const newBuffer = new Uint8Array(tileWidth * tileHeight * 4);
             newImageBufferReads.push(
-                this.renderer.readRenderTargetPixelsAsync(outputRenderTarget, 0, 0, tileWidth, tileHeight, newBuffer) as Promise<Uint8Array>
+                this.renderer.readRenderTargetPixelsAsync(outputRenderTarget, 0, 0, tileWidth, tileHeight, newBuffer) as Promise<Uint8Array>,
             );
             tiles.push({
                 x: tileX,
@@ -839,13 +839,13 @@ export class BrushStroke {
                     createImageBitmap(
                         new ImageData(new Uint8ClampedArray(newSettleResult.value), tiles[i].width, tiles[i].height),
                         { imageOrientation: 'flipY' },
-                    )
+                    ),
                 );
                 createdOldBitmaps.push(
                     createImageBitmap(
                         new ImageData(new Uint8ClampedArray(oldSettleResult.value), tiles[i].width, tiles[i].height),
                         { imageOrientation: 'flipY' },
-                    )
+                    ),
                 );
             }
         }

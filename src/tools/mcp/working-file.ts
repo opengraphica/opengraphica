@@ -18,7 +18,7 @@ registerTool({
                 },
             ],
         };
-    }
+    },
 });
 
 registerTool({
@@ -33,10 +33,10 @@ registerTool({
             structuredContent: {
                 width: workingFileStore.state.width,
                 height: workingFileStore.state.height,
-            }
-        }
-    }
-})
+            },
+        };
+    },
+});
 
 registerTool({
     name: 'get-layer-list',
@@ -47,10 +47,10 @@ registerTool({
     async execute() {
         const { default: workingFileStore } = await import('@/store/working-file');
         function getLayers(storeLayers: WorkingFileLayer[]) {
-            const layers: Partial<WorkingFileLayer & { selected: boolean }>[] = [];
+            const layers: Partial<WorkingFileLayer & { selected: boolean; }>[] = [];
             for (const storedLayer of storeLayers) {
                 const { a, b, c, d, e, f } = storedLayer.transform;
-                const layer: Partial<WorkingFileLayer & { selected: boolean }> = {
+                const layer: Partial<WorkingFileLayer & { selected: boolean; }> = {
                     id: storedLayer.id,
                     name: storedLayer.name,
                     type: storedLayer.type,
@@ -69,9 +69,9 @@ registerTool({
         return {
             structuredContent: {
                 layers: getLayers(workingFileStore.state.layers),
-            }
-        }
-    }
+            },
+        };
+    },
 });
 
 registerTool({
@@ -100,10 +100,10 @@ registerTool({
                     type: 'image',
                     data: canvas.toDataURL('image/png'),
                     mimeType: 'image/png',
-                }
-            ]
+                },
+            ],
         };
-    }
+    },
 });
 
 registerTool({
@@ -126,17 +126,17 @@ registerTool({
         if (layer?.type !== 'vector') throw new Error(t('mcp.common.error.layerNotFound'));
         const serializer = new XMLSerializer();
         const svgString = serializer.serializeToString(
-            (layer.data.sourceDocument?.documentElement) ? layer.data.sourceDocument : await getStoredSvgDocument(layer.data.sourceUuid)
+            (layer.data.sourceDocument?.documentElement) ? layer.data.sourceDocument : await getStoredSvgDocument(layer.data.sourceUuid),
         ).replace(/xmlns=""/g, '');
         return {
             content: [
                 {
                     type: 'text',
                     text: svgString,
-                }
-            ]
+                },
+            ],
         };
-    }
+    },
 });
 
 registerTool({
@@ -151,7 +151,7 @@ registerTool({
     },
     async execute({ ids }) {
         if (ids.length === 0) {
-            throw new Error(t('mcp.selectLayers.error.noIds'))
+            throw new Error(t('mcp.selectLayers.error.noIds'));
         }
 
         const { default: historyStore, createHistoryReserveToken, historyReserveQueueFree } = await import('@/store/history');
@@ -175,10 +175,10 @@ registerTool({
                 {
                     type: 'text',
                     text: t('mcp.selectLayers.response.success'),
-                }
+                },
             ],
         };
-    }
+    },
 });
 
 registerTool({
@@ -214,12 +214,12 @@ registerTool({
                     resolve(image);
                 };
                 image.onerror = () => {
-                    reject()
+                    reject();
                 };
                 image.src = imageDataUri;
             });
             const sourceUuid = await createStoredImage(
-                await createCanvasFromImage(image)
+                await createCanvasFromImage(image),
             );
             await historyStore.dispatch('runAction', {
                 action: new InsertLayerAction({
@@ -243,11 +243,11 @@ registerTool({
                 {
                     type: 'text',
                     text: t('mcp.insertRasterLayer.response.success'),
-                }
+                },
             ],
         };
-    }
-})
+    },
+});
 
 registerTool({
     name: 'set-layer-transform',
@@ -280,7 +280,7 @@ registerTool({
                     new UpdateLayerAction({
                         id: layerId,
                         transform: new DOMMatrix(transform),
-                    })
+                    }),
                 );
             }
             if (actions.length > 0) {
@@ -300,14 +300,14 @@ registerTool({
                 {
                     type: 'text',
                     text: t('mcp.setLayerTransform.response.success'),
-                }
+                },
             ],
         };
-    }
+    },
 });
 
 registerTool({
-    name: 'reorder-layers', 
+    name: 'reorder-layers',
     description: t('mcp.reorderLayers.description'),
     inputSchema: {
         type: 'object',
@@ -344,10 +344,10 @@ registerTool({
                 {
                     type: 'text',
                     text: t('mcp.reorderLayers.response.success'),
-                }
+                },
             ],
         };
-    }
+    },
 });
 
 registerTool({
@@ -386,8 +386,8 @@ registerTool({
                 {
                     type: 'text',
                     text: t('mcp.deleteLayers.response.success'),
-                }
+                },
             ],
         };
-    }
+    },
 });

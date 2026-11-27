@@ -6,7 +6,7 @@ import workingFileStore, { calculateLayerOrder, type WorkingFileState } from '@/
 import { writeWorkingFile, deleteWorkingFile } from '@/store/data/working-file-database';
 import {
     discardActiveSelectionMask, discardAppliedSelectionMask,
-    activeSelectionPath, appliedSelectionPaths,
+    activeSelectionPath, appliedSelectionPaths
 } from '@/tools/store/selection-state';
 
 import appEmitter from '@/lib/emitter';
@@ -27,7 +27,7 @@ export interface CreateFileOptions {
 export class CreateFileAction extends BaseAction {
 
     private createFileOptions!: Partial<WorkingFileState>;
-    private previousState: { [key: string]: any } = {};
+    private previousState: { [key: string]: any; } = {};
 
     constructor(createFileOptions: Partial<WorkingFileState>) {
         super('createNewFile', 'action.createNewFile');
@@ -58,11 +58,11 @@ export class CreateFileAction extends BaseAction {
             selectedLayerIds: this.createFileOptions.selectedLayerIds || [],
             timelineIdCounter: this.createFileOptions.timelineIdCounter || 0,
             timelines: this.createFileOptions.timelines || [],
-            width: this.createFileOptions.width
+            width: this.createFileOptions.width,
         };
 
         this.previousState = {};
-        for (let key in changes) {
+        for (const key in changes) {
             this.previousState[key] = workingFileStore.get(key as keyof WorkingFileState);
             workingFileStore.set(key as keyof WorkingFileState, changes[key]);
             if (key === 'layers') {
@@ -90,7 +90,7 @@ export class CreateFileAction extends BaseAction {
     public async undo() {
         super.undo();
 
-        for (let key in this.previousState) {
+        for (const key in this.previousState) {
             workingFileStore.set(key as keyof WorkingFileState, this.previousState[key]);
             if (key === 'layers') {
                 await this.assignLayerRenderers(this.previousState[key]);

@@ -12,7 +12,7 @@ import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/stor
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
     appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview,
-    selectedLayersSelectionMaskPreviewCanvasOffset,
+    selectedLayersSelectionMaskPreviewCanvasOffset
 } from '@/tools/store/selection-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
@@ -30,7 +30,7 @@ import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions,
     RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer,
-    RendererBucketFillSettings, RendererPickedVectorLayerElement,
+    RendererBucketFillSettings, RendererPickedVectorLayerElement
 } from '@/types';
 
 type AsyncCallback<T> = () => T | PromiseLike<T>;
@@ -136,7 +136,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
                         };
                         return accumulator;
                     }, {}),
-                }
+                };
             }
             for (const familyName in remoteFonts) {
                 fontFetchDefinitions[familyName] = remoteFonts[familyName];
@@ -161,8 +161,10 @@ export class Webgl2RendererFrontend implements RendererFrontend {
             appliedSelectionMask, appliedSelectionMaskCanvasOffset,
             selectedLayersSelectionMaskPreview, selectedLayersSelectionMaskPreviewCanvasOffset,
         ], async (
-            [newActiveSelectionMask, newActiveSelectionMaskCanvasOffset, newAppliedSelectionMask, newAppliedSelectionMaskCanvasOffset,
-            newSelectedLayersSelectionMaskPreview, newSelectedLayersSelectionMaskPreviewCanvasOffset],
+            [
+                newActiveSelectionMask, newActiveSelectionMaskCanvasOffset, newAppliedSelectionMask, newAppliedSelectionMaskCanvasOffset,
+                newSelectedLayersSelectionMaskPreview, newSelectedLayersSelectionMaskPreviewCanvasOffset,
+            ],
         ) => {
             const newSelectionMask = newActiveSelectionMask ?? newAppliedSelectionMask ?? newSelectedLayersSelectionMaskPreview;
             const newCanvasOffset = newActiveSelectionMask ? newActiveSelectionMaskCanvasOffset : (newAppliedSelectionMask ? newAppliedSelectionMaskCanvasOffset : newSelectedLayersSelectionMaskPreviewCanvasOffset);
@@ -233,7 +235,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         const setRendererDirty = this.rendererBackend.isOffscreen
             ? () => {
                 // TODO - Remove this altogether? No longer used.
-                canvasStore.set('dirty', false)
+                canvasStore.set('dirty', false);
             }
             : () => {
                 if ((this.rendererBackend as Webgl2RendererBackend).dirty) {
@@ -241,7 +243,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
                     (this.rendererBackend as Webgl2RendererBackend).render(timelineCursor);
                 }
             };
-        
+
         let viewTransform = new Float64Array([
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -299,7 +301,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
 
     waitForRendererInitialized() {
         return new Promise<void>((resolve) => {
-            let intervalHandle = setInterval(() => {
+            const intervalHandle = setInterval(() => {
                 if (this.rendererBackend) {
                     clearInterval(intervalHandle);
                     resolve();
@@ -308,7 +310,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         });
     }
 
-    async onSvgRequest(request?: { sourceUuid: string, requestId: number, width: number, height: number }) {
+    async onSvgRequest(request?: { sourceUuid: string; requestId: number; width: number; height: number; }) {
         if (!request) return;
         const { sourceUuid, requestId, width, height } = request;
         let bitmap: ImageBitmap | undefined;
@@ -329,7 +331,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         });
     }
 
-    async onTextureRequest(request?: { sourceUuid: string, requestId: number }) {
+    async onTextureRequest(request?: { sourceUuid: string; requestId: number; }) {
         if (!request) return;
         const { sourceUuid, requestId } = request;
         messageBus.emit('frontend.replyFrontendTexture', {
@@ -357,7 +359,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         layerWatcher.attach(layer);
     }
 
-    onLayerReordered(options?: { layer: WorkingFileAnyLayer, order: number }) {
+    onLayerReordered(options?: { layer: WorkingFileAnyLayer; order: number; }) {
         if (!options) return;
         const { layer, order } = options;
         if (!layer || order == null) return;
@@ -387,7 +389,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         if (event?.props.blendingMode) {
             // TODO - only pass necessary data for each layer (id, type, blendingMode, layers).
             this.rendererBackend.setLayerOrder(
-                deepToRaw(workingFileStore.get('layers'))
+                deepToRaw(workingFileStore.get('layers')),
             );
         }
     }
@@ -395,7 +397,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
     onLayerOrderCalculated() {
         // TODO - only pass necessary data for each layer (id, type, blendingMode, layers).
         this.rendererBackend.setLayerOrder(
-            deepToRaw(workingFileStore.get('layers'))
+            deepToRaw(workingFileStore.get('layers')),
         );
     }
 
@@ -472,7 +474,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         const imageHeight = workingFileStore.get('height');
         const cameraTransform = new DOMMatrix()
             .scaleSelf(imageWidth, imageHeight)
-            .translateSelf(canvasX, canvasY)
+            .translateSelf(canvasX, canvasY);
         const bitmap = await this.takeSnapshot(1, 1, {
             cameraTransform,
             disableScaleToSize: true,
@@ -502,7 +504,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
     async startBrushStroke(
         settings: RendererBrushStrokeSettings,
     ) {
-        await this.rendererBackend.startBrushStroke(settings)
+        await this.rendererBackend.startBrushStroke(settings);
     }
 
     async moveBrushStroke(

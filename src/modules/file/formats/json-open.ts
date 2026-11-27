@@ -17,12 +17,12 @@ import type {
     WorkingFileLayer, WorkingFileLayerMask,
     WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer,
     WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
-    WorkingFileVideoLayer, WorkingFileTextLayer,
+    WorkingFileVideoLayer, WorkingFileTextLayer
 } from '@/types';
 
 export async function parseSerializedFileToActions(
-    serializedFile: SerializedFile<ColorModel>
-): Promise<{ workingFileDefinition: Partial<WorkingFileState>, insertLayerActions: InsertLayerAction<any>[] }> {
+    serializedFile: SerializedFile<ColorModel>,
+): Promise<{ workingFileDefinition: Partial<WorkingFileState>; insertLayerActions: InsertLayerAction<any>[]; }> {
 
     const serializedMasks = serializedFile.masks;
     const masks: Record<number, WorkingFileLayerMask> = {};
@@ -54,14 +54,14 @@ export async function parseSerializedFileToActions(
     const insertLayerActions: InsertLayerAction<any>[] = await parseLayersToActions(serializedFile.layers);
     return {
         workingFileDefinition,
-        insertLayerActions
+        insertLayerActions,
     };
 }
 
 async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): Promise<InsertLayerAction<any>[]> {
     let insertLayerActions: InsertLayerAction<any>[] = [];
     let groupInsertLayerActions: InsertLayerAction<any>[] = [];
-    for (let layer of layers) {
+    for (const layer of layers) {
         let parsedLayer: Partial<WorkingFileLayer<ColorModel>> = {
             blendingMode: layer.blendingMode,
             filters: layer.filters,
@@ -93,7 +93,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 ...parsedLayer,
                 type: 'group',
                 expanded: (layer as SerializedFileGroupLayer<ColorModel>).expanded,
-                layers: []
+                layers: [],
             } as WorkingFileGroupLayer<ColorModel>;
             groupInsertLayerActions = groupInsertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<ColorModel>).layers));
         }
@@ -104,20 +104,20 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 type: 'raster',
                 data: {
                     sourceUuid: await parseDataUrlToStoredImage(serializedLayer.data.sourceImageSerialized || ''),
-                }
+                },
             } as WorkingFileRasterLayer<ColorModel>;
         }
         else if (layer.type === 'rasterSequence') {
             const serializedLayer = layer as SerializedFileRasterSequenceLayer<ColorModel>;
             const parsedSequence: WorkingFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
-            for (let frame of serializedLayer.data.sequence) {
+            for (const frame of serializedLayer.data.sequence) {
                 parsedSequence.push({
                     start: frame.start,
                     end: frame.end,
                     image: {
                         sourceUuid: await parseDataUrlToStoredImage(frame.image.sourceImageSerialized || ''),
                     },
-                    thumbnailImageSrc: null
+                    thumbnailImageSrc: null,
                 });
             }
             parsedLayer = {
@@ -125,8 +125,8 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 type: 'rasterSequence',
                 data: {
                     currentFrame: parsedSequence[0]?.image,
-                    sequence: parsedSequence
-                }
+                    sequence: parsedSequence,
+                },
             } as WorkingFileRasterSequenceLayer<ColorModel>;
         }
         else if (layer.type === 'vector') {
@@ -142,7 +142,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                         resolve();
                     };
                     image!.src = URL.createObjectURL(
-                        createBlobFromDataUri(serializedLayer.data.sourceSvgSerialized!)
+                        createBlobFromDataUri(serializedLayer.data.sourceSvgSerialized!),
                     );
                 });
             }
@@ -171,7 +171,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                             }
                         }, { once: true });
                         video!.play();
-                        let playStartTimeout = setTimeout(() => {
+                        const playStartTimeout = setTimeout(() => {
                             hasResolved = true;
                             resolve();
                         }, 1000);
@@ -181,7 +181,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                         resolve();
                     }, { once: true });
                     video!.src = URL.createObjectURL(
-                        createBlobFromDataUri(serializedLayer.data.sourceVideoSerialized!)
+                        createBlobFromDataUri(serializedLayer.data.sourceVideoSerialized!),
                     );
                 });
             }
@@ -201,7 +201,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
             } as WorkingFileTextLayer<ColorModel>;
         }
         insertLayerActions.push(
-            new InsertLayerAction<InsertAnyLayerOptions<ColorModel>>(parsedLayer as InsertAnyLayerOptions<ColorModel>)
+            new InsertLayerAction<InsertAnyLayerOptions<ColorModel>>(parsedLayer as InsertAnyLayerOptions<ColorModel>),
         );
     }
     insertLayerActions = insertLayerActions.concat(groupInsertLayerActions);

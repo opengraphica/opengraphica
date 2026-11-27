@@ -1,6 +1,6 @@
 import {
     ColorModel, WorkingFileLayer,
-    WorkingFileGroupLayer,  WorkingFileAnyLayer
+    WorkingFileGroupLayer, WorkingFileAnyLayer
 } from '@/types';
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
@@ -12,7 +12,7 @@ export class ReorderLayersAction extends BaseAction {
     private insertLayerIds!: number[];
     private referenceLayerId!: number;
     private insertPosition!: 'below' | 'above' | 'topChild' | 'bottomChild';
-    private insertLayerPreviousPositions: { groupId: number | null, index: number }[] = [];
+    private insertLayerPreviousPositions: { groupId: number | null; index: number; }[] = [];
 
     constructor(insertLayerIds: number[], referenceLayerId: number, insertPosition: 'below' | 'above' | 'topChild' | 'bottomChild') {
         super('reorderLayers', 'action.reorderLayers');
@@ -24,8 +24,8 @@ export class ReorderLayersAction extends BaseAction {
         super.do();
 
         // Map ids to layer objects
-        let insertLayers: WorkingFileAnyLayer<ColorModel>[] = [];
-        for (let layerId of this.insertLayerIds) {
+        const insertLayers: WorkingFileAnyLayer<ColorModel>[] = [];
+        for (const layerId of this.insertLayerIds) {
             const layer = getLayerById(layerId);
             if (!layer) {
                 throw new Error('Aborted - Cannot find insert layer.');
@@ -34,29 +34,29 @@ export class ReorderLayersAction extends BaseAction {
         }
 
         // Gather information about current insert layer state before moving them
-        for (let layer of insertLayers) {
+        for (const layer of insertLayers) {
             if (layer) {
                 const layerParent = this.getLayerParent(layer.id).layers;
                 const layerIndex = layerParent.indexOf(layer);
                 layerParent.splice(layerIndex, 1);
                 this.insertLayerPreviousPositions.push({
                     groupId: layer.groupId,
-                    index: layerIndex
+                    index: layerIndex,
                 });
             }
         }
 
         // Get layer object for reference layer inserting around
-        let referenceLayer = getLayerById(this.referenceLayerId);
+        const referenceLayer = getLayerById(this.referenceLayerId);
         if (!referenceLayer) {
             throw new Error('Aborted - Cannot find reference layer.');
         }
 
         // Insert the layers and change group IDs
         if (this.insertPosition === 'below' || this.insertPosition === 'above') {
-            let referenceParent = this.getLayerParent(this.referenceLayerId);
+            const referenceParent = this.getLayerParent(this.referenceLayerId);
             referenceParent.layers.splice(referenceParent.layers.indexOf(referenceLayer) + (this.insertPosition === 'below' ? 0 : 1), 0, ...insertLayers);
-            for (let layer of insertLayers) {
+            for (const layer of insertLayers) {
                 layer.groupId = referenceParent.id;
             }
         } else {
@@ -65,7 +65,7 @@ export class ReorderLayersAction extends BaseAction {
                 throw new Error('Aborted - Reference layer is not a group layer.');
             }
             referenceGroupLayer.layers.splice(this.insertPosition === 'bottomChild' ? 0 : referenceGroupLayer.layers.length, 0, ...insertLayers);
-            for (let layer of insertLayers) {
+            for (const layer of insertLayers) {
                 layer.groupId = referenceGroupLayer.id;
             }
         }
@@ -93,8 +93,8 @@ export class ReorderLayersAction extends BaseAction {
         super.undo();
 
         // Map ids to layer objects
-        let insertedLayers: WorkingFileLayer<ColorModel>[] = [];
-        for (let layerId of this.insertLayerIds) {
+        const insertedLayers: WorkingFileLayer<ColorModel>[] = [];
+        for (const layerId of this.insertLayerIds) {
             const layer = getLayerById(layerId);
             if (!layer) {
                 throw new Error('Aborted - Cannot find insert layer.');
@@ -103,14 +103,14 @@ export class ReorderLayersAction extends BaseAction {
         }
 
         // Get layer object for reference layer inserting around
-        let referenceLayer = getLayerById(this.referenceLayerId);
+        const referenceLayer = getLayerById(this.referenceLayerId);
         if (!referenceLayer) {
             throw new Error('Aborted - Cannot find reference layer.');
         }
 
         // Remove layers from inserted positions
         if (this.insertPosition === 'below' || this.insertPosition === 'above') {
-            let referenceParent = this.getLayerParent(this.referenceLayerId);
+            const referenceParent = this.getLayerParent(this.referenceLayerId);
             referenceParent.layers.splice(referenceParent.layers.indexOf(referenceLayer) + (this.insertPosition === 'below' ? -insertedLayers.length : 1), insertedLayers.length);
         } else {
             const referenceGroupLayer = referenceLayer as WorkingFileGroupLayer<ColorModel>;
@@ -121,13 +121,13 @@ export class ReorderLayersAction extends BaseAction {
         }
 
         // Place inserted layers back in their original positions
-        let previousPositions = this.insertLayerPreviousPositions.slice().reverse();
-        for (let [i, layer] of insertedLayers.slice().reverse().entries()) {
+        const previousPositions = this.insertLayerPreviousPositions.slice().reverse();
+        for (const [i, layer] of insertedLayers.slice().reverse().entries()) {
             if (layer) {
                 const groupId = previousPositions[i].groupId;
                 const layerParent = groupId == null ? workingFileStore.get('layers') : getGroupLayerById(groupId)?.layers;
                 if (!layerParent) {
-                    throw new Error('Aborted - Could not find layer parent.')
+                    throw new Error('Aborted - Could not find layer parent.');
                 }
                 layerParent.splice(previousPositions[i].index, 0, layer);
                 layer.groupId = groupId;
@@ -157,10 +157,10 @@ export class ReorderLayersAction extends BaseAction {
         super.free();
     }
 
-    private getLayerParent(id: number): { id: number | null, layers: WorkingFileLayer<ColorModel>[] } {
-        let parent: { id: number | null, layers: WorkingFileLayer<ColorModel>[] } = {
+    private getLayerParent(id: number): { id: number | null; layers: WorkingFileLayer<ColorModel>[]; } {
+        let parent: { id: number | null; layers: WorkingFileLayer<ColorModel>[]; } = {
             id: null,
-            layers: workingFileStore.get('layers')
+            layers: workingFileStore.get('layers'),
         };
         const layer = getLayerById(id);
         if (layer && layer.groupId != null) {
@@ -168,7 +168,7 @@ export class ReorderLayersAction extends BaseAction {
             if (parentGroupLayer) {
                 parent = {
                     id: parentGroupLayer.id,
-                    layers: parentGroupLayer.layers
+                    layers: parentGroupLayer.layers,
                 };
             }
         }

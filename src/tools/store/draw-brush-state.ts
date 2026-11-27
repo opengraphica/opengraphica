@@ -36,7 +36,7 @@ interface PermanentStorageState {
     selectedBrush: string;
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'drawBrushStateStore',
     state: {
         brushSize: 100,
@@ -48,7 +48,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 g: 0,
                 b: 0,
                 alpha: 1,
-                style: '#000000'
+                style: '#000000',
             },
             {
                 is: 'color',
@@ -56,7 +56,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 g: 1,
                 b: 1,
                 alpha: 1,
-                style: '#ffffff'
+                style: '#ffffff',
             },
             {
                 is: 'color',
@@ -64,11 +64,11 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 g: 0,
                 b: 0,
                 alpha: 1,
-                style: '#ff0000'
+                style: '#ff0000',
             },
         ],
         colorPaletteIndex: 0,
-        selectedBrush: 'simplePen'
+        selectedBrush: 'simplePen',
     },
     restore: ['brushSize', 'colorPalette', 'colorPaletteIndex', 'selectedBrushCategory', 'selectedBrush'],
 });

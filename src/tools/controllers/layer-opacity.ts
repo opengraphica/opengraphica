@@ -8,7 +8,7 @@ import historyStore from '@/store/history';
 import workingFileStore, { getLayerById } from '@/store/working-file';
 import {
     layerOpacityEmitter, previewOpacity,
-    editingLayers, editingLayerIds, editingLayersRestoreOpacity,
+    editingLayers, editingLayerIds, editingLayersRestoreOpacity
 } from '@/tools/store/layer-opacity-state';
 
 import { BundleAction } from '@/actions/bundle';
@@ -43,7 +43,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         let totalOpacity = 0;
         for (const layerId of editingLayerIds.value) {
             const opacity = getLayerById(layerId)?.opacity ?? 1;
-            totalOpacity += opacity
+            totalOpacity += opacity;
             editingLayersRestoreOpacity.value.push(opacity);
         }
 
@@ -102,12 +102,12 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     {
                         opacity: editingLayersRestoreOpacity.value[layerIndex] ?? 1,
                     },
-                )
-            )
+                ),
+            );
         }
 
         historyStore.dispatch('runAction', {
-            action: new BundleAction('updateLayerOpacity', 'action.updateLayerOpacity', updateActions)
+            action: new BundleAction('updateLayerOpacity', 'action.updateLayerOpacity', updateActions),
         });
     }
 

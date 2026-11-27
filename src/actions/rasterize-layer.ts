@@ -73,7 +73,7 @@ export class RasterizeLayerAction extends BaseAction {
         let newTransform = layer.transform;
         const { width, height } = limitMaxDimension(layer.width, layer.height, maxTextureSize);
         blob = await createImageBlobFromCanvas(
-            await resizeImage(await createImageFromBlob(blob), width, height)
+            await resizeImage(await createImageFromBlob(blob), width, height),
         );
         newTransform = layer.transform.multiply(new DOMMatrix().scale(layer.width / width, layer.height / height));
 

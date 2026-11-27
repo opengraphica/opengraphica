@@ -124,14 +124,14 @@ export async function createRasterMaterials(params: RasterMaterialUpdateParams):
  */
 export async function updateRasterMaterial(
     material: ShaderMaterial,
-    params: RasterMaterialUpdateParams
+    params: RasterMaterialUpdateParams,
 ) {
     return (await updateRasterMaterials([material], params))[0];
 }
 
 export async function updateRasterMaterials(
     materials: ShaderMaterial[],
-    params: RasterMaterialUpdateParams
+    params: RasterMaterialUpdateParams,
 ) {
     let isSourceTextureUpdate = false;
     let srcTexture: Texture | undefined = undefined;
@@ -161,13 +161,13 @@ export async function updateRasterMaterials(
                 const { width: renderTargetWidth, height: renderTargetHeight } = limitMaxDimension(
                     params.srcTexture.width + extendedBounds[0] + extendedBounds[2],
                     params.srcTexture.height + extendedBounds[1] + extendedBounds[3],
-                    params.canvasFilters?.[0]?.maxPassTextureSize ?? Infinity
+                    params.canvasFilters?.[0]?.maxPassTextureSize ?? Infinity,
                 );
                 if (material.userData.srcRenderTarget?.width === renderTargetWidth && material.userData.srcRenderTarget?.height === renderTargetHeight) {
                     break createRenderTarget;
                 }
                 const renderTargetIndex = material.userData.disposableTextures.findIndex(
-                    (otherRenderTarget) => otherRenderTarget === material.userData.srcRenderTarget
+                    (otherRenderTarget) => otherRenderTarget === material.userData.srcRenderTarget,
                 );
                 if (renderTargetIndex > -1) {
                     material.userData.disposableTextures.splice(renderTargetIndex, 1);

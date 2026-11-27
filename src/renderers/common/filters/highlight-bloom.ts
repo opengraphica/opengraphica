@@ -20,21 +20,21 @@ export default class HighlightBloomCanvasFilter implements CanvasFilter<Highligh
                 default: [0.5, 0.5],
                 preview: [0.3, 0.5],
                 min: 0,
-                max: 1
+                max: 1,
             },
             radius: {
                 type: 'percentage',
                 default: 0,
                 preview: 0.2,
                 min: 0,
-                max: 1
+                max: 1,
             },
             strength: {
                 type: 'percentage',
                 default: 0,
                 preview: 0.5,
                 min: 0,
-                max: 1
+                max: 1,
             },
         } as CanvasFilterEditConfig;
     }

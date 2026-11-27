@@ -1,5 +1,5 @@
 /**
- * This file implements the Open Raster specification, with customizations to support 
+ * This file implements the Open Raster specification, with customizations to support
  * OpenGraphica's specific functionality.
  * @see https://www.openraster.org/
  */
@@ -27,9 +27,9 @@ function serializeFloat(value: number) {
         return '1.0';
     }
     if (Object.is(value, -0)) {
-        return "-0.0";
+        return '-0.0';
     }
-    let text = value.toString();
+    const text = value.toString();
     if (Number.isInteger(value) && !/[eE]/.test(text)) {
         return `${text}.0`;
     }
@@ -145,7 +145,7 @@ async function generateLayer(
 
         layerNode.appendChild(filtersNode);
     }
-    
+
     if (layer.type === 'empty') {
         const layerDataFilename = `layer${layer.id}.svg`;
         layerNode.setAttribute('src', 'data/' + layerDataFilename);
@@ -153,7 +153,7 @@ async function generateLayer(
             Promise.resolve([
                 layerDataFilename,
                 fflate.strToU8(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${workingFileStore.get('width')} ${workingFileStore.get('height')}"></svg>`),
-            ])
+            ]),
         );
     } else if (layer.type === 'gradient') {
         layerNode.setAttribute('og:gradient-start-x', serializeFloat(layer.data.start.x));
@@ -179,7 +179,7 @@ async function generateLayer(
             Promise.resolve([
                 layerDataFilename,
                 fflate.strToU8(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${layer.width} ${layer.height}"></svg>`),
-            ])
+            ]),
         );
     } else if (layer.type === 'group') {
         for (const childLayer of layer.layers) {
@@ -191,7 +191,7 @@ async function generateLayer(
         if (storedImage) {
             data.push(
                 createArrayBufferFromBlob(
-                    await createImageBlobFromCanvas(storedImage)
+                    await createImageBlobFromCanvas(storedImage),
                 ).then((arrayBuffer) => {
                     const layerDataFilename = `layer${layer.id}.png`;
                     layerNode.setAttribute('src', 'data/' + layerDataFilename);
@@ -202,7 +202,7 @@ async function generateLayer(
                             { level: 0 },
                         ],
                     ];
-                })
+                }),
             );
         }
     } else if (layer.type === 'rasterSequence') {
@@ -218,7 +218,7 @@ async function generateLayer(
             if (storedImage) {
                 data.push(
                     createArrayBufferFromBlob(
-                        await createImageBlobFromCanvas(storedImage)
+                        await createImageBlobFromCanvas(storedImage),
                     ).then((arrayBuffer) => {
                         if (frameIndex === 0) {
                             layerNode.setAttribute('src', 'data/' + frameFilename);
@@ -230,7 +230,7 @@ async function generateLayer(
                                 { level: 0 },
                             ],
                         ];
-                    })
+                    }),
                 );
             }
         }
@@ -271,7 +271,7 @@ async function generateLayer(
             Promise.resolve([
                 layerDataFilename,
                 fflate.strToU8(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${layer.width} ${layer.height}"></svg>`),
-            ])
+            ]),
         );
     } else if (layer.type === 'vector') {
         const storedImage = await getStoredSvgImage(layer.data.sourceUuid);
@@ -286,7 +286,7 @@ async function generateLayer(
                         layerDataFilename,
                         new Uint8Array(arrayBuffer),
                     ];
-                })
+                }),
             );
         }
     } else if (layer.type === 'video') {
@@ -296,7 +296,7 @@ async function generateLayer(
                 fetch(storedVideo.src).then((result) => {
                     return result.blob();
                 }).then((blob) => {
-                    let extension = getExtensionForMimeType(blob.type);
+                    const extension = getExtensionForMimeType(blob.type);
                     const layerDataFilename = `layer${layer.id}.${extension}`;
                     return createArrayBufferFromBlob(blob).then((arrayBuffer) => {
                         layerNode.setAttribute('src', 'data/' + layerDataFilename);
@@ -305,10 +305,10 @@ async function generateLayer(
                             [
                                 new Uint8Array(arrayBuffer),
                                 { level: 0 },
-                            ]
+                            ],
                         ];
                     });
-                })
+                }),
             );
         }
     }
@@ -394,7 +394,7 @@ async function generateLayerStack() {
                                 { level: 0 },
                             ],
                         ];
-                    })
+                    }),
                 );
             } catch (error) {
 
@@ -419,7 +419,7 @@ async function generateLayerStack() {
             if (storedImage) {
                 data.push(
                     createArrayBufferFromBlob(
-                        await createImageBlobFromCanvas(storedImage)
+                        await createImageBlobFromCanvas(storedImage),
                     ).then((arrayBuffer) => {
                         const maskDataFilename = `mask${maskId}.png`;
                         maskNode.setAttribute('src', 'data/' + maskDataFilename);
@@ -430,7 +430,7 @@ async function generateLayerStack() {
                                 { level: 0 },
                             ],
                         ];
-                    })
+                    }),
                 );
             }
         }
@@ -439,7 +439,7 @@ async function generateLayerStack() {
     return {
         xmlDocument,
         data,
-    }
+    };
 }
 
 export async function serializeWorkingFile(): Promise<Blob> {
@@ -453,14 +453,14 @@ export async function serializeWorkingFile(): Promise<Blob> {
     })).canvas!;
     const { width: thumbnailWidth, height: thumbnailHeight } = limitMaxDimension(width, height, 256);
     const mergedImageBuffer = await createArrayBufferFromBlob(
-        await createImageBlobFromCanvas(mergedImageCanvas)
+        await createImageBlobFromCanvas(mergedImageCanvas),
     );
     let thumbnailImageBuffer = mergedImageBuffer;
     if (thumbnailWidth < width) {
         try {
             const thumbnailCanvas = await resizeImage(mergedImageCanvas, thumbnailWidth, thumbnailHeight);
             thumbnailImageBuffer = await createArrayBufferFromBlob(
-                await createImageBlobFromCanvas(thumbnailCanvas)
+                await createImageBlobFromCanvas(thumbnailCanvas),
             );
         } catch (error) {
             console.warn('[src/modules/file/formats/ora.ts] Failed to generate thumbnail.', error);
@@ -474,17 +474,17 @@ export async function serializeWorkingFile(): Promise<Blob> {
     const serializer = new XMLSerializer();
     const stackXml = fflate.strToU8(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        + indentXml(serializer.serializeToString(xmlDocument))
+        + indentXml(serializer.serializeToString(xmlDocument)),
     );
     const zipFileBuffer = await new Promise<Uint8Array<ArrayBuffer>>((resolve, reject) => {
         fflate.zip({
-            mimetype: [ fflate.strToU8('image/openraster'), { level: 0 }],
+            mimetype: [fflate.strToU8('image/openraster'), { level: 0 }],
             'stack.xml': stackXml,
             'data': resolvedData,
             'Thumbnails': {
-                'thumbnail.png': [ new Uint8Array(thumbnailImageBuffer), { level: 0 } ],
+                'thumbnail.png': [new Uint8Array(thumbnailImageBuffer), { level: 0 }],
             },
-            'mergedimage.png': [ new Uint8Array(mergedImageBuffer), { level: 0 } ],
+            'mergedimage.png': [new Uint8Array(mergedImageBuffer), { level: 0 }],
         }, (error, data) => {
             if (error || !data?.length) {
                 reject(error);

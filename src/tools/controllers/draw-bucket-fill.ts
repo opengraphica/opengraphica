@@ -30,7 +30,7 @@ import { UpdateVectorLayerAttributesAction } from '@/actions/update-vector-layer
 import type {
     InsertRasterLayerOptions, UpdateRasterLayerOptions,
     RendererFrontend,
-    WorkingFileVectorLayer,
+    WorkingFileVectorLayer
 } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -52,7 +52,7 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
             this.renderer = renderer;
             this.renderer.getMaxTextureSize().then((maxTextureSize) => {
                 this.maxTextureSize = maxTextureSize;
-            })
+            });
         });
 
         this.onDelete = this.onDelete.bind(this);
@@ -63,7 +63,7 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
         // Tutorial message
         if (!editorStore.state.tutorialFlags.drawBucketFillToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.drawBucketFillToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.drawBucketFillToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -71,12 +71,12 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
                     title: t('tutorialTip.drawBucketFillToolIntroduction.title'),
                     message: {
                         touch: message + (tm('tutorialTip.drawBucketFillToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`;
                         }).join(''),
                         mouse: message + (tm('tutorialTip.drawBucketFillToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`;
                         }).join(''),
-                    }
+                    },
                 });
             });
         }
@@ -134,15 +134,15 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
     private async bucketFillStart() {
         if (!this.renderer) return;
 
-        let { viewTransformPoint } = this.getTransformedCursorInfo();
+        const { viewTransformPoint } = this.getTransformedCursorInfo();
 
         const startBucketFillReserveToken = createHistoryReserveToken();
         await historyStore.dispatch('reserve', { token: startBucketFillReserveToken });
 
         const { width, height } = workingFileStore.state;
         const { width: textureWidth, height: textureHeight } = limitMaxDimension(width, height, this.maxTextureSize);
-        let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'vector' || layer.type === 'empty');
-        let layerActions: BaseAction[] = [];
+        const selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'vector' || layer.type === 'empty');
+        const layerActions: BaseAction[] = [];
 
         // Insert raster layer if none selected
         let insertLayerAction: InsertLayerAction<InsertRasterLayerOptions> | undefined;
@@ -174,7 +174,7 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
                         data: {
                             sourceUuid: await createStoredImage(createEmptyCanvas(textureWidth, textureHeight)),
                         },
-                    })
+                    }),
                 );
             } else if (!['raster', 'vector'].includes(selectedLayer.type)) {
                 selectedLayers.splice(i, 1);
@@ -212,10 +212,10 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
                     attributes['stroke'] = currentColor.style.slice(0, 7);
                     attributes['stroke-opacity'] = `${currentColor.alpha}`;
                 }
-                this.renderer?.updateVectorLayerAttributes(layerId, element.id, attributes)
+                this.renderer?.updateVectorLayerAttributes(layerId, element.id, attributes);
                 this.fillingVectorLayerShapes.push([layerId, element.id, attributes]);
             }
-            
+
             this.fillingRasterLayerIds = selectedLayers.filter((layer) => layer.type === 'raster').map((layer) => layer.id);
             if (insertLayerAction && !this.fillingRasterLayerIds.includes(insertLayerAction.insertedLayerId)) {
                 this.fillingRasterLayerIds.push(insertLayerAction.insertedLayerId);
@@ -270,16 +270,16 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
         this.applyBucketFill();
     }
 
-    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix } {
+    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint; viewDecomposedTransform: DecomposedMatrix; } {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewDecomposedTransform = canvasStore.get('decomposedTransform');
         const viewTransformPoint = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
             .matrixTransform(viewTransform.inverse());
-        
+
         return {
             viewTransformPoint,
-            viewDecomposedTransform
+            viewDecomposedTransform,
         };
     }
 
@@ -298,7 +298,7 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
             if (this.fillingVectorLayerShapes.length > 0) {
                 for (const [layerId, nodeId, attributes] of this.fillingVectorLayerShapes) {
                     layerActions.push(
-                        new UpdateVectorLayerAttributesAction(layerId, nodeId, attributes, true)
+                        new UpdateVectorLayerAttributesAction(layerId, nodeId, attributes, true),
                     );
                 }
             }
@@ -316,8 +316,8 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
                             data: {
                                 tileUpdates: await transferRendererTilesToRasterLayerUpdates([renderTiles[renderTileIndex]]),
                                 alreadyRendererd: true,
-                            }
-                        })
+                            },
+                        }),
                     );
                 }
             }
@@ -358,7 +358,7 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
     onSelectAll() {
         if (activeSelectionMask.value || appliedSelectionMask.value) {
             historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
+                action: new ClearSelectionAction(),
             });
         }
     }

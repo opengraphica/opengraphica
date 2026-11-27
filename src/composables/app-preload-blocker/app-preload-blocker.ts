@@ -26,7 +26,7 @@ export function useAppPreloadBlocker() {
                     nextTick(() => {
                         appPreloadBlockerCount.value -= 1;
                     });
-                })
+                });
             });
         }
     });

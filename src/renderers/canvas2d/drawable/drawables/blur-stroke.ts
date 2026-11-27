@@ -66,7 +66,7 @@ function createBlurStack(): BlurStack {
         b: 0,
         a: 0,
         next: null as unknown as BlurStack,
-    }
+    };
 }
 
 export default class BlurStroke implements Drawable<BlurStrokeData> {
@@ -94,7 +94,7 @@ export default class BlurStroke implements Drawable<BlurStrokeData> {
         let right = -Infinity;
         let bottom = -Infinity;
 
-        let startPointIndex = (refresh ? 0 : Math.max(0, this.points.length - 3 - this.smoothing));
+        const startPointIndex = (refresh ? 0 : Math.max(0, this.points.length - 3 - this.smoothing));
         // this.pointBeziers = this.pointBeziers.slice(0, startPointIndex);
 
         for (let i = startPointIndex; i < this.points.length; i++) {
@@ -159,11 +159,11 @@ export default class BlurStroke implements Drawable<BlurStrokeData> {
         let averageX = 0;
         let averageY = 0;
         for (let i = 1; i < points.length; i++) {
-            let previousPoint1 = {
+            const previousPoint1 = {
                 x: points[i - 1].x,
                 y: points[i - 1].y,
             };
-            let nextPoint1 = {
+            const nextPoint1 = {
                 x: points[i].x,
                 y: points[i].y,
             };

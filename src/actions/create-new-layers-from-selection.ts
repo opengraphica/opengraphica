@@ -2,13 +2,13 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
-    createAppliedSelectionPaths,
+    createAppliedSelectionPaths
 } from '@/tools/store/selection-state';
 import canvasStore from '@/store/canvas';
 import { createStoredImage } from '@/store/image';
 import { cloneStoredSvg } from '@/store/svg';
 import workingFileStore, {
-    getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById,
+    getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById
 } from '@/store/working-file';
 import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
 
@@ -26,7 +26,7 @@ import renderers from '@/renderers/canvas2d/layers';
 import {
     ColorModel, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, InsertRasterLayerOptions,
     InsertVectorLayerOptions,
-    VectorPathCommandMove, VectorPathCommandLine,
+    VectorPathCommandMove, VectorPathCommandLine
 } from '@/types';
 
 interface CreateNewLayersFromSelectionOptions {
@@ -87,7 +87,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
             ctx.imageSmoothingEnabled = false;
 
             // Create new layer for each of the selected layers.
-            for (let layer of selectedLayers) {
+            for (const layer of selectedLayers) {
                 if (['raster', 'rasterSequence'].includes(layer.type)) {
 
                     ctx.globalCompositeOperation = 'source-over';
@@ -108,7 +108,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                     ctx.globalCompositeOperation = 'destination-in';
                     ctx.drawImage(selectionMask, -selectionBounds.left, -selectionBounds.top);
                     ctx.globalCompositeOperation = 'source-over';
-                    
+
                     const sourceUuid = await createStoredImage(workingCanvas);
 
                     this.insertLayerActions.push(
@@ -120,8 +120,8 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                             transform: new DOMMatrix().translateSelf(selectionOffset.x + selectionBounds.left, selectionOffset.y + selectionBounds.top),
                             data: {
                                 sourceUuid,
-                            }
-                        })
+                            },
+                        }),
                     );
 
                 } else if (layer.type === 'vector') {
@@ -138,8 +138,8 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                             transform: new DOMMatrix().multiply(layer.transform),
                             data: {
                                 sourceUuid: await cloneStoredSvg(layer.data.sourceUuid),
-                            }
-                        })
+                            },
+                        }),
                     );
                     this.insertVectorLayerIndices.add(this.insertLayerActions.length - 1);
 
@@ -178,7 +178,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                     },
                 ));
                 this.trimLayerEmptySpaceActions.push(
-                    new TrimLayerEmptySpaceAction(layerId)
+                    new TrimLayerEmptySpaceAction(layerId),
                 );
             }
         }
@@ -201,7 +201,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
             if (this.selectNewLayers === 'replace') {
                 this.selectLayersAction = new SelectLayersAction(this.insertedLayerIds, previousSelectedLayerIds);
             } else {
-                this.selectLayersAction = new SelectLayersAction([ ...workingFileStore.get('selectedLayerIds'), ...this.insertedLayerIds ], previousSelectedLayerIds);
+                this.selectLayersAction = new SelectLayersAction([...workingFileStore.get('selectedLayerIds'), ...this.insertedLayerIds], previousSelectedLayerIds);
             }
         }
 

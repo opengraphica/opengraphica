@@ -17,10 +17,10 @@ export async function createNewFile(options: CreateFileOptions) {
 
     preferencesStore.set('useCanvasViewport', preferencesStore.get('preferCanvasViewport'));
     await historyStore.dispatch('runAction', {
-        action: new CreateFileAction(options)
+        action: new CreateFileAction(options),
     });
     await historyStore.dispatch('free', {
         memorySize: Infinity,
-        databaseSize: Infinity
+        databaseSize: Infinity,
     });
 };

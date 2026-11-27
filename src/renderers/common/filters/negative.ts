@@ -2,7 +2,7 @@ import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
 export enum NegativeInvertColorSpace {
     PERCEPTUAL_RGB = 0,
-    LINEAR_RGB = 1
+    LINEAR_RGB = 1,
 }
 
 export interface NegativeCanvasFilterParams {
@@ -25,29 +25,29 @@ export default class NegativeCanvasFilter implements CanvasFilter<NegativeCanvas
                 default: NegativeInvertColorSpace.PERCEPTUAL_RGB,
                 options: [
                     { key: 'perceptualRgb', value: NegativeInvertColorSpace.PERCEPTUAL_RGB },
-                    { key: 'linearRgb', value: NegativeInvertColorSpace.LINEAR_RGB }
-                ]
+                    { key: 'linearRgb', value: NegativeInvertColorSpace.LINEAR_RGB },
+                ],
             },
             invertRed: {
                 type: 'boolean',
                 constant: true,
-                default: true
+                default: true,
             },
             invertGreen: {
                 type: 'boolean',
                 constant: true,
-                default: true
+                default: true,
             },
             invertBlue: {
                 type: 'boolean',
                 constant: true,
-                default: true
+                default: true,
             },
             invertValue: {
                 type: 'boolean',
                 constant: true,
-                default: false
-            }
+                default: false,
+            },
         } as CanvasFilterEditConfig;
     }
 }

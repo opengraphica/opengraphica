@@ -13,8 +13,8 @@ export function pointDistance2d(x1: number, y1: number, x2: number, y2: number) 
 
 // Finds the angle between the line segment defined by two points and the x axis. range is (-PI, PI], where positive values are clockwise.
 export function clockwiseAngle2d(cx: number, cy: number, ex: number, ey: number) {
-    var dy = ey - cy;
-    var dx = ex - cx;
+    const dy = ey - cy;
+    const dx = ex - cx;
     return Math.atan2(dy, dx);
 }
 
@@ -24,7 +24,7 @@ export function rotateDirectionVector2d(x: number, y: number, angle: number) {
     const cosAngle = Math.cos(angle);
     return {
         x: x * cosAngle - y * sinAngle,
-        y: x * sinAngle + y * cosAngle
+        y: x * sinAngle + y * cosAngle,
     };
 }
 
@@ -44,9 +44,9 @@ export function lineIntersectsLine2d(x1: number, y1: number, x2: number, y2: num
     if (denominator === 0) {
         return null;
     }
-    let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
-    let intersectionX = x1 + ua * (x2 - x1);
-    let intersectionY = y1 + ua * (y2 - y1);
+    const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
+    const intersectionX = x1 + ua * (x2 - x1);
+    const intersectionY = y1 + ua * (y2 - y1);
     return { x: intersectionX, y: intersectionY };
 }
 
@@ -56,7 +56,7 @@ export function nearestPowerOf2(value: number) {
 }
 
 // Finds the bounding box, given a list of points.
-export function findPointListBounds(points: Array<DOMPoint | { x: number, y: number }>) {
+export function findPointListBounds(points: Array<DOMPoint | { x: number; y: number; }>) {
     let left = Infinity;
     let right = -Infinity;
     let top = Infinity;
@@ -74,7 +74,7 @@ export function findPointListBounds(points: Array<DOMPoint | { x: number, y: num
         right,
         top,
         bottom,
-    }
+    };
 }
 
 export function findRectListBounds(rects: Array<DOMRect>, rounded?: boolean) {
@@ -113,12 +113,12 @@ export function isEqualApprox(a, b, epsilon = 0.00001) {
 
 export function limitMaxDimension(originalWidth: number, originalHeight: number, max: number) {
     if (originalWidth > originalHeight) {
-        let width = Math.min(max, originalWidth);
-        let height = Math.floor(width * (originalHeight / originalWidth));
+        const width = Math.min(max, originalWidth);
+        const height = Math.floor(width * (originalHeight / originalWidth));
         return { width, height };
     } else {
-        let height = Math.min(max, originalHeight);
-        let width = Math.floor(height * (originalWidth / originalHeight));
+        const height = Math.min(max, originalHeight);
+        const width = Math.floor(height * (originalWidth / originalHeight));
         return { width, height };
     }
 }

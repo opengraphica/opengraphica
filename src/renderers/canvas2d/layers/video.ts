@@ -11,7 +11,7 @@ export default class VideoLayerRenderer extends BaseLayerRenderer {
             0,
             0,
             layer.width,
-            layer.height
+            layer.height,
         );
     }
 }

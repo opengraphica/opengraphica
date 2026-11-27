@@ -24,7 +24,7 @@ export default class MonteCarloBlurCanvasFilter implements CanvasFilter<MonteCar
                     { key: '16', value: 16 },
                     { key: '32', value: 32 },
                     { key: '64', value: 64 },
-                ]
+                ],
             },
             size: {
                 type: 'percentage',

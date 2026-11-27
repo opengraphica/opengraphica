@@ -33,23 +33,23 @@ export async function createCanvasFilter(name: string): Promise<Webgl2RendererCa
     const CanvasFilterClass: ClassType<Webgl2RendererCanvasFilter>
         = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/common/filters/${kebabCaseName}`)).default;
     const canvasFilter = new CanvasFilterClass();
-    let fragmentShaders: string[] = [];
+    const fragmentShaders: string[] = [];
     const passCount = canvasFilter.passes || 1;
     if (passCount > 1) {
         for (let i = 0; i < passCount; i++) {
             const passKebabCaseName = kebabCaseName + '-' + i;
             fragmentShaders.push(
-                (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${passKebabCaseName}.frag`)).default
+                (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${passKebabCaseName}.frag`)).default,
             );
         }
     } else {
         fragmentShaders.push(
-            (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default
+            (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default,
         );
     }
     let vertexShader: string | undefined;
     if (canvasFilter.hasVertexShader) {
-        vertexShader = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.vert`)).default
+        vertexShader = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.vert`)).default;
     }
     canvasFilter.fragmentShader = fragmentShaders[0];
     canvasFilter.fragmentShaders = fragmentShaders;
@@ -94,7 +94,7 @@ function getLayerFilterParamUniformValue(
     paramName: string,
     paramValue: any,
     editConfig: CanvasFilterEditConfig,
-    otherParams: Record<string, unknown>
+    otherParams: Record<string, unknown>,
 ) {
     const type = editConfig[paramName].type;
     if (type === 'boolean') {
@@ -131,9 +131,9 @@ function getLayerFilterParamUniformValue(
  */
 
 export interface CreateLayerShaderUniformsAndDefinesResult {
-    uniforms: Record<string, IUniform>,
-    defines: Record<string, unknown>,
-    textures: Texture[],
+    uniforms: Record<string, IUniform>;
+    defines: Record<string, unknown>;
+    textures: Texture[];
 }
 
 export function createLayerShaderUniformsAndDefines(
@@ -148,9 +148,10 @@ export function createLayerShaderUniformsAndDefines(
     const uniforms: Record<string, IUniform> = {
         opacity: { value: 1 },
     };
-    let textures: Texture[] = [];
+    const textures: Texture[] = [];
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         if (canvasFilter == null || (canvasFilter.overrideDisabled ?? canvasFilter.disabled) === true) continue;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
         const editConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
         const computedParamNames: string[] = [];
         const paramsList = canvasFilter.overrideParams ?? canvasFilter.params;
@@ -173,7 +174,7 @@ export function createLayerShaderUniformsAndDefines(
                 } else {
                     const replaceParamName = 'param' + index + '_' + editParamName;
                     uniforms[replaceParamName] = {
-                        value: paramValue
+                        value: paramValue,
                     };
                 }
             }
@@ -190,7 +191,7 @@ export function createLayerShaderUniformsAndDefines(
             } else {
                 const replaceParamName = 'param' + index + '_' + editParamName;
                 uniforms[replaceParamName] = {
-                    value: paramValue
+                    value: paramValue,
                 };
             }
             if ((paramValue as Texture).isTexture) {
@@ -233,7 +234,7 @@ export interface CreateLayerShaderPass {
 export async function createLayerShader(
     options: CreateLayerShaderOptions,
 ): Promise<CreateLayerShaderPass[]> {
-    
+
     const {
         fragmentShaderMain, fragmentShaderSetup, vertexShaderMain, vertexShaderSetup,
         canvasFilters, width, height, useAutomaticLayerTextureMipmaps,
@@ -259,8 +260,9 @@ export async function createLayerShader(
                 }
                 currentPassFilters.push({
                     ...canvasFilter,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
                     editConfig: canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!,
-                    pass: i
+                    pass: i,
                 });
                 if (i < passCount - 1) {
                     filtersByPass.push(currentPassFilters);
@@ -294,7 +296,7 @@ export async function createLayerShader(
 
         const rendererBackend = getWebgl2RendererBackend();
 
-        let vertexShaderMainCalls: string[] = [];
+        const vertexShaderMainCalls: string[] = [];
         let fragmentShaderMainCalls: string[] = [];
 
         const alreadyIncludedFilters = new Set<string>();
@@ -307,6 +309,7 @@ export async function createLayerShader(
         let hasSampleBackbufferLod = false;
         for (const [index, canvasFilter] of passFilters.entries()) {
             if (canvasFilter == null || (canvasFilter.overrideDisabled ?? canvasFilter.disabled) === true) continue;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
             const editConfig = canvasFilter.editConfig ?? canvasFilter.getEditConfig?.()!;
 
             let filterVertexShader = canvasFilter.vertexShader ?? '';
@@ -367,11 +370,11 @@ export async function createLayerShader(
                         }
                         if (functionMaskTexture) {
                             fragmentShader += '    filterColorResult = vec4('
-                                +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
-                                +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
-                                +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
-                                +       'filterColorResult.a * filterMaskAlpha + filterColorBuffer.a * (1.0 - filterMaskAlpha)'
-                                +   ');\n';
+                                + 'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
+                                + 'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
+                                + 'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
+                                + 'filterColorResult.a * filterMaskAlpha + filterColorBuffer.a * (1.0 - filterMaskAlpha)'
+                                + ');\n';
                         }
                     }
                     fragmentShader += '    return filterColorResult;\n}\n\n';
@@ -402,11 +405,11 @@ export async function createLayerShader(
                         }
                         if (functionMaskTexture) {
                             fragmentShader += '    filterColorResult = vec4('
-                                +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
-                                +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
-                                +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
-                                +       'filterColorResult.a * filterMaskAlpha + filterColorBuffer.a * (1.0 - filterMaskAlpha)'
-                                +   ');\n';
+                                + 'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
+                                + 'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
+                                + 'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
+                                + 'filterColorResult.a * filterMaskAlpha + filterColorBuffer.a * (1.0 - filterMaskAlpha)'
+                                + ');\n';
                         }
                     }
                     fragmentShader += '    return filterColorResult;\n}\n\n';
@@ -428,15 +431,15 @@ export async function createLayerShader(
                 if (maskTexture) {
                     fragmentShaderMainCalls.push(
                         '    filterColorResult = vec4('
-                        +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
-                        +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
-                        +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
-                        +       'filterColorResult.a * filterMaskAlpha + filterColorBuffer.a * (1.0 - filterMaskAlpha)'
-                        +   ');'
+                        + 'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
+                        + 'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
+                        + 'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
+                        + 'filterColorResult.a * filterMaskAlpha + filterColorBuffer.a * (1.0 - filterMaskAlpha)'
+                        + ');',
                     );
                 }
             }
-            
+
             for (const editParamName in editConfig) {
                 const isConstant = (editConfig[editParamName].constant);
                 const searchParamName = isConstant
@@ -445,7 +448,7 @@ export async function createLayerShader(
                 const replaceParamName = isConstant
                     ? 'constant' + index + '_' + editParamName
                     : 'param' + index + '_' + editParamName;
-                
+
                 if (filterVertexShader) {
                     filterVertexShader = filterVertexShader.replaceAll(searchParamName, replaceParamName);
                 }
@@ -524,7 +527,7 @@ export async function createLayerShader(
             getExtendedBounds: (canvasFilters: Webgl2RendererCanvasFilter[]) => {
                 const extendedBounds = [0, 0, 0, 0];
                 const usedFilters = canvasFilters.filter((canvasFilter) => canvasFilter != null && !canvasFilter.overrideDisabled && !canvasFilter.disabled);
-                for (let [canvasFilterIndex, canvasFilter] of usedFilters.entries()) {
+                for (const [canvasFilterIndex, canvasFilter] of usedFilters.entries()) {
                     const bounds = getExtendedBoundsFunctions[canvasFilterIndex]?.(canvasFilter.overrideParams ?? canvasFilter.params);
                     if (!bounds) continue;
                     extendedBounds[0] = Math.max(extendedBounds[0], bounds[0]);
@@ -533,7 +536,7 @@ export async function createLayerShader(
                     extendedBounds[3] = Math.max(extendedBounds[3], bounds[3]);
                 }
                 return extendedBounds;
-            }
+            },
         });
     }
 

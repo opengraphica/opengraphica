@@ -17,7 +17,7 @@ import type {
 } from '@/types';
 
 export class RasterLayerMeshController implements WgpuWasmRendererMeshController {
-    
+
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
     filters: Array<Webgl2RendererCanvasFilter | null> = [];
@@ -97,7 +97,7 @@ export class RasterLayerMeshController implements WgpuWasmRendererMeshController
         if (data.tileUpdates) {
             if (data.tileUpdateId === this.tileUpdateId) return;
             const tileTextures = await Promise.allSettled(
-                data.tileUpdates.map((tileUpdate) => requestFrontendTextureImageData(tileUpdate.sourceUuid))
+                data.tileUpdates.map((tileUpdate) => requestFrontendTextureImageData(tileUpdate.sourceUuid)),
             );
             for (const [updateIndex, tileUpdate] of data.tileUpdates.entries()) {
                 const tileTexture = tileTextures[updateIndex].status === 'fulfilled' ? tileTextures[updateIndex].value : null;
@@ -117,7 +117,7 @@ export class RasterLayerMeshController implements WgpuWasmRendererMeshController
             this.queueRegenerateThumbnail();
         } else {
             this.sourceUuid = data.sourceUuid;
-            const sourceImageData = await requestFrontendTextureImageData(data.sourceUuid)
+            const sourceImageData = await requestFrontendTextureImageData(data.sourceUuid);
             if (sourceImageData) {
                 backend.updateMeshControllerSourceImageData(this.id, sourceImageData);
                 await this.scheduleMaterialUpdate('update');
@@ -181,7 +181,7 @@ export class RasterLayerMeshController implements WgpuWasmRendererMeshController
     //     this.material.uniforms.dstTexture.value = texture;
     //     this.material.uniformsNeedUpdate = true;
     // }
-    
+
     detach() {
         const backend = getWgpuWasmRendererBackend();
         backend.removeMeshController(this.id);

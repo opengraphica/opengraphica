@@ -37,7 +37,7 @@
 //         if (layer.type === 'group') {
 //             for (const childLayer of (layer as WorkingFileGroupLayer).layers) {
 //                 stack.unshift(childLayer);
-//             }    
+//             }
 //         }
 //         if (layer.renderer) {
 //             if (!noRenderPassModes.has(layer.blendingMode)) {

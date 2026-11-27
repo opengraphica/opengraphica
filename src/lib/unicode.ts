@@ -28,7 +28,7 @@ export function getScripts(text: string): string[] {
 
 export function getSubsets(text: string, mergeWhenMultipleOptions: boolean = false): string[] {
     const foundSubsets = new Set<string>();
-    let lookupsWithMultipleSubsets: Array<string[]> = [];
+    const lookupsWithMultipleSubsets: Array<string[]> = [];
     for (let i = 0; i < text.length; i++) {
         const charCode = text.charCodeAt(i);
         let lookupSubsets = subsetLookupCache.get(charCode);

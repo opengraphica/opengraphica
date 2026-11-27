@@ -8,7 +8,7 @@ export function fragment(
     filter: CanvasFilter<HueCanvasFilterParams>,
     sourceImageData: Uint8ClampedArray,
     targetImageData: Uint8ClampedArray,
-    dataPosition: number
+    dataPosition: number,
 ) {
     const rotate = filter.params.rotate ?? 0;
 

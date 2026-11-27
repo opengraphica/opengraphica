@@ -7,7 +7,7 @@ import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/stor
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
     appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview,
-    selectedLayersSelectionMaskPreviewCanvasOffset,
+    selectedLayersSelectionMaskPreviewCanvasOffset
 } from '@/tools/store/selection-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
@@ -25,7 +25,7 @@ import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions, RendererBucketFillSettings,
     RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer,
-    RendererPickedVectorLayerElement,
+    RendererPickedVectorLayerElement
 } from '@/types';
 
 export class WgpuWasmRendererFrontend implements RendererFrontend {
@@ -86,8 +86,10 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
             appliedSelectionMask, appliedSelectionMaskCanvasOffset,
             selectedLayersSelectionMaskPreview, selectedLayersSelectionMaskPreviewCanvasOffset,
         ], async (
-            [newActiveSelectionMask, newActiveSelectionMaskCanvasOffset, newAppliedSelectionMask, newAppliedSelectionMaskCanvasOffset,
-            newSelectedLayersSelectionMaskPreview, newSelectedLayersSelectionMaskPreviewCanvasOffset],
+            [
+                newActiveSelectionMask, newActiveSelectionMaskCanvasOffset, newAppliedSelectionMask, newAppliedSelectionMaskCanvasOffset,
+                newSelectedLayersSelectionMaskPreview, newSelectedLayersSelectionMaskPreviewCanvasOffset,
+            ],
         ) => {
             const newSelectionMask = newActiveSelectionMask ?? newAppliedSelectionMask ?? newSelectedLayersSelectionMaskPreview;
             const newCanvasOffset = newActiveSelectionMask ? newActiveSelectionMaskCanvasOffset : (newAppliedSelectionMask ? newAppliedSelectionMaskCanvasOffset : newSelectedLayersSelectionMaskPreviewCanvasOffset);
@@ -154,7 +156,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         const setRendererDirty = this.rendererBackend.isOffscreen
             ? () => {
                 // TODO - Remove this altogether? No longer used.
-                canvasStore.set('dirty', false)
+                canvasStore.set('dirty', false);
             }
             : () => {
                 if ((this.rendererBackend as WgpuWasmRendererBackend).dirty) {
@@ -162,8 +164,8 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
                     (this.rendererBackend as WgpuWasmRendererBackend).render(timelineCursor);
                 }
             };
-        
-        let viewTransform = new Float32Array([
+
+        const viewTransform = new Float32Array([
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
@@ -252,7 +254,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
     }
 
     async overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null) {
-        
+
     }
 
     async startBrushStroke(settings: RendererBrushStrokeSettings) {
@@ -296,7 +298,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
     }
 
     async waitForRasterReadiness(layerId: number) {
-        
+
     }
 
     async dispose() {
@@ -307,7 +309,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
     }
 
 
-    async onSvgRequest(request?: { sourceUuid: string, width: number, height: number }) {
+    async onSvgRequest(request?: { sourceUuid: string; width: number; height: number; }) {
     }
 
     async onTextureRequest(sourceUuid?: string) {
@@ -350,7 +352,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         layerWatcher.attach(layer);
     }
 
-    onLayerReordered(options?: { layer: WorkingFileAnyLayer, order: number }) {
+    onLayerReordered(options?: { layer: WorkingFileAnyLayer; order: number; }) {
         if (!options) return;
         const { layer, order } = options;
         if (!layer || order == null) return;
@@ -380,7 +382,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         if (event?.props.blendingMode) {
             // TODO - not sure if passing the layers here is necessary.
             this.rendererBackend.setLayerOrder(
-                []
+                [],
             );
         }
     }
@@ -388,7 +390,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
     onLayerOrderCalculated() {
         // TODO - not sure if passing the layers here is necessary.
         this.rendererBackend.setLayerOrder(
-            []
+            [],
         );
     }
 

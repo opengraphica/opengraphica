@@ -5,14 +5,14 @@ import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 
 import type {
     Webgl2RendererBackendPublic, Webgl2RendererApplySelectionMaskToAlphaChannelOptions,
-    Webgl2RendererBackendTakeSnapshotOptions, MeshControllerInterface,
+    Webgl2RendererBackendTakeSnapshotOptions, MeshControllerInterface
 } from '@/renderers/webgl2/backend';
 import type {
     FontFamilyFetchDefinition,
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
     WorkingFileLayer, WorkingFileLayerMask,
     RendererBucketFillSettings, RendererPickedVectorLayerElement,
-    Webgl2RendererCanvasFilter,
+    Webgl2RendererCanvasFilter
 } from '@/types';
 
 export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPublic {
@@ -21,12 +21,12 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
     backendWorker!: Worker;
     messageReceivedCallbacks = new Map<BackendWorkerMessage, Array<(arg?: any) => void>>();
 
-    onRequestFrontendSvg!: (request: { sourceUuid: string, requestId: number, width: number, height: number }) => void;
-    onRequestFrontendTexture!: (request: { sourceUuid: string, requestId: number }) => void;
+    onRequestFrontendSvg!: (request: { sourceUuid: string; requestId: number; width: number; height: number; }) => void;
+    onRequestFrontendTexture!: (request: { sourceUuid: string; requestId: number; }) => void;
 
     constructor() {
         this.backendWorker = new Worker(
-            /* webpackChunkName: 'worker-webgl2-renderer-backend' */ new URL('../backend/backend.worker.ts', import.meta.url)
+            /* webpackChunkName: 'worker-webgl2-renderer-backend' */ new URL('../backend/backend.worker.ts', import.meta.url),
         );
         this.backendWorker.onmessage = ({ data }) => {
             switch (data.type) {
@@ -79,10 +79,10 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
                     type: BackendWorkerMessage.DISPOSE_MESH_CONTROLLER,
                     id,
                 });
-            }
+            },
         };
 
-        async function forwardControllerMethod(this: { prop: string | symbol }) {
+        async function forwardControllerMethod(this: { prop: string | symbol; }) {
             backendWorker.postMessage({
                 type: BackendWorkerMessage.UPDATE_MESH_CONTROLLER,
                 methodName: this.prop,
@@ -99,7 +99,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
                     return Reflect.get(target, prop, receiver);
                 }
                 return forwardControllerMethod.bind({ prop });
-            }
+            },
         });
 
         this.backendWorker.postMessage({
@@ -132,7 +132,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
             imageWidth,
             imageHeight,
             viewWidth,
-            viewHeight
+            viewHeight,
         }, [canvas]);
 
         await this.messageReceived(BackendWorkerMessage.INITIALIZE_RESULT);
@@ -144,7 +144,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
             imageWidth,
             imageHeight,
             viewWidth,
-            viewHeight
+            viewHeight,
         });
 
         await this.messageReceived(BackendWorkerMessage.RESIZE_RESULT);
@@ -200,7 +200,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         await this.messageReceived(BackendWorkerMessage.SET_MASKS_RESULT);
     }
 
-    async setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }) {
+    async setSelectionMask(image?: ImageBitmap, offset?: { x: number; y: number; }) {
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.SET_SELECTION_MASK,
             image, offset,

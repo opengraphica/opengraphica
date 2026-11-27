@@ -1,5 +1,5 @@
 import {
-    RepeatWrapping, RGBAFormat, UnsignedByteType, NearestFilter,
+    RepeatWrapping, RGBAFormat, UnsignedByteType, NearestFilter
 } from 'three/src/constants';
 import { Color } from 'three/src/math/Color';
 import { DataTexture } from 'three/src/textures/DataTexture';
@@ -113,7 +113,7 @@ export class ImageBackground {
 
         this.backgroundGeometry?.dispose();
         this.backgroundMaterial?.dispose();
-        
+
         (this.backgroundGeometry as any) = undefined;
         (this.backgroundMaterial as any) = undefined;
         (this.backgroundMesh as any) = undefined;
@@ -169,7 +169,7 @@ export function createTransparencyGridTexture(
         width,
         height,
         RGBAFormat,
-        UnsignedByteType
+        UnsignedByteType,
     );
 
     texture.generateMipmaps = false;

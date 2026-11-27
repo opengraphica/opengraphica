@@ -26,7 +26,7 @@ export interface WorkingFileState {
     layerIdCounter: number;
     layers: WorkingFileLayer<ColorModel>[];
     maskIdCounter: number;
-    masks: Record<number, WorkingFileLayerMask>,
+    masks: Record<number, WorkingFileLayerMask>;
     measuringUnits: MeasuringUnits;
     remoteFonts: Record<string, FontFamilyFetchDefinition>;
     resolutionUnits: ResolutionUnits;
@@ -50,7 +50,7 @@ const store = new PerformantStore<WorkingFileStore>({
         activeTimelineId: null,
         background: {
             visible: true,
-            color: { is: 'color', r: 1, g: 1, b: 1, alpha: 1, style: '#ffffff' }
+            color: { is: 'color', r: 1, g: 1, b: 1, alpha: 1, style: '#ffffff' },
         },
         colorModel: 'rgba',
         colorSpace: 'sRGB',
@@ -72,9 +72,9 @@ const store = new PerformantStore<WorkingFileStore>({
         selectedLayerIds: [],
         timelineIdCounter: 0,
         timelines: [],
-        width: 818 // Always pixels
+        width: 818, // Always pixels
     },
-    nonReactive: ['fileHandle']
+    nonReactive: ['fileHandle'],
 });
 export default store;
 
@@ -113,8 +113,8 @@ export function getCanvasColorSpace(): 'srgb' | 'display-p3' {
 export function getCanvasRenderingContext2DSettings(): CanvasRenderingContext2DSettings {
     return {
         alpha: true,
-        colorSpace: getCanvasColorSpace()
-    }
+        colorSpace: getCanvasColorSpace(),
+    };
 }
 
 export function getWebGLContextAttributes(): WebGLContextAttributes {
@@ -125,7 +125,7 @@ export function getLayerById<T extends WorkingFileAnyLayer<ColorModel>>(id: numb
     if (parent == null) {
         parent = store.get('layers');
     }
-    for (let layer of parent) {
+    for (const layer of parent) {
         if (layer.id === id) {
             return layer as never;
         } else if (layer.type === 'group') {
@@ -140,7 +140,7 @@ export function getLayerById<T extends WorkingFileAnyLayer<ColorModel>>(id: numb
 
 export function getParentGroupByLayerId(id: number, parent?: WorkingFileGroupLayer<ColorModel>): WorkingFileGroupLayer<ColorModel> | null {
     const layerList = parent?.layers ?? store.get('layers');
-    for (let layer of layerList) {
+    for (const layer of layerList) {
         if (layer.id === id) {
             return parent ?? null;
         } else if (layer.type === 'group') {
@@ -153,14 +153,14 @@ export function getParentGroupByLayerId(id: number, parent?: WorkingFileGroupLay
     return null;
 }
 
-export function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | number, options?: { excludeSelf?: boolean }): DOMMatrix {
+export function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | number, options?: { excludeSelf?: boolean; }): DOMMatrix {
     let layer: WorkingFileLayer<ColorModel> | null = null;
     if (typeof layerOrId === 'number') {
         layer = getLayerById(layerOrId);
     } else {
         layer = layerOrId;
     }
-    let transform = new DOMMatrix();
+    const transform = new DOMMatrix();
     if (layer) {
         if (layer.groupId != null) {
             transform.multiplySelf(getLayerGlobalTransform(layer.groupId));
@@ -201,7 +201,7 @@ export function getLayerBoundingPoints(layerOrId: WorkingFileLayer<ColorModel> |
 }
 
 export function getAllSizableLayerBoundingPoints(parent?: WorkingFileGroupLayer<ColorModel>) {
-    let boundingPoints = new Map<number, DOMPoint[]>();
+    const boundingPoints = new Map<number, DOMPoint[]>();
     const childLayers = parent?.layers ?? store.get('layers');
     for (const layer of childLayers) {
         if (layer.type === 'gradient') continue;
@@ -231,8 +231,8 @@ export function getLayersByType<T extends WorkingFileLayer<ColorModel>>(type: st
     if (parent == null) {
         parent = store.get('layers');
     }
-    let layers: WorkingFileLayer<ColorModel>[] = [];
-    for (let layer of parent) {
+    const layers: WorkingFileLayer<ColorModel>[] = [];
+    for (const layer of parent) {
         if (layer.type === type) {
             layers.push(layer);
         }
@@ -250,7 +250,7 @@ export function getSelectedLayers<T = WorkingFileAnyLayer<ColorModel>>(providedS
     const selectedLayers: WorkingFileAnyLayer<ColorModel>[] = [];
     const selectedLayerIds = providedSelectedLayerIds ?? store.get('selectedLayerIds');
     if (selectedLayerIds.length > 0) {
-        for (let id of selectedLayerIds) {
+        for (const id of selectedLayerIds) {
             const layer = getLayerById(id);
             if (layer) {
                 selectedLayers.push(layer);
@@ -262,7 +262,7 @@ export function getSelectedLayers<T = WorkingFileAnyLayer<ColorModel>>(providedS
 
 export function getTimelineById(id: number): WorkingFileTimeline | null {
     const timelines = store.get('timelines');
-    for (let timeline of timelines) {
+    for (const timeline of timelines) {
         if (timeline.id === id) {
             return timeline;
         }
@@ -281,10 +281,10 @@ export function ensureUniqueLayerSiblingName(layerId: number | null | undefined,
         }
         let largestNumber = -1;
         name = name.replace(/\s#[0-9]{1,}$/g, '');
-        for (let sibling of siblings) {
+        for (const sibling of siblings) {
             const siblingName = sibling.name.replace(/\s#[0-9]{1,}$/g, '');
             if (siblingName === name) {
-                let numberPart = sibling.name.split('#').pop() + '';
+                const numberPart = sibling.name.split('#').pop() + '';
                 let number = 0;
                 if (/^[0-9]{1,}$/g.test(numberPart)) {
                     number = parseInt(numberPart);
@@ -314,7 +314,7 @@ export function regenerateLayerThumbnail(layer: WorkingFileAnyLayer<ColorModel>)
 }
 
 function isMaskIdUsed(maskId: number, parentLayers?: WorkingFileLayer<ColorModel>[]) {
-    let layers: WorkingFileLayer<ColorModel>[] | undefined = parentLayers ?? store.get('layers');
+    const layers: WorkingFileLayer<ColorModel>[] | undefined = parentLayers ?? store.get('layers');
     if (layers != null) {
         for (const layer of layers) {
             if (layer.type === 'group') {

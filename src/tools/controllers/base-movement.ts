@@ -44,18 +44,18 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
         const touches = this.touches;
         if (touches.length === 2) {
             this.lastCursorX = -canvasStore.state.viewportCanvasOffsetLeft + (touches[0].down.pageX + touches[1].down.pageX) / 2;
-            this.lastCursorY = -canvasStore.state.viewportCanvasOffsetTop +  (touches[0].down.pageY + touches[1].down.pageY) / 2;
+            this.lastCursorY = -canvasStore.state.viewportCanvasOffsetTop + (touches[0].down.pageY + touches[1].down.pageY) / 2;
             const transform = canvasStore.get('transform');
             this.moveTranslateStart = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio).matrixTransform(transform.inverse());
             this.moveTouchDistanceStart = pointDistance2d(
                 touches[0].down.pageX,
                 touches[0].down.pageY,
                 touches[1].down.pageX,
-                touches[1].down.pageY
+                touches[1].down.pageY,
             );
             this.moveTouchAngleStart = Math.atan2(
                 touches[1].down.pageY - touches[0].down.pageY,
-                touches[1].down.pageX - touches[0].down.pageX
+                touches[1].down.pageX - touches[0].down.pageX,
             );
             const decomposed = canvasStore.get('decomposedTransform');
             this.moveScaleStart = decomposed.scaleX;
@@ -132,7 +132,7 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
                     angleDifference = touchAngle - this.moveTouchAngleStart;
                     if (touchRotation === 'snap') {
                         let finalAngle = (this.moveRotationStart + angleDifference);
-                        finalAngle = Math.round(finalAngle / (Math.PI/24)) * (Math.PI/24);
+                        finalAngle = Math.round(finalAngle / (Math.PI / 24)) * (Math.PI / 24);
                         angleDifference = -this.moveRotationStart + finalAngle;
                     }
                 }
@@ -190,31 +190,31 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
     }
 
     protected normalizeWheel(event: WheelEvent | any) {
-        let pixelStep = 10;
-        let lineHeight = 40;
-        let pageHeight = 800;
-    
+        const pixelStep = 10;
+        const lineHeight = 40;
+        const pageHeight = 800;
+
         let sX = 0, sY = 0, // spinX, spinY
             pX = 0, pY = 0; // pixelX, pixelY
-    
+
         // Legacy
         if ('detail' in event) { sY = event.detail; }
         if ('wheelDelta' in event) { sY = -event.wheelDelta / 120; }
         if ('wheelDeltaY' in event) { sY = -event.wheelDeltaY / 120; }
         if ('wheelDeltaX' in event) { sX = -event.wheelDeltaX / 120; }
-    
+
         // Side scrolling on FF with DOMMouseScroll
         if ('axis' in event && event.axis === event.HORIZONTAL_AXIS) {
             sX = sY;
             sY = 0;
         }
-    
+
         pX = sX * pixelStep;
         pY = sY * pixelStep;
-    
+
         if ('deltaY' in event) { pY = event.deltaY; }
         if ('deltaX' in event) { pX = event.deltaX; }
-    
+
         if ((pX || pY) && event.deltaMode) {
             if (event.deltaMode == 1) { // delta in LINE units
                 pX *= lineHeight;
@@ -224,16 +224,16 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
                 pY *= pageHeight;
             }
         }
-    
+
         // Fall-back if spin cannot be determined
         if (pX && !sX) { sX = (pX < 1) ? -1 : 1; }
         if (pY && !sY) { sY = (pY < 1) ? -1 : 1; }
-    
+
         return {
             spinX: sX,
             spinY: sY,
             pixelX: pX,
-            pixelY: pY
+            pixelY: pY,
         };
     }
 

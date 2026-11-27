@@ -17,14 +17,14 @@ export default class SpreadCanvasFilter implements CanvasFilter<SpreadCanvasFilt
                 default: 0.1,
                 preview: 0.1,
                 min: 0,
-                max: 1
+                max: 1,
             },
             vertical: {
                 type: 'percentage',
                 default: 0.1,
                 preview: 0.1,
                 min: 0,
-                max: 1
+                max: 1,
             },
             seed: {
                 type: 'percentage',

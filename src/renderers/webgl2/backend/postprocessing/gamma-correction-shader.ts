@@ -6,7 +6,7 @@
 export const GammaCorrectionShader = {
 
     uniforms: {
-        'tDiffuse': { value: null }
+        'tDiffuse': { value: null },
     },
 
     vertexShader: /* glsl */`
@@ -30,6 +30,6 @@ export const GammaCorrectionShader = {
             gl_FragColor = texture2D(tDiffuse, vUv);
             gl_FragColor = vec4(gl_FragColor.r / gl_FragColor.a, gl_FragColor.g / gl_FragColor.a, gl_FragColor.b / gl_FragColor.a, gl_FragColor.a);
             #include <colorspace_fragment>
-        }`
+        }`,
 
 };

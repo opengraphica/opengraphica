@@ -25,7 +25,7 @@ import {
     brushPressureMinSize, brushPressureTaper, brushConcentration, brushPressureMinConcentration,
     brushColorBlendingStrength, brushPressureMinColorBlendingStrength,
     brushColorBlendingPersistence, brushHardness, isPreviewingSize,
-    applyPixelSnapping,
+    applyPixelSnapping
 } from '../store/draw-brush-state';
 
 import type { BaseAction } from '@/actions/base';
@@ -40,7 +40,7 @@ import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/render
 
 import type {
     InsertRasterLayerOptions, RendererFrontend, RendererTextureTile,
-    UpdateRasterLayerOptions, WorkingFileAnyLayer,
+    UpdateRasterLayerOptions, WorkingFileAnyLayer
 } from '@/types';
 
 
@@ -64,7 +64,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private isQueueingInput: boolean = false;
     private queuedBrushStrokePoints: Array<BrushStrokePoint> = [];
     private actionQueue: AsyncCallbackQueue = new AsyncCallbackQueue();
-    
+
     private drawLoopDeltaAccumulator: number = 0;
     private drawLoopLastRunTimestamp: number = 0;
     private drawLoopLastPointerMoveTimestamp: number = 0;
@@ -80,7 +80,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.renderer = renderer;
             this.renderer.getMaxTextureSize().then((maxTextureSize) => {
                 this.maxTextureSize = maxTextureSize;
-            })
+            });
         });
 
         this.canvasViewDirtyUnwatch = watch(() => canvasStore.state.viewDirty, () => {
@@ -88,7 +88,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             if (brushPixelSnap.value) {
                 cursorHoverPosition.value = new DOMPoint(
                     this.lastCursorX * devicePixelRatio,
-                    this.lastCursorY * devicePixelRatio
+                    this.lastCursorY * devicePixelRatio,
                 ).matrixTransform(canvasStore.state.transform.inverse());
                 applyPixelSnapping(cursorHoverPosition.value);
             }
@@ -124,7 +124,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             } else {
                 cursorHoverPosition.value = new DOMPoint(
                     -100000000000,
-                    -100000000000
+                    -100000000000,
                 );
             }
         });
@@ -136,14 +136,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
-            -100000000000
+            -100000000000,
         );
         cursorHoverAngle.value = 0;
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.drawBrushToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.drawBrushToolIntroduction.introduction') as string[]).map((message) => {
+                const message = (tm('tutorialTip.drawBrushToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -151,8 +151,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     title: t('tutorialTip.drawBrushToolIntroduction.title'),
                     message: {
                         touch: message,
-                        mouse: message
-                    }
+                        mouse: message,
+                    },
                 });
             });
         }
@@ -200,7 +200,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         if ((e.pointerType === 'pen' || !editorStore.state.isPenUser)) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             applyPixelSnapping(cursorHoverPosition.value);
             cursorHoverAngle.value = brushAngle.value + e.twist;
@@ -266,7 +266,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         const { width, height } = workingFileStore.state;
         const { width: textureWidth, height: textureHeight } = limitMaxDimension(width, height, this.maxTextureSize);
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'empty');
-        let layerActions: BaseAction[] = [];
+        const layerActions: BaseAction[] = [];
 
         // Insert raster layer if none selected
         if (selectedLayers.length === 0) {
@@ -296,7 +296,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                         data: {
                             sourceUuid: await createStoredImage(createEmptyCanvas(textureWidth, textureHeight)),
                         },
-                    })
+                    }),
                 );
             } else if (selectedLayer.type !== 'raster') {
                 selectedLayers.splice(i, 1);
@@ -338,7 +338,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             // Populate first drawing point
             const transformedPoint = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             applyPixelSnapping(transformedPoint);
 
@@ -364,7 +364,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     tiltX: 0,
                     tiltY: 0,
                     twist: e.twist,
-                }
+                },
             );
 
             // Draw first point
@@ -391,7 +391,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         if ((e.pointerType === 'pen' || !editorStore.state.isPenUser) && !isPreviewingSize.value) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             applyPixelSnapping(cursorHoverPosition.value);
             cursorHoverAngle.value = brushAngle.value + e.twist;
@@ -403,10 +403,10 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         ) {
             const transformedPoint = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
+                this.lastCursorY * devicePixelRatio,
             ).matrixTransform(canvasStore.state.transform.inverse());
             applyPixelSnapping(transformedPoint);
-            
+
             const pressure = this.drawingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
             const size = brushSize.value * (
                 brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
@@ -461,7 +461,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
             if (count > 60) break;
         }
-        
+
         if (now - this.drawLoopLastPointerMoveTimestamp > 25) {
             this.drawLoopDeltaAccumulator += now - this.drawLoopLastRunTimestamp;
 
@@ -503,7 +503,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
             const drawingBrushStroke = this.drawingBrushStroke;
             this.drawingBrushStroke = null;
-            let drawingOnLayers = this.drawingOnLayers.slice();
+            const drawingOnLayers = this.drawingOnLayers.slice();
             this.drawingOnLayers = [];
 
             const collectedTiles: Array<Promise<Array<RendererTextureTile>>> = [];
@@ -546,7 +546,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     collectedTiles.push(
                         renderer.stopBrushStroke(
                             layer.id,
-                        )
+                        ),
                     );
                 }
             }
@@ -569,8 +569,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                                     data: {
                                         tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
                                         alreadyRendererd: true,
-                                    }
-                                })
+                                    },
+                                }),
                             );
                         }
                     }
@@ -607,7 +607,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private onSelectAll() {
         if (activeSelectionMask.value || appliedSelectionMask.value) {
             historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
+                action: new ClearSelectionAction(),
             });
         }
     }
@@ -621,7 +621,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     }
 
     protected handleCursorIcon() {
-        let newIcon = super.handleCursorIcon();
+        const newIcon = super.handleCursorIcon();
         canvasStore.set('cursor', newIcon);
         return newIcon;
     }

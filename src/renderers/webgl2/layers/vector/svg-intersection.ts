@@ -61,12 +61,12 @@ class Polynomial {
         } else if (Math.abs(maxValue) <= Polynomial.TOLERANCE) {
             result = max;
         } else if (minValue * maxValue <= 0) {
-            let tmp1: number = Math.log(max - min);
-            let tmp2: number = LN10 * Polynomial.ACCURACY;
-            let iters: number = Math.ceil((tmp1 + tmp2) / LN2);
+            const tmp1: number = Math.log(max - min);
+            const tmp2: number = LN10 * Polynomial.ACCURACY;
+            const iters: number = Math.ceil((tmp1 + tmp2) / LN2);
             for (let i = 0; i < iters; i++) {
                 result = 0.5 * (min + max);
-                var value: number = this.eval(result);
+                const value: number = this.eval(result);
                 if (Math.abs(value) <= Polynomial.TOLERANCE) {
                     break;
                 }
@@ -79,7 +79,7 @@ class Polynomial {
                 }
             }
         }
-        return result
+        return result;
     }
 
     getDerivative() {
@@ -158,7 +158,7 @@ class Polynomial {
             if (isZeroApprox(d)) {
                 results.push(0.5 * -b);
             } else if (d > 0.0) {
-                var e = Math.sqrt(d);
+                const e = Math.sqrt(d);
                 results.push(0.5 * (-b + e));
                 results.push(0.5 * (-b - e));
             }
@@ -294,10 +294,10 @@ export function intersectSegmentWithSegment(
 
     const intersectionPoint = new Vector2(x, y);
 
-    var aLength = a0.distanceTo(a1);
-    var aT = a0.distanceTo(intersectionPoint) / aLength
-    var bLength = b0.distanceTo(b1);
-    var bT = b0.distanceTo(intersectionPoint) / bLength
+    const aLength = a0.distanceTo(a1);
+    const aT = a0.distanceTo(intersectionPoint) / aLength;
+    const bLength = b0.distanceTo(b1);
+    const bT = b0.distanceTo(intersectionPoint) / bLength;
     return [{
         "t0": aT,
         "t1": bT,
@@ -343,8 +343,8 @@ export function intersectQuadraticBezierWithSegment(
 
             const p6 = p4.clone().lerp(p5, t);
 
-            var lineLength = a1.distanceTo(a2);
-            var lineT = lineLength != 0 ? (a1.distanceTo(p6) / lineLength) : 0.0;
+            const lineLength = a1.distanceTo(a2);
+            const lineT = lineLength != 0 ? (a1.distanceTo(p6) / lineLength) : 0.0;
 
             if (a1.x == a2.x) {
                 if (min.y <= p6.y && p6.y <= max.y) {
@@ -449,19 +449,19 @@ export function intersectQuadraticBezierWithQuadraticBezier(
             ]).getRoots();
 
             if (xRoots.length > 0 && yRoots.length > 0) {
-                var TOLERANCE = 1e-4;
+                const TOLERANCE = 1e-4;
 
                 checkRoots:
                 for (let j = 0; j < xRoots.length; j++) {
-                    var xRoot = xRoots[j];
+                    const xRoot = xRoots[j];
                     if (0 <= xRoot && xRoot <= 1) {
-                        for (var k = 0; k < yRoots.length; k++) {
+                        for (let k = 0; k < yRoots.length; k++) {
                             if (Math.abs(xRoot - yRoots[k]) < TOLERANCE) {
                                 result.push({
                                     t0: xRoot,
                                     t1: s,
                                     point: c22.clone().multiplyScalar(s*s).add(c21.clone().multiplyScalar(s).add(c20)),
-                                })
+                                });
                                 break checkRoots;
                             }
                         }
@@ -525,7 +525,7 @@ export function intersectQuadraticBezierWithCubicBezier(
     const c23x2 = c23.x*c23.x;
     const c23y2 = c23.y*c23.y;
 
-    var poly = new Polynomial([
+    const poly = new Polynomial([
         -2*c12.x*c12.y*c23.x*c23.y + c12x2*c23y2 + c12y2*c23x2,
         -2*c12.x*c12.y*c22.x*c23.y - 2*c12.x*c12.y*c22.y*c23.x + 2*c12y2*c22.x*c23.x +
             2*c12x2*c22.y*c23.y,
@@ -572,7 +572,7 @@ export function intersectQuadraticBezierWithCubicBezier(
 
             checkRoots:
             for (let j = 0; j < xRoots.length; j++) {
-                var xRoot = xRoots[j];
+                const xRoot = xRoots[j];
                 
                 if (0 <= xRoot && xRoot <= 1) {
                     for (let k = 0; k < yRoots.length; k++) {
@@ -581,7 +581,7 @@ export function intersectQuadraticBezierWithCubicBezier(
                                 t0: xRoot,
                                 t1: s,
                                 point: c23.clone().multiplyScalar(s*s*s).add(c22.clone().multiplyScalar(s*s).add(c21.clone().multiplyScalar(s).add(c20))),
-                            })
+                            });
                             break checkRoots;
                         }
                     }
@@ -596,13 +596,13 @@ export function intersectQuadraticBezierWithCubicBezier(
 export function intersectCubicBezierWithSegment(
     p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, a1: Vector2, a2: Vector2
 ): IntersectionResult[] {
-    var a: Vector2, b: Vector2, c: Vector2, d: Vector2;
-    var c3: Vector2, c2: Vector2, c1: Vector2, c0: Vector2;
-    var cl: number;
-    var n: Vector2;
-    var min = a1.clone().min(a2);
-    var max = a1.clone().max(a2);
-    var result: IntersectionResult[] = [];
+    let a: Vector2, b: Vector2, c: Vector2, d: Vector2;
+    let c3: Vector2, c2: Vector2, c1: Vector2, c0: Vector2;
+    let cl: number;
+    let n: Vector2;
+    const min = a1.clone().min(a2);
+    const max = a1.clone().max(a2);
+    const result: IntersectionResult[] = [];
     
     a = p1.clone().multiplyScalar(-1);
     b = p2.clone().multiplyScalar(3);
@@ -634,7 +634,7 @@ export function intersectCubicBezierWithSegment(
         n.dot(c0) + cl
     ]).getRoots();
 
-    for (var i = 0; i < roots.length; i++) {
+    for (let i = 0; i < roots.length; i++) {
         const t = roots[i];
 
         if (0 <= t && t <= 1) {
@@ -647,8 +647,8 @@ export function intersectCubicBezierWithSegment(
 
             const p10 = p8.clone().lerp(p9, t);
 
-            var lineLength = a1.distanceTo(a2);
-            var lineT = lineLength != 0 ? (a1.distanceTo(p10) / lineLength) : 0.0;
+            const lineLength = a1.distanceTo(a2);
+            const lineT = lineLength != 0 ? (a1.distanceTo(p10) / lineLength) : 0.0;
 
             if (a1.x == a2.x) {
                 if (min.y <= p10.y && p10.y <= max.y) {
@@ -686,7 +686,7 @@ export function intersectCubicBezierWithCubicBezier(
     let a: Vector2, b: Vector2, c: Vector2, d: Vector2;
     let c13: Vector2, c12: Vector2, c11: Vector2, c10: Vector2;
     let c23: Vector2, c22: Vector2, c21: Vector2, c20: Vector2;
-    var result: IntersectionResult[] = [];
+    const result: IntersectionResult[] = [];
 
     a = a1.clone().multiplyScalar(-1);
     b = a2.clone().multiplyScalar(3);
@@ -996,7 +996,7 @@ export function findCubicBezierSelfIntersections(
     const resolution = Math.min(PATH_SEGMENTATION_MAX, Math.max(PATH_SEGMENTATION_MIN, Math.floor(length / PATH_SEGMENTATION_SEGMENT_SIZE)));
     let previousSegment = p0;
     for (let i = 0; i < resolution + 1; i++) {
-        var newSegment = cubicBezierAt(p0, p1, p2, p3, i / resolution);
+        const newSegment = cubicBezierAt(p0, p1, p2, p3, i / resolution);
         intersectionCheckLength += previousSegment.distanceTo(newSegment);
         segments.push(newSegment);
         previousSegment = newSegment;
@@ -1005,18 +1005,18 @@ export function findCubicBezierSelfIntersections(
     const selfIntersections: Vector2[] = [];
     const selfSegmentRange = segments.length - 1;
     for (let i = 0; i < selfSegmentRange; i++) {
-        var a0 = segments[i];
-        var a1 = segments[i + 1];
+        const a0 = segments[i];
+        const a1 = segments[i + 1];
         for (let j = i + 1; j < selfSegmentRange; j++) {
-            var b0 = segments[j];
-            var b1 = segments[j + 1];
+            const b0 = segments[j];
+            const b1 = segments[j + 1];
             const [intersection] = intersectSegmentWithSegment(a0, a1, b0, b1);
             if (intersection && !isEqualApprox(intersection.point, a0) && !isEqualApprox(intersection.point, b0)) {
                 selfIntersections.push(intersection.point);
             }
         }
     }
-    return selfIntersections
+    return selfIntersections;
 }
 
 function reverseIntersectionT(intersections: IntersectionResult[]): IntersectionResult[] {

@@ -80,7 +80,7 @@ export class LetterMeshCache {
     constructor(parent: Object3D) {
         this.parent = parent;
     }
-    
+
     setMaterial(material: ShaderMaterial) {
         this.material = material;
 
@@ -154,7 +154,7 @@ export class LetterMeshCache {
             y,
             fontSize,
             fill,
-        })
+        });
     }
 
     createLetterGeometry(
@@ -166,10 +166,10 @@ export class LetterMeshCache {
         let currentPath: Path | null = null;
 
         const paths: Array<{
-            points: PathPoint[],
-            clockwise: boolean,
-            bounds: ReturnType<typeof Clipper.GetBounds>,
-            holes: Array<Path>
+            points: PathPoint[];
+            clockwise: boolean;
+            bounds: ReturnType<typeof Clipper.GetBounds>;
+            holes: Array<Path>;
         }> = [];
 
         // Translate path commands to segmented polygon paths
@@ -226,7 +226,7 @@ export class LetterMeshCache {
                     if (!Clipper.PointInPolygon(paths[i].points[pi], paths[j].points)) continue parentPathCheck;
                 }
                 paths[j].holes.push(
-                    new Path().setFromPoints(paths[i].points.map((point) => new Vector2(point.x, point.y)))
+                    new Path().setFromPoints(paths[i].points.map((point) => new Vector2(point.x, point.y))),
                 );
                 paths.splice(i, 1);
                 break;
@@ -238,7 +238,7 @@ export class LetterMeshCache {
         for (const path of paths) {
             const shape = new Shape();
             shape.setFromPoints(
-                path.points.map((point) => new Vector2(point.x, point.y))
+                path.points.map((point) => new Vector2(point.x, point.y)),
             );
             for (const hole of path.holes) {
                 shape.holes.push(hole);
@@ -255,7 +255,7 @@ export class LetterMeshCache {
                 geometry.dispose();
             }
         }
-        
+
         if (geometry) {
             const geometryKey = this.createGlyphGeometryKey(glyph, fontName, isFallback);
             this.glyphGeometries.set(geometryKey, geometry);
@@ -357,8 +357,8 @@ export class LetterMeshCache {
         for (const [materialGroupKey, materialGroup] of this.geometryMaterialGroups.entries()) {
             let isMaterialGroupUsed = false;
 
-            let mergedGeometryKey: MergedGeometryKey = [];
-            let geometriesToMerge: GeometryToMerge[] = [];
+            const mergedGeometryKey: MergedGeometryKey = [];
+            const geometriesToMerge: GeometryToMerge[] = [];
 
             const discardedGlyphGroupKeys: string[] = [];
             usedStagedGlyphs.clear();
@@ -392,7 +392,7 @@ export class LetterMeshCache {
                     isGlyphGroupUsed = true;
 
                     const geometryKey = this.createGlyphGeometryKey(glyphGroup.glyph, glyphGroup.fontName, glyphGroup.isFallback);
-                    let geometry = this.glyphGeometries.get(geometryKey) ?? this.createLetterGeometry(
+                    const geometry = this.glyphGeometries.get(geometryKey) ?? this.createLetterGeometry(
                         glyphGroup.glyph, glyphGroup.fontName, glyphGroup.isFallback,
                     );
                     if (!geometry) continue;
@@ -435,11 +435,11 @@ export class LetterMeshCache {
                         matrix.compose(
                             new Vector3(geometry.x, geometry.y, 0),
                             new Quaternion().setFromEuler(new Euler(0, 0, 0)),
-                            new Vector3(geometry.fontSize * 0.001, geometry.fontSize * 0.001, geometry.fontSize * 0.001)
+                            new Vector3(geometry.fontSize * 0.001, geometry.fontSize * 0.001, geometry.fontSize * 0.001),
                         );
                         geometries.push(geometry.geometry.clone().applyMatrix4(matrix));
                     }
-    
+
                     // Generate the merged geometry and mesh; add to scene
                     materialGroup.mergedGeometry = mergeGeometries(geometries) ?? undefined;
                     if (materialGroup.mergedGeometry) {

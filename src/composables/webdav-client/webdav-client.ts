@@ -26,7 +26,7 @@ export function createWebdavClient(options: CreateWebdavClientOptions): WebdavCl
 
     let client: WebDAVClient | null = null;
     let currentConnectUuid: string = '';
-    let connected = ref<boolean>(false);
+    const connected = ref<boolean>(false);
 
     watch(() => ([
         preferencesStore.state.enableWebdavServer,
@@ -54,7 +54,7 @@ export function createWebdavClient(options: CreateWebdavClientOptions): WebdavCl
             return;
         }
         currentConnectUuid = uuidv4();
-        let connectUuid = currentConnectUuid;
+        const connectUuid = currentConnectUuid;
         const { createClient } = await import('webdav/web');
         if (currentConnectUuid !== connectUuid) return;
         client = createClient(webdavServerUrl, webdavUsername ? {
@@ -86,7 +86,7 @@ export function createWebdavClient(options: CreateWebdavClientOptions): WebdavCl
         connected: computed(() => connected.value),
         install(app) {
             app.provide(webdavClientKey, webdavClient);
-        }
+        },
     } as never as WebdavClient;
 
     globalClient = webdavClient;

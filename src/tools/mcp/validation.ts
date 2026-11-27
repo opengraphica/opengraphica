@@ -58,6 +58,7 @@ export const registerTool: WebMCP.ModelContext['registerTool'] = (tool, options)
         return originalExecute(inputObject, options);
     };
     try {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
         return document.modelContext?.registerTool(tool, options)!;
     } catch (error) {
         return undefined as any;

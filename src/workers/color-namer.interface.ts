@@ -18,7 +18,7 @@ export function createColorNamer(): string {
     const uuid = uuidv4();
 
     const worker = new Worker(
-        /* webpackChunkName: 'worker-color-namer' */ new URL('./color-namer.worker.ts', import.meta.url)
+        /* webpackChunkName: 'worker-color-namer' */ new URL('./color-namer.worker.ts', import.meta.url),
     );
 
     worker.onmessage = ({ data }) => {
@@ -32,7 +32,7 @@ export function createColorNamer(): string {
             const [queueItem] = requestQueue.splice(queueItemIndex, 1);
             queueItem.resolve(name);
         }
-    }
+    };
 
     worker.onmessageerror = (error) => {
         console.error('[src/workers/color-name.interface.ts] Error received from colorNamerWorker', error);

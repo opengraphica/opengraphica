@@ -8,7 +8,7 @@ export function resetObjectUrlUsers() {
 export function registerObjectUrlUser(objectUrl: any, user: any) {
     objectUrl = objectUrl.toString();
     if (objectUrl) {
-        let existingUsers = objectUrlUsers.get(objectUrl) || [];
+        const existingUsers = objectUrlUsers.get(objectUrl) || [];
         if (!existingUsers.includes(user)) {
             existingUsers.push(user);
         }
@@ -18,7 +18,7 @@ export function registerObjectUrlUser(objectUrl: any, user: any) {
 
 export function unregisterObjectUrlUser(objectUrl: any, user: any) {
     objectUrl = objectUrl.toString();
-    let existingUsers = objectUrlUsers.get(objectUrl) || [];
+    const existingUsers = objectUrlUsers.get(objectUrl) || [];
     existingUsers.splice(existingUsers.indexOf(user), 1);
     if (existingUsers.length === 0) {
         objectUrlUsers.delete(objectUrl);

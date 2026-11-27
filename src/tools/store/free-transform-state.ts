@@ -27,7 +27,7 @@ interface PermanentStorageState {
     useLayerCenterSnapping: boolean;
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'eraseBrushStateStore',
     state: {
         useSnapping: true,
@@ -80,12 +80,12 @@ export const metricsDockLeft = ref(0);
 export const metricsDockVisible = ref<boolean>(false);
 
 export const transformOptions = computed(() => {
-    let canTranslate: boolean = true;
+    const canTranslate: boolean = true;
     let canScale: boolean = true;
-    let canRotate: boolean = true;
-    let shouldShowUnevenScalingHandles = new Set<boolean>(); // Enables the edge handles with apply uneven scaling
-    let shouldMaintainAspectRatio = new Set<boolean>(); // The scale must be applied evenly to layer's width/height
-    let shouldScaleDuringResize = new Set<boolean>(); // The scale will be applied to the layer's DOMMatrix, otherwise width/height are changed
+    const canRotate: boolean = true;
+    const shouldShowUnevenScalingHandles = new Set<boolean>(); // Enables the edge handles with apply uneven scaling
+    const shouldMaintainAspectRatio = new Set<boolean>(); // The scale must be applied evenly to layer's width/height
+    const shouldScaleDuringResize = new Set<boolean>(); // The scale will be applied to the layer's DOMMatrix, otherwise width/height are changed
     let shouldSnapRotationDegrees: boolean = useSnapping.value && useRotationSnapping.value;
     if (isShiftKeyPressed.value === true) {
         shouldMaintainAspectRatio.add(false);
@@ -138,7 +138,7 @@ export const isUnevenScalingEnabled = computed<boolean>(() => {
     return transformOptions.value.shouldShowUnevenScalingHandles;
 });
 
-freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number, width?: number, height?: number, rotation?: number, transformOriginX?: number, transformOriginY?: number }) => {
+freeTransformEmitter.on('setDimensions', (event?: { top?: number; left?: number; width?: number; height?: number; rotation?: number; transformOriginX?: number; transformOriginY?: number; }) => {
     if (event) {
         if (event.transformOriginX != null) {
             transformOriginX.value = event.transformOriginX;
@@ -180,7 +180,7 @@ function getLayerCornerBounds(layer: WorkingFileLayer) {
         right: Math.max(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x),
         top: Math.min(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y),
         bottom: Math.max(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y),
-    }
+    };
 }
 
 function createLayerTransformAction(layer: WorkingFileLayer, globalTransform, x: number, y: number): UpdateLayerAction<any> {
@@ -224,7 +224,7 @@ export async function alignSelectedLayersToCanvas(position: 'left' | 'right' | '
         }
         if (isRunAction) {
             actions.push(
-                createLayerTransformAction(layer, bounds.globalTransform, x, y)
+                createLayerTransformAction(layer, bounds.globalTransform, x, y),
             );
         }
     }
@@ -254,7 +254,7 @@ export async function resetSelectedLayerWidths() {
                 transform: new DOMMatrix()
                     .translateSelf(decomposedTransform.translateX, decomposedTransform.translateY)
                     .rotateSelf(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                    .scaleSelf(scaleX, scaleY)
+                    .scaleSelf(scaleX, scaleY),
             }));
         }
     }
@@ -280,7 +280,7 @@ export async function resetSelectedLayerHeights() {
                 transform: new DOMMatrix()
                     .translateSelf(decomposedTransform.translateX, decomposedTransform.translateY)
                     .rotateSelf(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                    .scaleSelf(scaleX, scaleY)
+                    .scaleSelf(scaleX, scaleY),
             }));
         }
     }
@@ -349,7 +349,7 @@ export async function stretchToImageBounds() {
                 id: layer.id,
                 transform: new DOMMatrix()
                     .scaleSelf(workingFileStore.get('width') / layer.width, workingFileStore.get('height') / layer.height)
-                    .multiplySelf(globalTransform.inverse())
+                    .multiplySelf(globalTransform.inverse()),
             }));
         }
         await historyStore.dispatch('runAction', {

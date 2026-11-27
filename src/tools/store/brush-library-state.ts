@@ -10,7 +10,7 @@ interface PermanentStorageState {
     customBrushes: BrushDefinition[];
 }
 
-const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+const permanentStorage = new PerformantStore<{ dispatch: {}; state: PermanentStorageState; }>({
     name: 'brushLibraryStore',
     state: {
         customBrushes: [],
@@ -20,7 +20,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
 
 const customBrushes = permanentStorage.getDeepWritableRef('customBrushes');
 
-export const brushPreviews = reactive<{ [key: string]: HTMLCanvasElement }>({});
+export const brushPreviews = reactive<{ [key: string]: HTMLCanvasElement; }>({});
 
 export const brushEditorTab = ref<string>('general');
 
@@ -45,11 +45,11 @@ export function createBrushDefaults(brushDefinition: WithRequiredProperty<Partia
 }
 
 export const brushesByCategory = computed(() => {
-    let encounteredIds = new Set<string>();
-    let categories: Record<string, BrushDefinition[]> = {};
+    const encounteredIds = new Set<string>();
+    const categories: Record<string, BrushDefinition[]> = {};
     let brushDefinition: WithRequiredProperty<Partial<BrushDefinition>, 'id' | 'categories'>;
     for (brushDefinition of customBrushes.value) {
-        for (let categoryId of brushDefinition.categories) {
+        for (const categoryId of brushDefinition.categories) {
             if (!categories[categoryId]) categories[categoryId] = [];
             if (!encounteredIds.has(brushDefinition.id)) {
                 encounteredIds.add(brushDefinition.id);
@@ -60,7 +60,7 @@ export const brushesByCategory = computed(() => {
     for (brushDefinition of defaultBrushDefinitions.brushes as BrushDefinition[]) {
         if (brushDefinition.hidden) continue;
         createBrushDefaults(brushDefinition);
-        for (let categoryId of brushDefinition.categories) {
+        for (const categoryId of brushDefinition.categories) {
             if (!categories[categoryId]) categories[categoryId] = [];
             if (!encounteredIds.has(brushDefinition.id)) {
                 encounteredIds.add(brushDefinition.id);
@@ -68,8 +68,8 @@ export const brushesByCategory = computed(() => {
             }
         }
     }
-    let sortedCategories: BrushCategoryWithBrushes[] = [];
-    for (let category of defaultBrushDefinitions.categories) {
+    const sortedCategories: BrushCategoryWithBrushes[] = [];
+    for (const category of defaultBrushDefinitions.categories) {
         const brushes = categories[category.id] ?? [];
         sortedCategories.push({
             id: category.id,

@@ -2,14 +2,14 @@ import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
 export enum ColorBlindnessSimulationMethod {
     BRETTEL = 0,
-    VIENOT = 1
+    VIENOT = 1,
 }
 
 export enum ColorBlindnessType {
     PROTAN = 0,
     DEUTERAN = 1,
     TRITAN = 2,
-    ACHROMA = 3
+    ACHROMA = 3,
 }
 
 export interface ColorBlindnessCanvasFilterParams {
@@ -30,8 +30,8 @@ export default class ColorBlindnessCanvasFilter implements CanvasFilter<ColorBli
                 default: ColorBlindnessSimulationMethod.BRETTEL,
                 options: [
                     { key: 'brettel', value: ColorBlindnessSimulationMethod.BRETTEL },
-                    { key: 'vienot', value: ColorBlindnessSimulationMethod.VIENOT }
-                ]
+                    { key: 'vienot', value: ColorBlindnessSimulationMethod.VIENOT },
+                ],
             },
             type: {
                 type: 'integer',
@@ -42,14 +42,14 @@ export default class ColorBlindnessCanvasFilter implements CanvasFilter<ColorBli
                     { key: 'deuteran', value: ColorBlindnessType.DEUTERAN },
                     { key: 'tritan', value: ColorBlindnessType.TRITAN },
                     { key: 'achroma', value: ColorBlindnessType.ACHROMA },
-                ]
+                ],
             },
             severity: {
                 type: 'percentage',
                 default: 1,
                 min: 0,
-                max: 1
-            }
+                max: 1,
+            },
         } as CanvasFilterEditConfig;
     }
 }

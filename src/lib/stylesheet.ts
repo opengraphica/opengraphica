@@ -9,7 +9,7 @@ export function loadStylesheet(url: string): Promise<HTMLLinkElement> {
         };
         link.onerror = (error: any) => {
             reject(error);
-        }
+        };
         link.href = url;
         head.appendChild(link);
     });

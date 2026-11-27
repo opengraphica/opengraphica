@@ -19,7 +19,7 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
                 0,
                 0,
                 layer.width,
-                layer.height
+                layer.height,
             );
             if (isFlipY) {
                 ctx.restore();

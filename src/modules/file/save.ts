@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver';
- import { t } from '@/i18n';
+import { t } from '@/i18n';
 
 import workingFileStore from '@/store/working-file';
 import { writeWorkingFile } from '@/store/data/working-file-database';
@@ -81,7 +81,7 @@ export async function saveWorkingFileToTemporaryStorage() {
         selectedLayerIds: workingFileStore.get('selectedLayerIds'),
         width: workingFileStore.get('width'),
         layers: workingFileStore.get('layers'),
-    }
+    };
     try {
         await writeWorkingFile(workingFile);
     } catch (error) {

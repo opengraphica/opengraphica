@@ -23,19 +23,19 @@ export default class ChromaKeyCanvasFilter implements CanvasFilter<ChromaKeyCanv
                 type: 'percentage',
                 default: 0.05,
                 min: 0,
-                max: 1
+                max: 1,
             },
             softness: {
                 type: 'percentage',
                 default: 0.05,
                 min: 0,
-                max: 1
+                max: 1,
             },
             spillSuppression: {
                 type: 'percentage',
                 default: 0.5,
                 min: 0,
-                max: 1
+                max: 1,
             },
             hueWeight: {
                 type: 'percentage',

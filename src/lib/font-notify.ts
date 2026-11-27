@@ -48,7 +48,7 @@ export async function notifyLoadingFontFamilies(fontFamilies: string[]) {
                 onClose() {
                     currentlyShowingNotificationHandle = null;
                     currentlyShowingNotification = false;
-                }
+                },
             });
         } else {
             updateLoadingFontFamilyList();

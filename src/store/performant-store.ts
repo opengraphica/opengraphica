@@ -44,7 +44,7 @@ export class PerformantStore<T extends StoreTypeMap> {
             this.onDispatch = options.onDispatch;
         }
         const reactiveState: Partial<T['state']> = {};
-        for (let prop in this.staticState) {
+        for (const prop in this.staticState) {
             if (this.nonReactiveProps.includes(prop)) {
                 reactiveState[prop] = undefined;
             } else {
@@ -129,7 +129,7 @@ export class PerformantStore<T extends StoreTypeMap> {
             }
             this.directSet(keyOrSubset as any, value);
         } else {
-            for (let key in keyOrSubset) {
+            for (const key in keyOrSubset) {
                 this.set(key as keyof T['state'], keyOrSubset[key] as T['state'][Extract<keyof T['state'], string>]);
             }
         }
@@ -157,7 +157,7 @@ export class PerformantStore<T extends StoreTypeMap> {
             },
             get: () => {
                 return this.get(key);
-            }
+            },
         });
     }
 
@@ -177,7 +177,7 @@ export class PerformantStore<T extends StoreTypeMap> {
             },
             get: () => {
                 return this.get(key);
-            }
+            },
         });
     }
 }
