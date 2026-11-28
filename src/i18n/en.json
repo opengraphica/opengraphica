@@ -739,6 +739,18 @@
                 "invertValue": "Invert Value"
             }
         },
+        "newsprint": {
+            "name": "Newsprint",
+            "help": "Simulates the dot matrix pattern used when printing an image on a newspaper.",
+            "param": {
+                "colorModel": "Color Model",
+                "colorModelOption": {
+                    "cmyk": "CMYK",
+                    "blackOnWhite": "Black On White"
+                },
+                "density": "Density"
+            }
+        },
         "pixelize": {
             "name": "Pixelize",
             "help": "Covers up image detail with large squares that look like a pixel grid.",

@@ -98,6 +98,10 @@
         "name": "layerFilter.emboss.name",
         "group": "distort"
     },
+    "newsprint": {
+        "name": "layerFilter.newsprint.name",
+        "group": "distort"
+    },
     "shapeMask": {
         "name": "layerFilter.shapeMask.name",
         "group": "distort"
