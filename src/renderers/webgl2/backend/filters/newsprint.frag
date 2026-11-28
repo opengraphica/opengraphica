@@ -21,6 +21,7 @@ vec4 processNewsprint(vec4 color, vec2 uv) {
     vec2 aspect = resolution / resolution.y;
 
     float density = (1.0 - cbrt(1.0 - clamp(pDensity, 0.01, 1.0))) * max(resolution.x, resolution.y);
+    float lod = max(0.0, log2(resolution.y / max(density, 0.0001)));
 
     vec4 angles = vec4(0.261, 1.309, 0.0, 0.785);
 
@@ -55,7 +56,7 @@ vec4 processNewsprint(vec4 color, vec2 uv) {
                     );
                     centerUv.x /= aspect.x;
 
-                    vec4 source = sampleBackbuffer(centerUv);
+                    vec4 source = sampleBackbufferLod(centerUv, lod);
                     float k = 1.0 - max(source.r, max(source.g, source.b));
                     float denominator = max(1.0 - k, 0.000001);
 
@@ -115,7 +116,7 @@ vec4 processNewsprint(vec4 color, vec2 uv) {
                 );
                 centerUv.x /= aspect.x;
 
-                vec4 source = sampleBackbuffer(centerUv);
+                vec4 source = sampleBackbufferLod(centerUv, lod);
                 float luminance = dot(source.rgb, vec3(0.2126, 0.7152, 0.0722));
 
                 float coverage = 1.0 - clamp(luminance, 0.0, 1.0);
